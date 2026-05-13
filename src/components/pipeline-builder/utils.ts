@@ -300,6 +300,42 @@ export const safeName = (
   return desiredName;
 };
 
+export const convertResourceToPipelineRefTask = (
+  usedNames: string[],
+  resource: PipelineKind,
+  runAfter?: string[],
+  namespace?: string,
+): PipelineTask => {
+  const pipelineRef =
+    resource.metadata.namespace === PIPELINE_NAMESPACE &&
+    namespace !== PIPELINE_NAMESPACE
+      ? {
+          resolver: 'cluster',
+          params: [
+            { name: 'kind', value: 'pipeline' },
+            { name: 'name', value: resource.metadata.name },
+            { name: 'namespace', value: PIPELINE_NAMESPACE },
+          ],
+        }
+      : {
+          name: resource.metadata.name,
+        };
+
+  const params = (resource.spec?.params || []).map(
+    (param: TektonParam): PipelineTaskParam => ({
+      name: param.name,
+      value: param.default,
+    }),
+  );
+
+  return {
+    name: safeName(usedNames, resource.metadata.name),
+    runAfter,
+    pipelineRef,
+    params,
+  };
+};
+
 export const convertResourceToLoadingTask = (
   usedNames: string[],
   resource: TaskKind,

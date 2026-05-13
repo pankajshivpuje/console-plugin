@@ -13,6 +13,7 @@ import {
   UpdateOperationAddData,
   UpdateOperationConvertToFinallyTaskData,
   UpdateOperationConvertToLoadingTaskData,
+  UpdateOperationConvertToPipelineData,
   UpdateOperationConvertToTaskData,
   UpdateOperationDeleteListTaskData,
   UpdateOperationFixInvalidTaskListData,
@@ -21,6 +22,7 @@ import {
 } from './types';
 import {
   convertResourceToLoadingTask,
+  convertResourceToPipelineRefTask,
   convertResourceToTask,
   mapAddRelatedToOthers,
   mapBeRelated,
@@ -148,6 +150,62 @@ const convertFinallyListToTask: UpdateOperationAction<
     namespace,
   );
 
+  return {
+    ...taskGrouping,
+    finallyTasks: [
+      ...finallyTasks.map((pipelineTask) =>
+        mapReplaceRelatedInOthers(newPipelineTask.name, name, pipelineTask),
+      ),
+      newPipelineTask,
+    ],
+    finallyListTasks: finallyListTasks
+      .filter((n) => n.name !== name)
+      .map((listTask) =>
+        mapReplaceRelatedInOthers(newPipelineTask.name, name, listTask),
+      ),
+  };
+};
+
+const convertListToPipeline: UpdateOperationAction<
+  UpdateOperationConvertToPipelineData
+> = (taskGrouping, data, namespace) => {
+  const { name, resource, runAfter } = data;
+  const { tasks, listTasks, finallyTasks } = taskGrouping;
+  const usedNames = getTaskNames([...tasks, ...finallyTasks]);
+  const newPipelineTask: PipelineTask = convertResourceToPipelineRefTask(
+    usedNames,
+    resource,
+    runAfter,
+    namespace,
+  );
+  return {
+    ...taskGrouping,
+    tasks: [
+      ...tasks.map((pipelineTask) =>
+        mapReplaceRelatedInOthers(newPipelineTask.name, name, pipelineTask),
+      ),
+      newPipelineTask,
+    ],
+    listTasks: listTasks
+      .filter((n) => n.name !== name)
+      .map((listTask) =>
+        mapReplaceRelatedInOthers(newPipelineTask.name, name, listTask),
+      ),
+  };
+};
+
+const convertFinallyListToPipeline: UpdateOperationAction<
+  UpdateOperationConvertToPipelineData
+> = (taskGrouping, data, namespace) => {
+  const { name, resource } = data;
+  const { tasks, finallyTasks, finallyListTasks } = taskGrouping;
+  const usedNames = getTaskNames([...tasks, ...finallyTasks]);
+  const newPipelineTask: PipelineTask = convertResourceToPipelineRefTask(
+    usedNames,
+    resource,
+    undefined,
+    namespace,
+  );
   return {
     ...taskGrouping,
     finallyTasks: [
@@ -523,6 +581,18 @@ export const applyChange = (
       return convertLoadingNodeToFinallyTask(
         taskGrouping,
         data as UpdateOperationConvertToTaskData,
+        namespace,
+      );
+    case UpdateOperationType.CONVERT_LIST_TO_PIPELINE:
+      return convertListToPipeline(
+        taskGrouping,
+        data as UpdateOperationConvertToPipelineData,
+        namespace,
+      );
+    case UpdateOperationType.CONVERT_LIST_TO_FINALLY_PIPELINE:
+      return convertFinallyListToPipeline(
+        taskGrouping,
+        data as UpdateOperationConvertToPipelineData,
         namespace,
       );
     default:

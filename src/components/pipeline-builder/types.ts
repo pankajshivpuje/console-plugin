@@ -1,5 +1,6 @@
 import { FormikErrors, FormikValues } from 'formik';
 import {
+  PipelineKind,
   PipelineTask,
   TaskKind,
   TektonParam,
@@ -135,6 +136,27 @@ export type UpdateOperationRemoveTaskData = UpdateOperationBaseData & {
 export type UpdateOperationRenameTaskData = UpdateOperationBaseData & {
   preChangePipelineTask: PipelineTask;
   newName: string;
+};
+
+export type UpdateOperationConvertToPipelineData = UpdateOperationBaseData & {
+  name: string;
+  resource: PipelineKind;
+  runAfter?: string[];
+};
+
+export type UpdateOperationConvertToLoadingPipelineData = {
+  name: string;
+  resource: PipelineKind;
+  runAfter?: string[];
+  isFinallyTask: boolean;
+};
+
+export type PipelineBuilderLoadingPipelineTask = PipelineBuilderTaskBase & {
+  isFinallyTask: boolean;
+  resource: PipelineKind;
+  pipelineRef: {
+    name: string;
+  };
 };
 
 export type CleanupResults = {
