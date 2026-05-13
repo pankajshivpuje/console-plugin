@@ -228,7 +228,7 @@ const Contents: FC<
     <QuickSearchController
       quickSearchProviders={quickSearchProviders}
       allItemsLoaded={catalogService.loaded}
-      searchPlaceholder={`${t('Add task')}...`}
+      searchPlaceholder={`${t('Add')}...`}
       namespace={namespace}
       viewContainer={viewContainer}
       isOpen={isOpen}

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { FormGroup, TextInputTypes } from '@patternfly/react-core';
+import { FormGroup, TextInputTypes, Card, CardHeader, CardTitle, CardBody } from '@patternfly/react-core';
 import { useTranslation } from 'react-i18next';
 import PipelineBuilderVisualization from './PipelineBuilderVisualization';
 import {
@@ -49,15 +49,20 @@ const PipelineBuilderFormEditor: FC<PipelineBuilderFormEditorProps> = (
         />
       </div>
 
-      <FormGroup label={t('Tasks')} isRequired>
-        <PipelineBuilderVisualization
-          onTaskSelection={onTaskSelection}
-          onUpdateTasks={onUpdateTasks}
-          onTaskSearch={onTaskSearch}
-          taskGroup={taskGroup}
-          taskResources={taskResources}
-        />
-      </FormGroup>
+      <Card isCompact isPlain>
+        <CardHeader>
+          <CardTitle>{t('Pipelines and tasks')}</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <PipelineBuilderVisualization
+            onTaskSelection={onTaskSelection}
+            onUpdateTasks={onUpdateTasks}
+            onTaskSearch={onTaskSearch}
+            taskGroup={taskGroup}
+            taskResources={taskResources}
+          />
+        </CardBody>
+      </Card>
 
       <FormGroup
         label={t('Parameters')}
