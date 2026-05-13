@@ -1,5 +1,6 @@
 import type { ReactNode, SetStateAction, Dispatch, FC } from 'react';
 import { Modal, ModalVariant } from '@patternfly/react-core';
+import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';
 import { useTranslation } from 'react-i18next';
 import { DetailsRendererFunction } from './QuickSearchDetails';
 import QuickSearchModalBody from './QuickSearchModalBody';
@@ -18,6 +19,8 @@ interface QuickSearchModalProps {
   viewContainer?: HTMLElement;
   limitItemCount?: number;
   icon?: ReactNode;
+  headerContent?: ReactNode;
+  itemFilter?: (item: CatalogItem) => boolean;
   detailsRenderer?: DetailsRendererFunction;
   callback?: TaskSearchCallback;
   setFailedTasks?: Dispatch<SetStateAction<string[]>>;
@@ -32,6 +35,8 @@ const QuickSearchModal: FC<QuickSearchModalProps> = ({
   allCatalogItemsLoaded,
   viewContainer,
   icon,
+  headerContent,
+  itemFilter,
   limitItemCount,
   detailsRenderer,
   callback,
@@ -60,6 +65,8 @@ const QuickSearchModal: FC<QuickSearchModalProps> = ({
         closeModal={closeModal}
         limitItemCount={limitItemCount}
         icon={icon}
+        headerContent={headerContent}
+        itemFilter={itemFilter}
         detailsRenderer={detailsRenderer}
         maxDimension={{ maxHeight, maxWidth }}
         viewContainer={viewContainer}

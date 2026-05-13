@@ -1,10 +1,8 @@
 import type { SetStateAction, Dispatch, ReactNode, FC } from 'react';
-import { Button, ButtonVariant, Content, Title } from '@patternfly/react-core';
-import { useNavigate } from 'react-router';
+import { Content, Title } from '@patternfly/react-core';
 import { useTranslation } from 'react-i18next';
 import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';
 import CatalogBadges from '../catalog/CatalogBadges';
-import { handleCta } from './utils/quick-search-utils';
 import { TaskSearchCallback } from '../pipeline-builder/types';
 
 import './QuickSearchDetails.scss';
@@ -15,6 +13,8 @@ export type QuickSearchDetailsRendererProps = {
   namespace?: string;
   callback?: TaskSearchCallback;
   setFailedTasks?: Dispatch<SetStateAction<string[]>>;
+  selectedVersion?: string;
+  onVersionChange?: (version: string) => void;
 };
 export type DetailsRendererFunction = (
   props: QuickSearchDetailsRendererProps,
@@ -31,9 +31,10 @@ const QuickSearchDetails: FC<QuickSearchDetailsProps> = ({
   namespace,
   callback,
   setFailedTasks,
+  selectedVersion,
+  onVersionChange,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  const navigate = useNavigate();
   const defaultContentRenderer: DetailsRendererFunction = (
     props: QuickSearchDetailsProps,
   ): ReactNode => {
@@ -50,16 +51,6 @@ const QuickSearchDetails: FC<QuickSearchDetailsProps> = ({
         {selectedItem.badges?.length > 0 ? (
           <CatalogBadges badges={selectedItem.badges} />
         ) : undefined}
-        <Button
-          variant={ButtonVariant.primary}
-          className="ocs-quick-search-details__form-button"
-          data-test="create-quick-search"
-          onClick={(e) => {
-            handleCta(e, props.selectedItem, props.closeModal, navigate);
-          }}
-        >
-          {props.selectedItem.cta.label}
-        </Button>
         <Content className="ocs-quick-search-details__description">
           {props.selectedItem.description}
         </Content>
@@ -77,6 +68,8 @@ const QuickSearchDetails: FC<QuickSearchDetailsProps> = ({
         namespace,
         callback,
         setFailedTasks,
+        selectedVersion,
+        onVersionChange,
       })}
     </div>
   );

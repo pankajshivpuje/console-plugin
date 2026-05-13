@@ -1,5 +1,6 @@
 import type { ReactNode, SetStateAction, Dispatch, FC } from 'react';
 import { useCallback, useEffect } from 'react';
+import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';
 import { useTranslation } from 'react-i18next';
 import { DetailsRendererFunction } from './QuickSearchDetails';
 import QuickSearchModal from './QuickSearchModal';
@@ -18,6 +19,8 @@ type QuickSearchControllerProps = {
   allItemsLoaded: boolean;
   isOpen: boolean;
   icon?: ReactNode;
+  headerContent?: ReactNode;
+  itemFilter?: (item: CatalogItem) => boolean;
   limitItemCount?: number;
   disableKeyboardOpen?: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -34,6 +37,8 @@ const QuickSearchController: FC<QuickSearchControllerProps> = ({
   allItemsLoaded,
   limitItemCount,
   icon,
+  headerContent,
+  itemFilter,
   isOpen,
   setIsOpen,
   disableKeyboardOpen = false,
@@ -112,6 +117,8 @@ const QuickSearchController: FC<QuickSearchControllerProps> = ({
     <QuickSearchModal
       limitItemCount={limitItemCount}
       icon={icon}
+      headerContent={headerContent}
+      itemFilter={itemFilter}
       isOpen={isOpen}
       closeModal={() => setIsOpen(false)}
       namespace={namespace}

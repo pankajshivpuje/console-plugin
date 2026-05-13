@@ -1,5 +1,11 @@
 import type { ReactNode, SetStateAction, Dispatch, FC, FormEvent } from 'react';
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import { debounce } from 'lodash-es';
 import { useNavigate } from 'react-router';
 import { ResizeDirection } from 're-resizable';
@@ -32,6 +38,8 @@ interface QuickSearchModalBodyProps {
   closeModal: () => void;
   limitItemCount?: number;
   icon?: ReactNode;
+  headerContent?: ReactNode;
+  itemFilter?: (item: CatalogItem) => boolean;
   detailsRenderer?: DetailsRendererFunction;
   maxDimension?: { maxHeight: number; maxWidth: number };
   viewContainer?: HTMLElement; // pass the html container element to specifythe movement boundary
@@ -47,6 +55,8 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   searchPlaceholder,
   allCatalogItemsLoaded,
   icon,
+  headerContent,
+  itemFilter,
   detailsRenderer,
   maxDimension,
   viewContainer,
@@ -81,12 +91,30 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchError, setIsSearchError] = useState(false);
   const ref = useRef<HTMLDivElement>();
+
+  const filteredCatalogItems = useMemo(() => {
+    if (!itemFilter || !catalogItems) return catalogItems;
+    return catalogItems.filter(itemFilter);
+  }, [catalogItems, itemFilter]);
+
+  useEffect(() => {
+    if (filteredCatalogItems && filteredCatalogItems.length > 0) {
+      setSelectedItemId(filteredCatalogItems[0]?.uid);
+      setSelectedItem(filteredCatalogItems[0]);
+    } else if (filteredCatalogItems) {
+      setSelectedItemId('');
+      setSelectedItem(null);
+    }
+  }, [itemFilter]);
+
   const listCatalogItems =
-    limitItemCount > 0 ? catalogItems?.slice(0, items) : catalogItems;
+    limitItemCount > 0
+      ? filteredCatalogItems?.slice(0, items)
+      : filteredCatalogItems;
 
   const getModalHeight = () => {
     let height: number = DEFAULT_HEIGHT_WITH_NO_ITEMS;
-    if (catalogItems?.length > 0) {
+    if (filteredCatalogItems?.length > 0) {
       if (modalSize?.height >= minHeight) {
         return modalSize?.height;
       }
@@ -104,16 +132,16 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   }, [viewContainer]);
 
   useEffect(() => {
-    if (catalogItems === null || catalogItems?.length === 0) {
+    if (filteredCatalogItems === null || filteredCatalogItems?.length === 0) {
       setMaxHeight(DEFAULT_HEIGHT_WITH_NO_ITEMS);
       setMinHeight(DEFAULT_HEIGHT_WITH_NO_ITEMS);
       setMinWidth(MIN_WIDTH);
-    } else if (catalogItems?.length > 0) {
+    } else if (filteredCatalogItems?.length > 0) {
       setMaxHeight(maxDimension?.maxHeight || undefined);
       setMinHeight(MIN_HEIGHT);
       setMinWidth(MIN_WIDTH);
     }
-  }, [catalogItems, maxDimension]);
+  }, [filteredCatalogItems, maxDimension]);
 
   useEffect(() => {
     if (ref.current) {
@@ -123,11 +151,11 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   }, []);
 
   useEffect(() => {
-    if (catalogItems && !selectedItemId) {
-      setSelectedItemId(catalogItems[0]?.uid);
-      setSelectedItem(catalogItems[0]);
+    if (filteredCatalogItems && !selectedItemId) {
+      setSelectedItemId(filteredCatalogItems[0]?.uid);
+      setSelectedItem(filteredCatalogItems[0]);
     }
-  }, [catalogItems, selectedItemId]);
+  }, [filteredCatalogItems, selectedItemId]);
 
   const handleDrag = () => {
     setIsRndActive(true);
@@ -341,7 +369,7 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
       dragHandleClassName="ocs-quick-search-bar"
       cancel=".ocs-quick-search-bar__input"
       enableResizing={
-        catalogItems === null || catalogItems?.length === 0
+        filteredCatalogItems === null || filteredCatalogItems?.length === 0
           ? {
               bottom: false,
               bottomLeft: false,
@@ -362,19 +390,20 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
           height: getModalHeight(),
         }}
       >
+        {headerContent}
         <QuickSearchBar
           searchTerm={searchTerm}
           searchPlaceholder={searchPlaceholder}
           onSearch={onSearch}
-          showNoResults={!isSearchError && catalogItems?.length === 0}
+          showNoResults={!isSearchError && filteredCatalogItems?.length === 0}
           showError={isSearchError}
           itemsLoaded={allCatalogItemsLoaded && !isSearching}
           icon={icon}
           autoFocus
         />
-        {catalogItems && selectedItem && (
+        {filteredCatalogItems && selectedItem && (
           <QuickSearchContent
-            catalogItems={catalogItems}
+            catalogItems={filteredCatalogItems}
             catalogItemTypes={catalogTypes}
             viewAll={viewAll}
             searchTerm={searchTerm}

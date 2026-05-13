@@ -1,6 +1,11 @@
 import type { FC } from 'react';
-import { useRef, useState, memo } from 'react';
+import { useRef, useState, memo, useMemo, useCallback } from 'react';
 import { PlusCircleIcon } from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@patternfly/react-core';
+import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';
 import { useTranslation } from 'react-i18next';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -23,6 +28,7 @@ import {
 } from './pipeline-quicksearch-utils';
 import { safeName } from '../pipeline-builder/utils';
 import PipelineQuickSearchDetails from './PipelineQuickSearchDetails';
+import PipelineQuickSearchPipelineDetails from './PipelineQuickSearchPipelineDetails';
 import { CatalogServiceProvider } from '../catalog/service';
 import { CatalogService } from '../catalog/types';
 import { QuickSearchProviders } from './quick-search-types';
@@ -45,10 +51,12 @@ interface QuickSearchProps {
 
 const Contents: FC<
   {
-    catalogService: CatalogService;
+    taskCatalogService: CatalogService;
+    pipelineCatalogService: CatalogService;
   } & QuickSearchProps
 > = ({
-  catalogService,
+  taskCatalogService,
+  pipelineCatalogService,
   namespace,
   viewContainer,
   isOpen,
@@ -62,11 +70,13 @@ const Contents: FC<
   const isDevConsoleProxyAvailable = useFlag(FLAGS.DEVCONSOLE_PROXY);
   savedCallback.current = callback;
   const [failedTasks, setFailedTasks] = useState<string[]>([]);
+  const [resourceKindFilter, setResourceKindFilter] = useState<
+    'task' | 'pipeline'
+  >('task');
 
   useLoadingTaskCleanup(onUpdateTasks, taskGroup);
   useCleanupOnFailure(failedTasks, onUpdateTasks, taskGroup);
 
-  // Get all existing task names from taskGroup and installed tasks
   const getExistingTaskNames = (): string[] => {
     const taskNames = new Set<string>();
     [
@@ -79,8 +89,7 @@ const Contents: FC<
       if (t?.name) taskNames.add(t.name);
     });
 
-    // Add installed catalog items (avoid duplicates)
-    catalogService.items.forEach((catalogItem) => {
+    taskCatalogService.items.forEach((catalogItem) => {
       const name = catalogItem.data?.metadata?.name;
       if (name) taskNames.add(name);
     });
@@ -92,7 +101,6 @@ const Contents: FC<
     createTaskFn: (taskNameToUse?: string) => Promise<any>,
     resolve: (value: any) => void,
   ) => {
-    // Checking if task with same name already exists, if yes then create with a different name to avoid conflict
     const existingTaskNames = getExistingTaskNames();
     if (existingTaskNames.includes(taskName)) {
       const taskNameToUse = safeName(existingTaskNames, taskName);
@@ -111,8 +119,8 @@ const Contents: FC<
     }
   };
 
-  const catalogServiceItems = catalogService.items.reduce((acc, item) => {
-    const installedTask = findInstalledTask(catalogService.items, item);
+  const taskCatalogItems = taskCatalogService.items.reduce((acc, item) => {
+    const installedTask = findInstalledTask(taskCatalogService.items, item);
 
     if (
       (item.provider === TaskProviders.artifactHub ||
@@ -125,6 +133,8 @@ const Contents: FC<
           installedTask.attributes?.versions[0]?.version?.toString();
       }
     }
+
+    item.attributes.resourceKind = 'task';
 
     item.cta.callback = ({ selectedVersion }) => {
       return new Promise((resolve) => {
@@ -207,27 +217,93 @@ const Contents: FC<
       });
     };
 
-    if (isTaskSearchable(catalogService.items, item)) {
+    if (isTaskSearchable(taskCatalogService.items, item)) {
       acc.push(item);
     }
     return acc;
   }, []);
 
+  const pipelineCatalogItems = pipelineCatalogService.items.reduce(
+    (acc, item) => {
+      item.attributes.resourceKind = 'pipeline';
+
+      item.cta.callback = () => {
+        return new Promise((resolve) => {
+          resolve(savedCallback.current(item.data));
+        });
+      };
+
+      if (isTaskSearchable(pipelineCatalogService.items, item)) {
+        acc.push(item);
+      }
+      return acc;
+    },
+    [],
+  );
+
   const quickSearchProviders: QuickSearchProviders = [
     {
       catalogType: 'pipelinesTaskCatalog',
-      items: catalogServiceItems,
-      loaded: catalogService.loaded,
+      items: taskCatalogItems,
+      loaded: taskCatalogService.loaded,
       getCatalogURL: (searchTerm: string, ns: string) =>
         `/search/ns/${ns}?keyword=${searchTerm}`,
       catalogLinkLabel: t('View all tekton tasks ({{itemCount, number}})'),
-      extensions: catalogService.catalogExtensions,
+      extensions: taskCatalogService.catalogExtensions,
+    },
+    {
+      catalogType: 'pipelinesPipelineCatalog',
+      items: pipelineCatalogItems,
+      loaded: pipelineCatalogService.loaded,
+      getCatalogURL: (searchTerm: string, ns: string) =>
+        `/search/ns/${ns}?keyword=${searchTerm}`,
+      catalogLinkLabel: t('View all pipelines ({{itemCount, number}})'),
+      extensions: pipelineCatalogService.catalogExtensions,
     },
   ];
+
+  const allItemsLoaded =
+    taskCatalogService.loaded && pipelineCatalogService.loaded;
+
+  const itemFilter = useMemo(
+    () => (item: CatalogItem) =>
+      (item.attributes?.resourceKind || 'task') === resourceKindFilter,
+    [resourceKindFilter],
+  );
+
+  const headerContent = (
+    <div className="pf-v6-u-px-md pf-v6-u-pt-md pf-v6-u-pb-sm">
+      <ToggleGroup aria-label={t('Resource type filter')}>
+        <ToggleGroupItem
+          text={t('Task')}
+          isSelected={resourceKindFilter === 'task'}
+          onChange={() => setResourceKindFilter('task')}
+          data-test="toggle-task"
+        />
+        <ToggleGroupItem
+          text={t('Pipeline')}
+          isSelected={resourceKindFilter === 'pipeline'}
+          onChange={() => setResourceKindFilter('pipeline')}
+          data-test="toggle-pipeline"
+        />
+      </ToggleGroup>
+    </div>
+  );
+
+  const detailsRenderer = useCallback(
+    (props) =>
+      props.selectedItem?.attributes?.resourceKind === 'pipeline' ? (
+        <PipelineQuickSearchPipelineDetails {...props} />
+      ) : (
+        <PipelineQuickSearchDetails {...props} />
+      ),
+    [],
+  );
+
   return (
     <QuickSearchController
       quickSearchProviders={quickSearchProviders}
-      allItemsLoaded={catalogService.loaded}
+      allItemsLoaded={allItemsLoaded}
       searchPlaceholder={`${t('Add')}...`}
       namespace={namespace}
       viewContainer={viewContainer}
@@ -235,9 +311,11 @@ const Contents: FC<
       setIsOpen={setIsOpen}
       disableKeyboardOpen
       icon={<PlusCircleIcon width="1.5em" height="1.5em" />}
+      headerContent={headerContent}
+      itemFilter={itemFilter}
       callback={savedCallback.current}
       setFailedTasks={setFailedTasks}
-      detailsRenderer={(props) => <PipelineQuickSearchDetails {...props} />}
+      detailsRenderer={detailsRenderer}
     />
   );
 };
@@ -256,19 +334,27 @@ const PipelineQuickSearch: FC<QuickSearchProps> = ({
       namespace={namespace}
       catalogId="pipelines-task-catalog"
     >
-      {(catalogService: CatalogService) => (
-        <Contents
-          {...{
-            namespace,
-            viewContainer,
-            isOpen,
-            setIsOpen,
-            catalogService,
-            callback,
-            onUpdateTasks,
-            taskGroup,
-          }}
-        />
+      {(taskCatalogService: CatalogService) => (
+        <CatalogServiceProvider
+          namespace={namespace}
+          catalogId="pipelines-pipeline-catalog"
+        >
+          {(pipelineCatalogService: CatalogService) => (
+            <Contents
+              {...{
+                namespace,
+                viewContainer,
+                isOpen,
+                setIsOpen,
+                taskCatalogService,
+                pipelineCatalogService,
+                callback,
+                onUpdateTasks,
+                taskGroup,
+              }}
+            />
+          )}
+        </CatalogServiceProvider>
       )}
     </CatalogServiceProvider>
   );
