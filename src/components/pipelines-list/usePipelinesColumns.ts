@@ -10,6 +10,7 @@ export const tableColumnInfo = [
     classNames: 'pf-v6-u-w-16-on-xl pf-v6-u-w-25-on-lg pf-v6-u-w-33-on-xs',
   },
   { id: 'namespace', classNames: 'pf-v6-u-w-8-on-xl pf-v6-u-w-16-on-xs' },
+  { id: 'nested-pipelines', classNames: 'pf-v6-m-hidden pf-m-visible-on-lg' },
   {
     id: 'last-run',
     classNames: 'pf-v6-u-w-16-on-xl pf-v6-u-w-25-on-lg pf-v6-u-w-33-on-xs',
@@ -44,32 +45,37 @@ const usePipelinesColumns = (namespace): TableColumn<K8sResourceCommon>[] => {
       : []),
     {
       id: tableColumnInfo[2].id,
-      title: t('Last run'),
-      sort: 'latestRun.metadata.name',
+      title: t('Nested pipelines'),
       props: { className: tableColumnInfo[2].classNames, modifier: 'nowrap' },
     },
     {
       id: tableColumnInfo[3].id,
-      title: t('Task status'),
-      sort: 'latestRun.status.succeededCondition',
+      title: t('Last run'),
+      sort: 'latestRun.metadata.name',
       props: { className: tableColumnInfo[3].classNames, modifier: 'nowrap' },
     },
     {
       id: tableColumnInfo[4].id,
-      title: t('Last run status'),
+      title: t('Task status'),
       sort: 'latestRun.status.succeededCondition',
       props: { className: tableColumnInfo[4].classNames, modifier: 'nowrap' },
     },
     {
       id: tableColumnInfo[5].id,
-      title: t('Last run time'),
-      sort: 'latestRun.status.completionTime',
-      props: { className: tableColumnInfo[5].classNames },
+      title: t('Last run status'),
+      sort: 'latestRun.status.succeededCondition',
+      props: { className: tableColumnInfo[5].classNames, modifier: 'nowrap' },
     },
     {
       id: tableColumnInfo[6].id,
-      title: '',
+      title: t('Last run time'),
+      sort: 'latestRun.status.completionTime',
       props: { className: tableColumnInfo[6].classNames },
+    },
+    {
+      id: tableColumnInfo[7].id,
+      title: '',
+      props: { className: tableColumnInfo[7].classNames },
     },
   ];
   return columns;

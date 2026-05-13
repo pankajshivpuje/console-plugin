@@ -4,7 +4,9 @@ import {
   getGroupVersionKindForModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { FC } from 'react';
+import { Link } from 'react-router';
 import { PipelineWithLatest } from '../../types/pipelineRun';
+import { PipelineKind } from '../../types/pipeline';
 import LinkedPipelineRunTaskStatus from './status/LinkedPipelineRunTaskStatus';
 import {
   pipelineFilterReducer,
@@ -21,6 +23,12 @@ import { getReferenceForModel } from '../pipelines-overview/utils';
 import { GetDataViewRows } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/internal-types';
 import { tableColumnInfo } from './usePipelinesColumns';
 import { DASH } from '../../consts';
+
+export const getNestedPipelineCount = (pipeline: PipelineKind): number => {
+  const tasks = pipeline.spec?.tasks || [];
+  const finallyTasks = pipeline.spec?.finally || [];
+  return [...tasks, ...finallyTasks].filter((t) => t.pipelineRef).length;
+};
 
 type PipelineStatusProps = {
   obj: PipelineWithLatest;
@@ -62,6 +70,21 @@ export const getPipelineListDataViewRows: GetDataViewRows<
         props: { modifier: 'nowrap' },
       },
       [tableColumnInfo[2].id]: {
+        cell: (() => {
+          const count = getNestedPipelineCount(obj);
+          if (count > 0) {
+            return (
+              <Link
+                to={`/k8s/ns/${obj.metadata.namespace}/tekton.dev~v1~Pipeline?nestedIn=${obj.metadata.name}`}
+              >
+                {count}
+              </Link>
+            );
+          }
+          return DASH;
+        })(),
+      },
+      [tableColumnInfo[3].id]: {
         cell: obj?.latestRun?.metadata?.name ? (
           <ResourceLink
             groupVersionKind={getGroupVersionKindForModel(PipelineRunModel)}
@@ -73,24 +96,24 @@ export const getPipelineListDataViewRows: GetDataViewRows<
         ),
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[3].id]: {
+      [tableColumnInfo[4].id]: {
         cell: obj?.latestRun ? (
           <LinkedPipelineRunTaskStatus pipelineRun={obj.latestRun} />
         ) : (
           DASH
         ),
       },
-      [tableColumnInfo[4].id]: {
+      [tableColumnInfo[5].id]: {
         cell: <PipelineStatus obj={obj} />,
       },
-      [tableColumnInfo[5].id]: {
+      [tableColumnInfo[6].id]: {
         cell: obj.latestRun?.status?.startTime ? (
           <Timestamp timestamp={obj.latestRun.status.startTime} />
         ) : (
           DASH
         ),
       },
-      [tableColumnInfo[6].id]: {
+      [tableColumnInfo[7].id]: {
         cell: (
           <LazyActionMenu
             context={{ [getReferenceForModel(PipelineModel)]: obj }}

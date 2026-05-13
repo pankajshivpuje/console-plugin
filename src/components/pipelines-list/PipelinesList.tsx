@@ -11,9 +11,10 @@ import { getPipelineListDataViewRows } from './PipelineRow';
 import { useGetPipelineRuns } from '../hooks/useTektonResult';
 import { PipelineModel } from '../../models';
 import { PropPipelineData, augmentRunsToData } from '../utils/pipeline-augment';
+import { PipelineKind } from '../../types/pipeline';
 import { useGetActiveUser } from '../hooks/hooks';
 import { ConsoleDataView } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { DataViewFilterToolbar } from '../common/DataViewFilterToolbar';
 import { useDataViewFilter } from '../hooks/useDataViewFilter';
 
@@ -55,6 +56,26 @@ const PipelinesList: FC<PipelineListProps> = ({
     useGetPipelineRuns(namespace);
   const pipelinesData = augmentRunsToData(pipelines, pipelineRuns);
 
+  const nestedIn = searchParams.get('nestedIn');
+
+  const filteredPipelines = useMemo(() => {
+    if (!nestedIn || !pipelinesData) return pipelinesData;
+    const parentPipeline = pipelinesData.find(
+      (p) => p.metadata?.name === nestedIn,
+    ) as PipelineKind | undefined;
+    if (!parentPipeline) return pipelinesData;
+    const allTasks = [
+      ...(parentPipeline.spec?.tasks || []),
+      ...(parentPipeline.spec?.finally || []),
+    ];
+    const referencedNames = allTasks
+      .filter((t) => t.pipelineRef?.name)
+      .map((t) => t.pipelineRef.name);
+    return pipelinesData.filter((p) =>
+      referencedNames.includes(p.metadata?.name),
+    );
+  }, [nestedIn, pipelinesData]);
+
   const {
     filterValues,
     onFilterChange,
@@ -62,7 +83,7 @@ const PipelinesList: FC<PipelineListProps> = ({
     filteredData,
     updatedCheckboxFilters,
   } = useDataViewFilter<PropPipelineData>({
-    data: pipelinesData || [],
+    data: filteredPipelines || [],
     options: { resourceType: 'Pipeline' },
   });
 
