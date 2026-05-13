@@ -1543,6 +1543,36 @@
     }
   },
   {
+    "type": "console.catalog/item-provider",
+    "properties": {
+      "catalogId": "pipelines-pipeline-catalog",
+      "type": "TektonHub",
+      "title": "%plugin__pipelines-console-plugin~TektonHub Pipelines%",
+      "provider": { "$codeRef": "catalog.TektonHubPipelineProvider" }
+    },
+    "flags": {
+      "required": [
+        "OPENSHIFT_PIPELINE",
+        "HIDE_STATIC_PIPELINE_PLUGIN_PIPELINE_BUILDER"
+      ]
+    }
+  },
+  {
+    "type": "console.catalog/item-provider",
+    "properties": {
+      "catalogId": "pipelines-pipeline-catalog",
+      "type": "ArtifactHub",
+      "title": "%plugin__pipelines-console-plugin~ArtifactHub Pipelines%",
+      "provider": { "$codeRef": "catalog.ArtifactHubPipelineProvider" }
+    },
+    "flags": {
+      "required": [
+        "OPENSHIFT_PIPELINE",
+        "HIDE_STATIC_PIPELINE_PLUGIN_PIPELINE_BUILDER"
+      ]
+    }
+  },
+  {
     "type": "console.page/route",
     "properties": {
       "exact": true,
