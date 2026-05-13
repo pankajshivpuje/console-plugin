@@ -45,6 +45,10 @@ import { FlexForm, FormBody } from './form-utils';
 import SyncedEditorField from './SyncedEditorField';
 import PipelineQuickSearch from '../task-quicksearch/PipelineQuickSearch';
 import { useOverlay } from '@openshift-console/dynamic-plugin-sdk';
+import AddResourceTypeModal, {
+  ResourceType,
+} from './modals/AddResourceTypeModal';
+import PipelineQuickSearchPipelines from '../task-quicksearch/PipelineQuickSearchPipelines';
 
 type PipelineBuilderFormProps = FormikProps<PipelineBuilderFormikValues> & {
   existingPipeline: PipelineKind;
@@ -78,6 +82,8 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
   const statusRef = useRef(status);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const savedCallback = useRef(() => {});
+  const [resourceType, setResourceType] = useState<ResourceType>('task');
+  const [typeModalOpen, setTypeModalOpen] = useState<boolean>(false);
 
   statusRef.current = status;
 
@@ -86,9 +92,9 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
     selectedTaskRef.current = null;
   };
   const onTaskSearch: TaskSearchCallback = (callback: () => void): void => {
-    setMenuOpen(true);
     resetSelectedTask();
     savedCallback.current = callback;
+    setTypeModalOpen(true);
   };
   const onTaskSelection = (
     task: PipelineTask,
@@ -250,15 +256,35 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
                   disablePaneBody
                   className="opp-pipeline-builder-form"
                 >
-                  <PipelineQuickSearch
-                    namespace={namespace}
-                    viewContainer={contentRef.current}
-                    isOpen={menuOpen}
-                    callback={savedCallback.current}
-                    setIsOpen={(open) => setMenuOpen(open)}
-                    onUpdateTasks={onUpdateTasks}
-                    taskGroup={taskGroup}
+                  <AddResourceTypeModal
+                    isOpen={typeModalOpen}
+                    onClose={() => setTypeModalOpen(false)}
+                    onSelect={(type) => {
+                      setResourceType(type);
+                      setMenuOpen(true);
+                    }}
                   />
+                  {resourceType === 'task' ? (
+                    <PipelineQuickSearch
+                      namespace={namespace}
+                      viewContainer={contentRef.current}
+                      isOpen={menuOpen}
+                      callback={savedCallback.current}
+                      setIsOpen={(open) => setMenuOpen(open)}
+                      onUpdateTasks={onUpdateTasks}
+                      taskGroup={taskGroup}
+                    />
+                  ) : (
+                    <PipelineQuickSearchPipelines
+                      namespace={namespace}
+                      viewContainer={contentRef.current}
+                      isOpen={menuOpen}
+                      callback={savedCallback.current}
+                      setIsOpen={(open) => setMenuOpen(open)}
+                      onUpdateTasks={onUpdateTasks}
+                      taskGroup={taskGroup}
+                    />
+                  )}
                   <SyncedEditorField
                     noMargin
                     name="editorType"
