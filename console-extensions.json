@@ -1528,6 +1528,21 @@
     }
   },
   {
+    "type": "console.catalog/item-provider",
+    "properties": {
+      "catalogId": "pipelines-pipeline-catalog",
+      "type": "Red Hat",
+      "title": "%plugin__pipelines-console-plugin~Pipelines%",
+      "provider": { "$codeRef": "catalog.TektonPipelineProvider" }
+    },
+    "flags": {
+      "required": [
+        "OPENSHIFT_PIPELINE",
+        "HIDE_STATIC_PIPELINE_PLUGIN_PIPELINE_BUILDER"
+      ]
+    }
+  },
+  {
     "type": "console.page/route",
     "properties": {
       "exact": true,
