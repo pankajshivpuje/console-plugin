@@ -3,8 +3,8 @@ import { FormikTouched, useFormikContext } from 'formik';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PIPELINE_NAMESPACE } from '../../consts';
-import { TaskModel } from '../../models';
-import { PipelineTask, TaskKind } from '../../types';
+import { PipelineModel, TaskModel } from '../../models';
+import { PipelineKind, PipelineTask, TaskKind } from '../../types';
 import { AddNodeDirection } from '../pipeline-topology/const';
 import {
   PipelineBuilderTaskNodeModel,
@@ -51,9 +51,16 @@ export const useFormikFetchAndSaveTasks = (
   const { setFieldValue, setStatus } =
     useFormikContext<PipelineBuilderFormikValues>();
 
-  const { namespacedTasks, clusterResolverTasks } = useK8sWatchResources<{
+  const {
+    namespacedTasks,
+    clusterResolverTasks,
+    namespacedPipelines,
+    clusterResolverPipelines,
+  } = useK8sWatchResources<{
     namespacedTasks: TaskKind[];
     clusterResolverTasks: TaskKind[];
+    namespacedPipelines: PipelineKind[];
+    clusterResolverPipelines: PipelineKind[];
   }>({
     namespacedTasks: {
       kind: getReferenceForModel(TaskModel),
@@ -65,12 +72,28 @@ export const useFormikFetchAndSaveTasks = (
       isList: true,
       namespace: PIPELINE_NAMESPACE,
     },
+    namespacedPipelines: {
+      kind: getReferenceForModel(PipelineModel),
+      isList: true,
+      namespace,
+    },
+    clusterResolverPipelines: {
+      kind: getReferenceForModel(PipelineModel),
+      isList: true,
+      namespace: PIPELINE_NAMESPACE,
+    },
   });
   const namespacedTaskData = namespacedTasks.loaded
     ? namespacedTasks.data
     : null;
   const clusterResolverTaskData = clusterResolverTasks.loaded
     ? clusterResolverTasks.data
+    : null;
+  const namespacedPipelineData = namespacedPipelines.loaded
+    ? namespacedPipelines.data
+    : null;
+  const clusterResolverPipelineData = clusterResolverPipelines.loaded
+    ? clusterResolverPipelines.data
     : null;
 
   useEffect(() => {
@@ -84,8 +107,25 @@ export const useFormikFetchAndSaveTasks = (
         false,
       );
     }
+    if (namespacedPipelineData) {
+      setFieldValue(
+        'taskResources.namespacedPipelines',
+        namespacedPipelineData,
+        false,
+      );
+    }
+    if (clusterResolverPipelineData) {
+      setFieldValue(
+        'taskResources.clusterResolverPipelines',
+        clusterResolverPipelineData,
+        false,
+      );
+    }
     const tasksLoaded = !!namespacedTaskData && !!clusterResolverTaskData;
     setFieldValue('taskResources.tasksLoaded', tasksLoaded, false);
+    const pipelinesLoaded =
+      !!namespacedPipelineData && !!clusterResolverPipelineData;
+    setFieldValue('taskResources.pipelinesLoaded', pipelinesLoaded, false);
     if (tasksLoaded) {
       // Wait for Formik to fully understand the set values (thread end) and then validate again
       setTimeout(() => validateForm(), 0);
@@ -94,10 +134,16 @@ export const useFormikFetchAndSaveTasks = (
     setFieldValue,
     namespacedTaskData,
     clusterResolverTaskData,
+    namespacedPipelineData,
+    clusterResolverPipelineData,
     validateForm,
   ]);
 
-  const error = namespacedTasks.loadError || clusterResolverTasks.loadError;
+  const error =
+    namespacedTasks.loadError ||
+    clusterResolverTasks.loadError ||
+    namespacedPipelines.loadError ||
+    clusterResolverPipelines.loadError;
   useEffect(() => {
     if (!error) return;
 

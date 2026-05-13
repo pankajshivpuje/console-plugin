@@ -112,6 +112,41 @@ export const getTopLevelErrorMessage: GetErrorMessage =
     return getTaskErrorString(mappingErrorType);
   };
 
+export const findPipeline = (
+  taskResources: PipelineBuilderTaskResources,
+  task: PipelineTask,
+): PipelineKind | null => {
+  if (!task?.pipelineRef) return null;
+  if (
+    !taskResources?.pipelinesLoaded ||
+    !taskResources.namespacedPipelines ||
+    !taskResources.clusterResolverPipelines
+  ) {
+    return null;
+  }
+
+  const { pipelineRef } = task;
+  let pipelineName: string | null = null;
+
+  if (pipelineRef.resolver === 'cluster') {
+    const nameParam = pipelineRef.params?.find(
+      (param) => param.name === 'name',
+    );
+    pipelineName = nameParam ? nameParam.value : null;
+  } else {
+    pipelineName = pipelineRef.name;
+  }
+
+  if (!pipelineName) return null;
+
+  const matchingName = (p: PipelineKind) => p.metadata.name === pipelineName;
+  return (
+    taskResources.namespacedPipelines.find(matchingName) ||
+    taskResources.clusterResolverPipelines.find(matchingName) ||
+    null
+  );
+};
+
 export const findTask = (
   resourceTasks: PipelineBuilderTaskResources,
   task: PipelineTask,
