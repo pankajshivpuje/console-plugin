@@ -1,10 +1,6 @@
 import type { FC } from 'react';
 import { useEffect } from 'react';
-import {
-  useParams,
-  useLocation,
-  useNavigate,
-} from 'react-router';
+import { useParams, useLocation, useNavigate } from 'react-router';
 
 import { usePacData } from './hooks/usePacData';
 import PacForm from './PacForm';

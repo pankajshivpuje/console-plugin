@@ -53,14 +53,16 @@ const ResultsList: FC<ResultsListProps> = ({
         </Table>
       ) : (
         <Bullseye>
-          <EmptyState 
+          <EmptyState
             variant={EmptyStateVariant.full}
             headingLevel="h4"
-            titleText={t('No {{resourceName}} results available due to failure', {
-              resourceName,
-            })}
-          >
-          </EmptyState>
+            titleText={t(
+              'No {{resourceName}} results available due to failure',
+              {
+                resourceName,
+              },
+            )}
+          ></EmptyState>
         </Bullseye>
       )}
     </>

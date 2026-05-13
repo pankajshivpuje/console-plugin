@@ -17,7 +17,9 @@ type TaskRunStatusProps = {
 };
 const TaskRunStatus: FC<TaskRunStatusProps> = ({ status, taskRun }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  const {isResourceManagedByKueue} = useMultiClusterProxyService({ labels: taskRun?.metadata?.labels });
+  const { isResourceManagedByKueue } = useMultiClusterProxyService({
+    labels: taskRun?.metadata?.labels,
+  });
   const pipelineRunName =
     taskRun.metadata?.labels?.[TektonResourceLabel.pipelinerun];
 

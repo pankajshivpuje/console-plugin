@@ -34,9 +34,7 @@ export type RepositoryLinkListProps = {
   pipelineRun: PipelineRunKind;
 };
 
-const RepositoryLinkList: FC<RepositoryLinkListProps> = ({
-  pipelineRun,
-}) => {
+const RepositoryLinkList: FC<RepositoryLinkListProps> = ({ pipelineRun }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const plrLabels = pipelineRun.metadata.labels;
   const plrAnnotations = pipelineRun.metadata.annotations;

@@ -25,8 +25,7 @@ export const useScrollContainer = (): [
   HTMLElement,
   (node: HTMLElement) => void,
 ] => {
-  const [scrollContainer, setScrollContainer] =
-    useState<HTMLElement>(null);
+  const [scrollContainer, setScrollContainer] = useState<HTMLElement>(null);
   const elementRef = useCallback((node: HTMLElement) => {
     if (node === null) {
       setScrollContainer(null);

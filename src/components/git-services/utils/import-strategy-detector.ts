@@ -58,11 +58,11 @@ type DetectedServiceData = {
 export const detectImportStrategies = async (
   repository: string,
   gitService: BaseService,
-  isServerlessEnabled: boolean = false,
+  isServerlessEnabled = false,
 ): Promise<DetectedServiceData> => {
   let detectedStrategies: DetectedStrategy[] = [];
   let addServerlessFxStrategy: boolean;
-  let loaded: boolean = false;
+  let loaded = false;
   let loadError = null;
 
   const repositoryStatus = gitService

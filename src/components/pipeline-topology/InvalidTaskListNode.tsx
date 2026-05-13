@@ -10,9 +10,7 @@ type InvalidTaskListNodeProps = {
   element: Node<NodeModel, TaskListNodeModelData>;
 };
 
-const InvalidTaskListNode: FC<InvalidTaskListNodeProps> = ({
-  element,
-}) => {
+const InvalidTaskListNode: FC<InvalidTaskListNodeProps> = ({ element }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const {
     task: { name },

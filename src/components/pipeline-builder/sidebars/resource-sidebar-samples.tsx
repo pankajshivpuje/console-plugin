@@ -193,9 +193,10 @@ interface ResourceSidebarSnippetsProps {
   insertSnippetYaml(id: string, yaml: string, reference: string);
 }
 
-export const ResourceSidebarSnippets: FC<
-  ResourceSidebarSnippetsProps
-> = ({ snippets, insertSnippetYaml }) => {
+export const ResourceSidebarSnippets: FC<ResourceSidebarSnippetsProps> = ({
+  snippets,
+  insertSnippetYaml,
+}) => {
   return (
     <ul
       className="co-resource-sidebar-list"

@@ -10,9 +10,7 @@ type TriggerTemplatesListPageProps = {
   hideNameLabelFilters?: boolean;
 };
 
-const TriggerTemplatesListPage: FC<TriggerTemplatesListPageProps> = (
-  props,
-) => {
+const TriggerTemplatesListPage: FC<TriggerTemplatesListPageProps> = (props) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const { hideNameLabelFilters, namespace } = props;
   return (

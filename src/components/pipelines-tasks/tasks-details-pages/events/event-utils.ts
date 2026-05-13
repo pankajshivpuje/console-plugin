@@ -40,23 +40,22 @@ export const usePipelineRunRelatedResources = (
   namespace: string,
   pipelineRunName: string,
 ): WatchK8sResults<ResourcesType> => {
-  const plrRelatedResources: WatchK8sResources<ResourcesType> =
-    useMemo(() => {
-      return {
-        taskruns: {
-          kind: getReferenceForModel(TaskRunModel),
-          namespace,
-          selector: {
-            matchLabels: { [TektonResourceLabel.pipelinerun]: pipelineRunName },
-          },
-          isList: true,
-          optional: true,
+  const plrRelatedResources: WatchK8sResources<ResourcesType> = useMemo(() => {
+    return {
+      taskruns: {
+        kind: getReferenceForModel(TaskRunModel),
+        namespace,
+        selector: {
+          matchLabels: { [TektonResourceLabel.pipelinerun]: pipelineRunName },
         },
-        pods: getPodsByLabels(namespace, {
-          [TektonResourceLabel.pipelinerun]: pipelineRunName,
-        }),
-      };
-    }, [namespace, pipelineRunName]);
+        isList: true,
+        optional: true,
+      },
+      pods: getPodsByLabels(namespace, {
+        [TektonResourceLabel.pipelinerun]: pipelineRunName,
+      }),
+    };
+  }, [namespace, pipelineRunName]);
   return useK8sWatchResources<ResourcesType>(plrRelatedResources);
 };
 /**
@@ -68,14 +67,13 @@ export const useTaskRunRelatedResources = (
   namespace: string,
   taskRunName: string,
 ): WatchK8sResults<ResourcesType> => {
-  const tsrRelatedResources: WatchK8sResources<ResourcesType> =
-    useMemo(() => {
-      return {
-        pods: getPodsByLabels(namespace, {
-          [TektonResourceLabel.taskrun]: taskRunName,
-        }),
-      };
-    }, [namespace, taskRunName]);
+  const tsrRelatedResources: WatchK8sResources<ResourcesType> = useMemo(() => {
+    return {
+      pods: getPodsByLabels(namespace, {
+        [TektonResourceLabel.taskrun]: taskRunName,
+      }),
+    };
+  }, [namespace, taskRunName]);
   return useK8sWatchResources<ResourcesType>(tsrRelatedResources);
 };
 

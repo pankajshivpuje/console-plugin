@@ -33,9 +33,7 @@ interface MultipleResourceKeySelectorProps {
   addString?: string;
 }
 
-const MultipleResourceKeySelector: FC<
-  MultipleResourceKeySelectorProps
-> = ({
+const MultipleResourceKeySelector: FC<MultipleResourceKeySelectorProps> = ({
   label,
   resourceModel,
   required,

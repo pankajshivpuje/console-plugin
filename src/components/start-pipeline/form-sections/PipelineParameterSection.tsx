@@ -27,7 +27,7 @@ const PipelineParameterSection: FC<ParametersSectionProps> = ({
   } = useFormikContext<CommonPipelineModalFormikValues>();
 
   return (
-    (<FieldArray
+    <FieldArray
       name="parameters"
       key="parameters-row"
       render={() =>
@@ -98,7 +98,7 @@ const PipelineParameterSection: FC<ParametersSectionProps> = ({
           </FormSection>
         )
       }
-    />)
+    />
   );
 };
 

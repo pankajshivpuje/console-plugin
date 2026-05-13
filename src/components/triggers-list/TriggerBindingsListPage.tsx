@@ -10,9 +10,7 @@ type TriggerBindingsListPageProps = {
   hideNameLabelFilters?: boolean;
 };
 
-const TriggerBindingsListPage: FC<TriggerBindingsListPageProps> = (
-  props,
-) => {
+const TriggerBindingsListPage: FC<TriggerBindingsListPageProps> = (props) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const { namespace, hideNameLabelFilters } = props;
   return (

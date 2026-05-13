@@ -1,13 +1,10 @@
 import type { FC } from 'react';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Button,
-  ButtonVariant,
   Label,
   LabelGroup,
   Level,
   LevelItem,
-  Split,
   SplitItem,
   Stack,
   StackItem,
@@ -17,11 +14,9 @@ import {
 import { CheckCircleIcon } from '@patternfly/react-icons/dist/esm/icons/check-circle-icon';
 import { debounce } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { getArtifactHubTaskDetails } from '../catalog/apis/artifactHub';
 import {
-  getCtaButtonText,
   getTaskCtaType,
   isArtifactHubTask,
   isOneVersionInstalled,
@@ -35,7 +30,6 @@ import {
   getTektonHubTaskVersions,
 } from '../catalog/apis/tektonHub';
 import { ExternalLink } from '../utils/link';
-import { handleCta } from '../quick-search';
 import { QuickSearchDetailsRendererProps } from '../quick-search/QuickSearchDetails';
 import { FLAGS } from '../../types';
 
@@ -43,15 +37,12 @@ import './PipelineQuickSearchDetails.scss';
 
 const PipelineQuickSearchDetails: FC<QuickSearchDetailsRendererProps> = ({
   selectedItem,
-  closeModal,
   namespace,
-  callback,
-  setFailedTasks,
+  selectedVersion: controlledVersion,
+  onVersionChange,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  const navigate = useNavigate();
   const isDevConsoleProxyAvailable = useFlag(FLAGS.DEVCONSOLE_PROXY);
-  const [selectedVersion, setSelectedVersion] = useState<string>();
   const [versions, setVersions] = useState(
     selectedItem?.attributes?.versions ?? [],
   );
@@ -60,13 +51,13 @@ const PipelineQuickSearchDetails: FC<QuickSearchDetailsRendererProps> = ({
   );
   const resetVersions = useCallback(() => {
     setVersions(selectedItem?.attributes?.versions ?? []);
-    setSelectedVersion(selectedItem?.attributes?.installed ?? '');
+    onVersionChange?.(selectedItem?.attributes?.installed ?? '');
     setHasInstalledVersion(isOneVersionInstalled(selectedItem));
-  }, [selectedItem]);
+  }, [selectedItem, onVersionChange]);
 
   const onChangeVersion = useCallback(
     (key) => {
-      setSelectedVersion(key);
+      onVersionChange?.(key);
       if (isArtifactHubTask(selectedItem)) {
         getArtifactHubTaskDetails(selectedItem, key, isDevConsoleProxyAvailable)
           .then((item) => {
@@ -85,7 +76,7 @@ const PipelineQuickSearchDetails: FC<QuickSearchDetailsRendererProps> = ({
           });
       }
     },
-    [resetVersions, selectedItem],
+    [resetVersions, selectedItem, onVersionChange],
   );
 
   useEffect(() => {
@@ -152,20 +143,21 @@ const PipelineQuickSearchDetails: FC<QuickSearchDetailsRendererProps> = ({
 
   useEffect(() => {
     if (isTaskVersionInstalled(selectedItem)) {
-      setSelectedVersion(selectedItem.attributes.installed);
+      onVersionChange?.(selectedItem.attributes.installed);
     } else {
-      setSelectedVersion(
+      onVersionChange?.(
         selectedItem.data?.latestVersion?.version?.toString() ||
           selectedItem.data?.task?.version?.toString(),
       );
     }
-  }, [selectedItem]);
+  }, [selectedItem, onVersionChange]);
+
   const loadedVersion = useMemo(
     () =>
       versions?.find(
-        (version) => version.version?.toString() === selectedVersion,
+        (version) => version.version?.toString() === controlledVersion,
       ),
-    [selectedVersion, versions],
+    [controlledVersion, versions],
   );
 
   const hubLink = getHubUIPath(
@@ -186,39 +178,17 @@ const PipelineQuickSearchDetails: FC<QuickSearchDetailsRendererProps> = ({
       </Level>
       <Level hasGutter>
         <LevelItem>
-          <Split hasGutter>
-            <SplitItem>
-              <Button
-                isDisabled={isTektonHubTaskWithoutVersions(selectedItem)}
-                data-test="task-cta"
-                variant={ButtonVariant.primary}
-                className="opp-quick-search-details__form-button"
-                onClick={(e) => {
-                  handleCta(e, selectedItem, closeModal, navigate, {
-                    selectedVersion,
-                    selectedItem,
-                    isDevConsoleProxyAvailable,
-                    namespace,
-                    callback,
-                    setFailedTasks,
-                  });
-                }}
-              >
-                {getCtaButtonText(selectedItem, selectedVersion)}
-              </Button>
+          {versions.length > 0 && (
+            <SplitItem data-test="task-version-dropdown">
+              <PipelineQuickSearchVersionDropdown
+                key={selectedItem.uid}
+                versions={versions}
+                item={selectedItem}
+                selectedVersion={controlledVersion}
+                onChange={onChangeVersion}
+              />
             </SplitItem>
-            {versions.length > 0 && (
-              <SplitItem data-test="task-version-dropdown">
-                <PipelineQuickSearchVersionDropdown
-                  key={selectedItem.uid}
-                  versions={versions}
-                  item={selectedItem}
-                  selectedVersion={selectedVersion}
-                  onChange={onChangeVersion}
-                />
-              </SplitItem>
-            )}
-          </Split>
+          )}
         </LevelItem>
         {hasInstalledVersion && (
           <LevelItem>
@@ -234,7 +204,7 @@ const PipelineQuickSearchDetails: FC<QuickSearchDetailsRendererProps> = ({
       </Level>
       {
         <PipelineQuickSearchTaskAlert
-          ctaType={getTaskCtaType(selectedItem, selectedVersion)}
+          ctaType={getTaskCtaType(selectedItem, controlledVersion)}
         />
       }
       <Content

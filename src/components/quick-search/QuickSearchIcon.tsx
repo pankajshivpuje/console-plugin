@@ -1,5 +1,5 @@
 import type { HTMLProps, FC, ReactElement } from 'react';
-import { t_chart_color_black_100 as globalWhite } from "@patternfly/react-tokens/dist/js/t_chart_color_black_100";
+import { t_chart_color_black_100 as globalWhite } from '@patternfly/react-tokens/dist/js/t_chart_color_black_100';
 
 const QuickSearchIcon: FC<HTMLProps<SVGElement>> = ({
   style,

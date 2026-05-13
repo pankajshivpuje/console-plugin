@@ -74,7 +74,7 @@ const TextColumnItemContent: FC<TextColumnItemContentProps> = ({
     <div ref={previewDropRef} style={{ opacity }}>
       <Flex
         alignItems={{ default: 'alignItemsFlexStart' }}
-        style={{ marginBottom: "var(--pf-t--global--spacer--sm)" }}
+        style={{ marginBottom: 'var(--pf-t--global--spacer--sm)' }}
       >
         {dndEnabled && (
           <FlexItem style={{ cursor: 'move' }}>
@@ -96,7 +96,8 @@ const TextColumnItemContent: FC<TextColumnItemContentProps> = ({
                 tooltipDeleteRow || t('plugin__pipelines-console-plugin~Remove')
               }
             >
-              <Button icon={<MinusCircleIcon />}
+              <Button
+                icon={<MinusCircleIcon />}
                 aria-label={
                   tooltipDeleteRow ||
                   t('plugin__pipelines-console-plugin~Remove')
@@ -113,7 +114,7 @@ const TextColumnItemContent: FC<TextColumnItemContentProps> = ({
                     onChange(values);
                   }
                 }}
-               />
+              />
             </Tooltip>
           </FlexItem>
         )}

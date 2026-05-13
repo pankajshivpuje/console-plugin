@@ -11,4 +11,3 @@ export const getPipelinesOverviewInterval = (state: {
 }): number | null => {
   return state.plugins?.pipelinesOverviewFilters?.interval ?? null;
 };
-

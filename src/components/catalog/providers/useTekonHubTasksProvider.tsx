@@ -68,8 +68,9 @@ const normalizeTektonHubTasks = (
 const useTektonHubTasksProvider: ExtensionHook<CatalogItem[]> = ({
   namespace,
 }): [CatalogItem[], boolean, string] => {
-  const [normalizedTektonHubTasks, setNormalizedTektonHubTasks] =
-    useState<CatalogItem<TektonHubTask>[]>([]);
+  const [normalizedTektonHubTasks, setNormalizedTektonHubTasks] = useState<
+    CatalogItem<TektonHubTask>[]
+  >([]);
 
   const canCreateTask = useAccessReview({
     group: TaskModel.apiGroup,

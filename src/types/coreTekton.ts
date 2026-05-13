@@ -157,5 +157,5 @@ export type TektonConfig = K8sResourceCommon & {
 
 export interface Scheduler {
   'multi-cluster-disabled': boolean;
-  'multi-cluster-role': string
+  'multi-cluster-role': string;
 }

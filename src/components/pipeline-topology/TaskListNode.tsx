@@ -10,10 +10,7 @@ type TaskListNodeProps = {
   unselectedText?: string;
 };
 
-const TaskListNode: FC<TaskListNodeProps> = ({
-  element,
-  unselectedText,
-}) => {
+const TaskListNode: FC<TaskListNodeProps> = ({ element, unselectedText }) => {
   const { height = 30, width = 120 } = {};
   const {
     clusterResolverTaskList = [],

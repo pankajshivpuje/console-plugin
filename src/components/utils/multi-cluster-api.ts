@@ -1,7 +1,8 @@
 import { consoleFetchJSON } from '@openshift-console/dynamic-plugin-sdk';
 import { PodKind, TaskRunKind } from '../../types';
 
-const PROXY_BASE = '/api/proxy/plugin/pipelines-console-plugin/multicluster-proxy';
+const PROXY_BASE =
+  '/api/proxy/plugin/pipelines-console-plugin/multicluster-proxy';
 
 export type ResolveResponse = {
   name: string;
@@ -11,7 +12,6 @@ export type ResolveResponse = {
 
 export type TaskRunsResponse = { items: TaskRunKind[] };
 export type PodsResponse = { items: PodKind[] };
-
 
 export const getMultiClusterTaskRuns = (
   ns: string,

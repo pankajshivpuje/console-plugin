@@ -28,8 +28,7 @@ export const getScrollDirection = (
 
 export const useScrollDirection = (): [ScrollDirection, (event) => void] => {
   const scrollPosition = useRef<number>(null);
-  const [scrollDirection, setScrollDirection] =
-    useState<ScrollDirection>(null);
+  const [scrollDirection, setScrollDirection] = useState<ScrollDirection>(null);
   const handleScroll = useCallback(
     (event) => {
       const { scrollHeight, scrollTop, clientHeight } = event.target;

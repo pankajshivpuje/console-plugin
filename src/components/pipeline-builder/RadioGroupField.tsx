@@ -46,7 +46,7 @@ const RadioGroupField: FC<RadioGroupFieldProps> = ({
   const isValid = !(touched && error);
   const errorMessage = !isValid ? error : '';
   return (
-    (<FormGroup
+    <FormGroup
       className={classNames('ocs-radio-group-field', {
         'ocs-radio-group-field--inline': isInline,
       })}
@@ -69,7 +69,7 @@ const RadioGroupField: FC<RadioGroupFieldProps> = ({
         );
 
         return (
-          (<Fragment key={option.value}>
+          <Fragment key={option.value}>
             <RadioButtonField
               {...field}
               {...props}
@@ -81,7 +81,7 @@ const RadioGroupField: FC<RadioGroupFieldProps> = ({
               description={description}
               onChange={onChange}
             />
-          </Fragment>)
+          </Fragment>
         );
       })}
       <FormHelperText>
@@ -95,7 +95,7 @@ const RadioGroupField: FC<RadioGroupFieldProps> = ({
           )}
         </HelperText>
       </FormHelperText>
-    </FormGroup>)
+    </FormGroup>
   );
 };
 

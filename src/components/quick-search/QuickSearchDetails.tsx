@@ -1,10 +1,5 @@
 import type { SetStateAction, Dispatch, ReactNode, FC } from 'react';
-import {
-  Button,
-  ButtonVariant,
-  Content,
-  Title,
-} from '@patternfly/react-core';
+import { Button, ButtonVariant, Content, Title } from '@patternfly/react-core';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';

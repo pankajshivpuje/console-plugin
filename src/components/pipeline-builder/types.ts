@@ -1,5 +1,6 @@
 import { FormikErrors, FormikValues } from 'formik';
 import {
+  PipelineBuilderTaskResources,
   PipelineKind,
   PipelineTask,
   TaskKind,

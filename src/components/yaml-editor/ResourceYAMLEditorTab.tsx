@@ -8,9 +8,7 @@ export interface ResourceYAMLEditorTabProps {
   obj: K8sResourceKind;
 }
 
-const ResourceYAMLEditorTab: FC<ResourceYAMLEditorTabProps> = ({
-  obj,
-}) => {
+const ResourceYAMLEditorTab: FC<ResourceYAMLEditorTabProps> = ({ obj }) => {
   return <ResourceYAMLEditor initialResource={obj} />;
 };
 

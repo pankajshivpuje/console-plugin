@@ -48,7 +48,7 @@ const RepositoryFormPage: FC = () => {
   };
 
   return (
-    (<Formik
+    <Formik
       initialValues={defaultRepositoryFormValues}
       onSubmit={handleSubmit}
       onReset={history.back}
@@ -68,7 +68,7 @@ const RepositoryFormPage: FC = () => {
           />
         );
       }}
-    </Formik>)
+    </Formik>
   );
 };
 

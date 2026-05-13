@@ -38,7 +38,7 @@ const TaskSidebarHeader: FC<TaskSidebarHeaderProps> = ({
   };
 
   return (
-    (<div className="opp-task-sidebar-header">
+    <div className="opp-task-sidebar-header">
       <Title headingLevel="h2" className="opp-task-sidebar-header__title">
         <div className="co-m-pane__name co-resource-item">
           <PipelineResourceRef
@@ -75,7 +75,7 @@ const TaskSidebarHeader: FC<TaskSidebarHeaderProps> = ({
         <TaskSidebarShortcuts />
       </div>
       <Divider className="co-divider" />
-    </div>)
+    </div>
   );
 };
 

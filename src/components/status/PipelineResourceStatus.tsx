@@ -13,9 +13,7 @@ const PipelineResourceStatus: FC<PipelineResourceStatusProps> = ({
   title,
 }) => (
   <Status status={status} title={title}>
-    {status === 'Failed' &&
-      Children.toArray(children).length > 0 &&
-      children}
+    {status === 'Failed' && Children.toArray(children).length > 0 && children}
   </Status>
 );
 

@@ -9,7 +9,7 @@ interface Cancelable {
 
 export const useDebounceCallback = <T extends (...args: any[]) => any>(
   callback: T,
-  timeout: number = 500,
+  timeout = 500,
   debounceParams: DebounceSettings = {
     leading: false,
     trailing: true,
@@ -20,6 +20,10 @@ export const useDebounceCallback = <T extends (...args: any[]) => any>(
   callbackRef.current = callback;
 
   return useMemo(() => {
-    return debounce((...args) => callbackRef.current(...args), timeout, memDebounceParams);
+    return debounce(
+      (...args) => callbackRef.current(...args),
+      timeout,
+      memDebounceParams,
+    );
   }, [memDebounceParams, timeout]);
 };

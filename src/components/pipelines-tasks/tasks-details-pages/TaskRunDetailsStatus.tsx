@@ -26,11 +26,11 @@ export interface TaskRunDetailsStatusProps {
   taskRun: TaskRunKind;
 }
 
-const TaskRunDetailsStatus: FC<TaskRunDetailsStatusProps> = ({
-  taskRun,
-}) => {
+const TaskRunDetailsStatus: FC<TaskRunDetailsStatusProps> = ({ taskRun }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  const {isResourceManagedByKueue} = useMultiClusterProxyService({ labels: taskRun?.metadata?.labels });
+  const { isResourceManagedByKueue } = useMultiClusterProxyService({
+    labels: taskRun?.metadata?.labels,
+  });
   const pipelineRunName =
     taskRun.metadata?.labels?.[TektonResourceLabel.pipelinerun];
 

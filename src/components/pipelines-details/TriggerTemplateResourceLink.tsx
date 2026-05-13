@@ -19,9 +19,11 @@ type TriggerTemplateResourceLinkProps = {
   model: K8sKind;
   links: RouteTemplate[];
 };
-const TriggerTemplateResourceLink: FC<
-  TriggerTemplateResourceLinkProps
-> = ({ links = [], namespace, model }) => {
+const TriggerTemplateResourceLink: FC<TriggerTemplateResourceLinkProps> = ({
+  links = [],
+  namespace,
+  model,
+}) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const title = t(model.labelPluralKey);
   const kind = getReferenceForModel(model);

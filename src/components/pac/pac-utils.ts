@@ -76,7 +76,7 @@ export const getPACInfo = async () =>
     ns: PIPELINE_NAMESPACE,
   });
 
-export const updatePACInfo = async (appLink: string = '') => {
+export const updatePACInfo = async (appLink = '') => {
   try {
     const controllerUrl = await getControllerUrl();
     const cfg = await getPACInfo();

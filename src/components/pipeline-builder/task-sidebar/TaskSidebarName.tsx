@@ -38,9 +38,7 @@ const TaskSidebarName: FC<TaskSidebarNameProps> = (props) => {
     statusPath,
     {},
   );
-  const [interimName, setInterimName] = useState(
-    nameError ?? initialName,
-  );
+  const [interimName, setInterimName] = useState(nameError ?? initialName);
   const [validating, setValidating] = useState(null);
   const isValid = !errorMessage;
   const reservedNames: string[] = [...tasks, ...finallyTasks]

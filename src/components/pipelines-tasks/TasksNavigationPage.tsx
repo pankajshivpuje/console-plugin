@@ -1,8 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import {
-  NamespaceBar,
-  NavPage,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { NamespaceBar, NavPage } from '@openshift-console/dynamic-plugin-sdk';
 import TasksList from './TasksList';
 import TaskRunsList from './TaskRunsList';
 import { TaskModel, TaskRunModel } from '../../models';
@@ -11,16 +8,15 @@ import { MultiTabListPage } from '../multi-tab-list';
 
 import './TasksNavigationPage.scss';
 
-
 const TasksNavigationPage = () => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  
+
   const menuActions: MenuActions = {
     tasks: {
-      model: TaskModel
+      model: TaskModel,
     },
     taskRun: {
-      model: TaskRunModel
+      model: TaskRunModel,
     },
   };
 

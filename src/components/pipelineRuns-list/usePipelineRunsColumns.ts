@@ -10,16 +10,25 @@ import { PipelineRunKind } from '../../types';
 import { sortPipelineAndTaskRunsByDuration } from '../pipelines-details/pipeline-step-utils';
 
 export const tableColumnInfo = [
-  {id: 'name', classNames: 'pf-v6-m-width-20'},
-  {id: 'commit-id', classNames: 'pf-v6-m-hidden pf-m-visible-on-sm pf-m-width-10'},
-  {id: 'namespace', classNames: ''}, 
-  {id: 'vulnerabilities', classNames: 'pf-v6-m-hidden pf-m-visible-on-md'},
-  {id: 'status', classNames: 'pf-v6-m-hidden pf-m-visible-on-sm pf-m-width-10'},
-  {id: 'task-status', classNames: 'pf-v6-m-hidden pf-m-visible-on-lg'},
-  {id: 'started', classNames: 'pf-v6-m-hidden pf-m-visible-on-lg'},
-  {id: 'duration', classNames: 'pf-v6-m-hidden pf-m-visible-on-xl'},
-  {id: 'branch-tag', classNames: 'pf-v6-m-hidden pf-m-visible-on-xl pf-m-width-5'},
-  {id: 'action', classNames: 'dropdown-kebab-pf pf-v6-c-table__action'}
+  { id: 'name', classNames: 'pf-v6-m-width-20' },
+  {
+    id: 'commit-id',
+    classNames: 'pf-v6-m-hidden pf-m-visible-on-sm pf-m-width-10',
+  },
+  { id: 'namespace', classNames: '' },
+  { id: 'vulnerabilities', classNames: 'pf-v6-m-hidden pf-m-visible-on-md' },
+  {
+    id: 'status',
+    classNames: 'pf-v6-m-hidden pf-m-visible-on-sm pf-m-width-10',
+  },
+  { id: 'task-status', classNames: 'pf-v6-m-hidden pf-m-visible-on-lg' },
+  { id: 'started', classNames: 'pf-v6-m-hidden pf-m-visible-on-lg' },
+  { id: 'duration', classNames: 'pf-v6-m-hidden pf-m-visible-on-xl' },
+  {
+    id: 'branch-tag',
+    classNames: 'pf-v6-m-hidden pf-m-visible-on-xl pf-m-width-5',
+  },
+  { id: 'action', classNames: 'dropdown-kebab-pf pf-v6-c-table__action' },
 ];
 
 const usePipelineRunsColumns = (
@@ -40,7 +49,10 @@ const usePipelineRunsColumns = (
             id: tableColumnInfo[1].id,
             title: t('Commit id'),
             sort: `metadata.labels.${RepositoryLabels[RepositoryFields.SHA]}`,
-            props: { className: tableColumnInfo[1].classNames, modifier: 'nowrap' },
+            props: {
+              className: tableColumnInfo[1].classNames,
+              modifier: 'nowrap',
+            },
           },
         ]
       : []),
@@ -50,7 +62,10 @@ const usePipelineRunsColumns = (
             id: tableColumnInfo[2].id,
             title: t('Namespace'),
             sort: 'metadata.namespace',
-            props: { className: tableColumnInfo[2].classNames, modifier: 'nowrap' },
+            props: {
+              className: tableColumnInfo[2].classNames,
+              modifier: 'nowrap',
+            },
           },
         ]
       : []),
@@ -92,7 +107,10 @@ const usePipelineRunsColumns = (
             sort: `metadata.annotations.${
               RepositoryAnnotations[RepoAnnotationFields.BRANCH]
             }`,
-            props: { className: tableColumnInfo[8].classNames, modifier: 'nowrap' },
+            props: {
+              className: tableColumnInfo[8].classNames,
+              modifier: 'nowrap',
+            },
           },
         ]
       : []),

@@ -10,9 +10,7 @@ import { PipelineRunKind } from '../../types';
 
 import ResultsList from './ResultsList';
 
-const OutputTab: FC<{ obj: PipelineRunKind }> = ({
-  obj: pipelineRun,
-}) => {
+const OutputTab: FC<{ obj: PipelineRunKind }> = ({ obj: pipelineRun }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
 
   return pipelineRun.status?.pipelineResults || pipelineRun.status?.results ? (

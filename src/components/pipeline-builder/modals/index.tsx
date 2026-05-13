@@ -22,7 +22,11 @@ type RemoveModalProps = {
   onRemove: ModalCallback;
 };
 
-const RemoveTaskModal: OverlayComponent<RemoveModalProps> = ({ taskName, closeOverlay, onRemove }) => {
+const RemoveTaskModal: OverlayComponent<RemoveModalProps> = ({
+  taskName,
+  closeOverlay,
+  onRemove,
+}) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
 
   const onSubmit = (e) => {
@@ -34,25 +38,25 @@ const RemoveTaskModal: OverlayComponent<RemoveModalProps> = ({ taskName, closeOv
   return (
     <Modal isOpen onClose={closeOverlay} variant={ModalVariant.small}>
       <ModalHeader title={t('Remove task')} />
-        <ModalBody>
-          <ModalContent
-            icon={<ExclamationTriangleIcon color={warningColor.value} />}
-            title={t('Remove {{taskName}}?', {
-              taskName,
-            })}
-            message={t('Are you sure you want to remove {{taskName}}?', {
-              taskName,
-            })}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button variant={ButtonVariant.secondary} onClick={closeOverlay}>
-            {t('Cancel')}
-          </Button>
-          <Button type="submit" variant={ButtonVariant.danger} onClick={onSubmit}>
-            {t('Confirm')}
-          </Button>
-        </ModalFooter>
+      <ModalBody>
+        <ModalContent
+          icon={<ExclamationTriangleIcon color={warningColor.value} />}
+          title={t('Remove {{taskName}}?', {
+            taskName,
+          })}
+          message={t('Are you sure you want to remove {{taskName}}?', {
+            taskName,
+          })}
+        />
+      </ModalBody>
+      <ModalFooter>
+        <Button variant={ButtonVariant.secondary} onClick={closeOverlay}>
+          {t('Cancel')}
+        </Button>
+        <Button type="submit" variant={ButtonVariant.danger} onClick={onSubmit}>
+          {t('Confirm')}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

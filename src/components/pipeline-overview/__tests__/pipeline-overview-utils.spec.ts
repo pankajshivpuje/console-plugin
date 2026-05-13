@@ -47,8 +47,14 @@ describe('pipeline-overview-utils', () => {
     overviewUtils.setPipelineNotStarted('pipeline-one', 'ns-1');
     overviewUtils.setPipelineNotStarted('pipeline-two', 'ns-1');
 
-    expect(overviewUtils.isPipelineNotStarted('pipeline-one', 'ns-1')).toBeTruthy();
-    expect(overviewUtils.isPipelineNotStarted('pipeline-two', 'ns-1')).toBeTruthy();
-    expect(overviewUtils.isPipelineNotStarted('pipeline-three', 'ns-1')).toBeFalsy();
+    expect(
+      overviewUtils.isPipelineNotStarted('pipeline-one', 'ns-1'),
+    ).toBeTruthy();
+    expect(
+      overviewUtils.isPipelineNotStarted('pipeline-two', 'ns-1'),
+    ).toBeTruthy();
+    expect(
+      overviewUtils.isPipelineNotStarted('pipeline-three', 'ns-1'),
+    ).toBeFalsy();
   });
 });

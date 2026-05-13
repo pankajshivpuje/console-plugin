@@ -10,9 +10,7 @@ type EventListenersListPageProps = {
   hideNameLabelFilters?: boolean;
 };
 
-const EventListenersListPage: FC<EventListenersListPageProps> = (
-  props,
-) => {
+const EventListenersListPage: FC<EventListenersListPageProps> = (props) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const { hideNameLabelFilters, namespace } = props;
   return (

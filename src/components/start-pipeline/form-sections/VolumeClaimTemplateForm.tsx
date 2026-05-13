@@ -236,8 +236,7 @@ const VolumeClaimTemplateForm: FC<VolumeClaimTemplateFormProps> = ({
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const [field] = useField(name);
   const initAccessModeHelp = t('Permissions to the mounted drive.');
-  const [accessModeHelp, setAccessModeHelp] =
-    useState(initAccessModeHelp);
+  const [accessModeHelp, setAccessModeHelp] = useState(initAccessModeHelp);
   const { setFieldValue, setFieldTouched, errors } =
     useFormikContext<FormikValues>();
   const [allowedAccessModes, setAllowedAccessModes] =
@@ -245,22 +244,17 @@ const VolumeClaimTemplateForm: FC<VolumeClaimTemplateFormProps> = ({
   const [volumeMode, setVolumeMode] = useState(initialVolumeMode);
   const [accessMode, setAccessMode] = useState('ReadWriteOnce');
   const [requestSizeError, setRequestSizeError] = useState(null);
-  const [requestSizeValue, setRequestSizeValue] =
-    useState(initialSizeValue);
+  const [requestSizeValue, setRequestSizeValue] = useState(initialSizeValue);
   const [requestSizeUnit, setRequestSizeUnit] = useState(initialSizeUnit);
   const [storageProvisioner, setStorageProvisioner] = useState('');
   const [storageClass, setStorageClass] = useState('');
   useFormikValidationFix(field.value);
 
-  const handleAccessMode: ReactEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
+  const handleAccessMode: ReactEventHandler<HTMLInputElement> = (event) => {
     setAccessMode(event.currentTarget.value);
   };
 
-  const handleVolumeMode: ReactEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
+  const handleVolumeMode: ReactEventHandler<HTMLInputElement> = (event) => {
     setVolumeMode(event.currentTarget.value);
   };
 

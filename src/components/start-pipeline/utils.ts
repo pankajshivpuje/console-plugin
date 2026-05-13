@@ -373,7 +373,10 @@ export const exposeRoute = async (
   try {
     if (!serviceGeneratedName) {
       if (iteration < 3) {
-        setTimeout(() => exposeRoute(elName, ns, launchOverlay, iteration + 1), 500);
+        setTimeout(
+          () => exposeRoute(elName, ns, launchOverlay, iteration + 1),
+          500,
+        );
       } else {
         // Unable to deterministically create the route; create a default one
         await k8sCreate({
@@ -401,9 +404,9 @@ export const exposeRoute = async (
     );
     await k8sCreate({ model: RouteModel, data: route, ns });
   } catch (e) {
-      launchOverlay(ModalErrorContent, {
-        title: 'Error Exposing Route',
-        error: e.message || 'Unknown error exposing the Webhook route',
-      });
+    launchOverlay(ModalErrorContent, {
+      title: 'Error Exposing Route',
+      error: e.message || 'Unknown error exposing the Webhook route',
+    });
   }
 };

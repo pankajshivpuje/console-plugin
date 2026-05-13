@@ -7,9 +7,7 @@ const DndProviderWithChildren = DndProvider as ComponentType<
 >;
 
 const withDragDropContext =
-  <TProps extends {}>(
-    Component: ComponentClass<TProps> | FC<TProps>,
-  ) =>
+  <TProps extends {}>(Component: ComponentClass<TProps> | FC<TProps>) =>
   (props: TProps) => {
     return (
       <DndProviderWithChildren backend={HTML5Backend} context={window}>

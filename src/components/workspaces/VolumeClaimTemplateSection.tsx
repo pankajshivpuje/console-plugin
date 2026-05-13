@@ -19,9 +19,7 @@ export interface VolumeClaimTemplatesSectionProps {
   ownerResourceKind?: string;
 }
 
-const VolumeClaimTemplatesSection: FC<
-  VolumeClaimTemplatesSectionProps
-> = ({
+const VolumeClaimTemplatesSection: FC<VolumeClaimTemplatesSectionProps> = ({
   namespace,
   ownerResourceName,
   ownerResourceKind = PipelineRunModel.kind,

@@ -1,9 +1,5 @@
 import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Divider,
-  Content,
-  ContentVariants,
-  } from '@patternfly/react-core';
+import { Divider, Content, ContentVariants } from '@patternfly/react-core';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import ProjectsList from './ProjectsList';

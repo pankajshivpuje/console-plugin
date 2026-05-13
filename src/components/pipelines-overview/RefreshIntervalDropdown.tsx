@@ -35,7 +35,7 @@ const IntervalDropdown: FC<Props> = ({ id, interval, setInterval }) => {
     interval === null ? OFF_KEY : formatPrometheusDuration(interval);
 
   return (
-    (<Dropdown
+    <Dropdown
       isOpen={isOpen}
       onSelect={setClosed}
       onOpenChange={(isOpen: boolean) => setValue(isOpen)}
@@ -61,7 +61,7 @@ const IntervalDropdown: FC<Props> = ({ id, interval, setInterval }) => {
           </DropdownItem>
         ))}
       </DropdownList>
-    </Dropdown>)
+    </Dropdown>
   );
 };
 

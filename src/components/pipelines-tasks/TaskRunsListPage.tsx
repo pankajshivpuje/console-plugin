@@ -32,9 +32,7 @@ const TaskRunsListPage: FC<TaskRunsListPageProps> = ({
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   return (
     <>
-      <DocumentTitle>
-        {t('TaskRuns')}
-      </DocumentTitle>
+      <DocumentTitle>{t('TaskRuns')}</DocumentTitle>
       {showTitle && (
         <ListPageHeader title={t('TaskRuns')}>
           <ListPageCreateLink

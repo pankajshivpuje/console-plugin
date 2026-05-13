@@ -13,7 +13,10 @@ type GHManifestData = {
   default_events: string[];
 };
 
-export const usePacGHManifest = (): { loaded: boolean; manifestData: GHManifestData } => {
+export const usePacGHManifest = (): {
+  loaded: boolean;
+  manifestData: GHManifestData;
+} => {
   const [elRoute, setElRoute] = useState<string>();
   const [loaded, setLoded] = useState<boolean>(false);
   const locURL = window.location.href;

@@ -83,33 +83,35 @@ const RepositoryFormSection = () => {
     </Flex>
   );
 
-  return (<>
-    <FormHeader title={title} />
-    <FormSection className="pipelines-console-plugin__page-section-width">
-      <InputField
-        label={t('Git Repo URL')}
-        name="gitUrl"
-        type={TextInputTypes.text}
-        required
-        onBlur={(e: FocusEvent<HTMLInputElement>) => {
-          const trimmedURL = e.target.value.trim();
-          if (e.target.value !== trimmedURL) {
-            debouncedHandleGitUrlChange(trimmedURL, '', '');
-          }
-        }}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          debouncedHandleGitUrlChange(e.target.value.trim(), '', '');
-        }}
-      />
-      <InputField
-        label={t('Name')}
-        name="name"
-        type={TextInputTypes.text}
-        required
-      />
-      <AdvancedConfigurations />
-    </FormSection>
-  </>);
+  return (
+    <>
+      <FormHeader title={title} />
+      <FormSection className="pipelines-console-plugin__page-section-width">
+        <InputField
+          label={t('Git Repo URL')}
+          name="gitUrl"
+          type={TextInputTypes.text}
+          required
+          onBlur={(e: FocusEvent<HTMLInputElement>) => {
+            const trimmedURL = e.target.value.trim();
+            if (e.target.value !== trimmedURL) {
+              debouncedHandleGitUrlChange(trimmedURL, '', '');
+            }
+          }}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            debouncedHandleGitUrlChange(e.target.value.trim(), '', '');
+          }}
+        />
+        <InputField
+          label={t('Name')}
+          name="name"
+          type={TextInputTypes.text}
+          required
+        />
+        <AdvancedConfigurations />
+      </FormSection>
+    </>
+  );
 };
 
 export default RepositoryFormSection;

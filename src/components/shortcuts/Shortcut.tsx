@@ -18,7 +18,9 @@ interface ShortcutProps {
   dragNdrop?: boolean;
 }
 
-export const ShortcutCommand: FC<HTMLAttributes<HTMLSpanElement>> = ({ children }) => (
+export const ShortcutCommand: FC<HTMLAttributes<HTMLSpanElement>> = ({
+  children,
+}) => (
   <span className="ocs-shortcut__command">
     <kbd className="co-kbd">{children}</kbd>
   </span>

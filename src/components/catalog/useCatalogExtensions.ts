@@ -78,9 +78,7 @@ const useCatalogExtensions = (
       ),
     );
 
-  const catalogTypeExtensions = useMemo<
-    ResolvedExtension<CatalogItemType>[]
-  >(
+  const catalogTypeExtensions = useMemo<ResolvedExtension<CatalogItemType>[]>(
     () =>
       (catalogType
         ? itemTypeExtensions.filter((e) => e.properties.type === catalogType)

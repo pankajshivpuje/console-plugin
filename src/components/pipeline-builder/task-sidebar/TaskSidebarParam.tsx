@@ -40,10 +40,7 @@ const TaskSidebarParam: FC<TaskSidebarParamProps> = (props) => {
     [hasParam, fieldName, name, setFieldValue, resourceParamName],
   );
 
-  const textAreaSettings: Omit<
-    ComponentProps<typeof TextAreaField>,
-    'name'
-  > = {
+  const textAreaSettings: Omit<ComponentProps<typeof TextAreaField>, 'name'> = {
     rows: 1,
     resizeOrientation: 'vertical',
   };

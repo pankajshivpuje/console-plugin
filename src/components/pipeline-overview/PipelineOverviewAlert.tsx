@@ -12,9 +12,10 @@ type PipelineOverviewAlertProps = {
   onClose?: () => void;
 };
 
-const PipelineOverviewAlert: FC<
-  PipelineOverviewAlertProps & AlertProps
-> = ({ title, onClose }) => {
+const PipelineOverviewAlert: FC<PipelineOverviewAlertProps & AlertProps> = ({
+  title,
+  onClose,
+}) => {
   return (
     <Alert
       className="opp-pipeline-overview-alert"

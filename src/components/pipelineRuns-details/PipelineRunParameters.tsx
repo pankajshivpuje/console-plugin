@@ -29,7 +29,7 @@ const PipelineRunParameters: FC<PipelineRunParametersProps> = ({
   className,
 }) => {
   return (
-    <PageSection hasBodyWrapper  isWidthLimited className={className}>
+    <PageSection hasBodyWrapper isWidthLimited className={className}>
       <MultiColumnField
         data-test="pipeline-parameters"
         name={fieldName}

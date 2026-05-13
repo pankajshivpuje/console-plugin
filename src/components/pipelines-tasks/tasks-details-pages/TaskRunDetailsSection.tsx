@@ -11,9 +11,7 @@ export interface TaskRunDetailsSectionProps {
   taskRun: TaskRunKind;
 }
 
-const TaskRunDetailsSection: FC<TaskRunDetailsSectionProps> = ({
-  taskRun,
-}) => {
+const TaskRunDetailsSection: FC<TaskRunDetailsSectionProps> = ({ taskRun }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   return (
     <>

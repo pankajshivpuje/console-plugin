@@ -42,7 +42,7 @@ const DEFAULT_ROW_RENDERER = ({
 }): ReactNode => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   return (
-    (<div className="odc-multi-column-field__row" data-test={`row ${fieldName}`}>
+    <div className="odc-multi-column-field__row" data-test={`row ${fieldName}`}>
       <Grid>
         {Children.map(children, (child: ReactElement, i) => {
           let newProps = child.props;
@@ -55,18 +55,19 @@ const DEFAULT_ROW_RENDERER = ({
             };
           }
           return (
-            (<GridItem span={spans[i]} key={fieldName}>
+            <GridItem span={spans[i]} key={fieldName}>
               <div className="odc-multi-column-field__col">
                 {cloneElement(child, newProps)}
               </div>
-            </GridItem>)
+            </GridItem>
           );
         })}
       </Grid>
       {!isReadOnly && (
         <div className={'odc-multi-column-field__col--button'}>
           <Tooltip content={tooltipDeleteRow || t('Remove')}>
-            <Button icon={<MinusCircleIcon />}
+            <Button
+              icon={<MinusCircleIcon />}
               data-test="delete-row"
               aria-label={tooltipDeleteRow || t('Remove')}
               variant={ButtonVariant.plain}
@@ -74,11 +75,11 @@ const DEFAULT_ROW_RENDERER = ({
               isInline
               onClick={!disableDeleteRow ? onDelete : undefined}
               isAriaDisabled={disableDeleteRow}
-             />
+            />
           </Tooltip>
         </div>
       )}
-    </div>)
+    </div>
   );
 };
 

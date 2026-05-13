@@ -8,9 +8,9 @@ type TriggerBindingEventListenersProps = {
   obj: TriggerBindingKind;
 };
 
-const TriggerBindingEventListeners: FC<
-  TriggerBindingEventListenersProps
-> = ({ obj }) => {
+const TriggerBindingEventListeners: FC<TriggerBindingEventListenersProps> = ({
+  obj,
+}) => {
   const namespace = obj?.metadata.namespace;
   const eventListeners: string[] = useTriggerBindingEventListenerNames(obj);
   return (

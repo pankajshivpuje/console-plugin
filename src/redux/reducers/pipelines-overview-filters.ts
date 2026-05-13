@@ -34,4 +34,3 @@ export const pipelinesOverviewFiltersReducer = (
       return state;
   }
 };
-

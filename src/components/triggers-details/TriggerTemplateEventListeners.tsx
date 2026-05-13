@@ -8,9 +8,9 @@ type TriggerTemplateEventListenersProps = {
   obj: TriggerTemplateKind;
 };
 
-const TriggerTemplateEventListeners: FC<
-  TriggerTemplateEventListenersProps
-> = ({ obj }) => {
+const TriggerTemplateEventListeners: FC<TriggerTemplateEventListenersProps> = ({
+  obj,
+}) => {
   const namespace = obj?.metadata.namespace;
   const eventListeners: string[] = useTriggerTemplateEventListenerNames(obj);
   return (

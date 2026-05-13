@@ -8,9 +8,10 @@ type BreadCrumbsProps = {
   className?: string;
 };
 
-export const BreadCrumbs: FC<
-  PropsWithChildren<BreadCrumbsProps>
-> = ({ breadcrumbs, className }) => (
+export const BreadCrumbs: FC<PropsWithChildren<BreadCrumbsProps>> = ({
+  breadcrumbs,
+  className,
+}) => (
   <Breadcrumb className={className}>
     {breadcrumbs.map((crumb, i, { length }) => {
       const isLast = i === length - 1;

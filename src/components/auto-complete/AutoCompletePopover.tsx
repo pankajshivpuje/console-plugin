@@ -27,63 +27,65 @@ const AutoCompletePopover: FC<AutoCompletePopoverProps> = ({
     options,
   } = useAutoComplete(autoCompleteValues, onAutoComplete);
 
-  return (<>
-    {children(contentRefCallback)}
-    <WithScrollContainer>
-      {(scrollContainer) => (
-        <Popper
-          {...popperProps}
-          placement="bottom-start"
-          closeOnEsc
-          closeOnOutsideClick
-          container={scrollContainer}
-          popperOptions={{
-            modifiers: {
-              hide: {
-                enabled: false,
+  return (
+    <>
+      {children(contentRefCallback)}
+      <WithScrollContainer>
+        {(scrollContainer) => (
+          <Popper
+            {...popperProps}
+            placement="bottom-start"
+            closeOnEsc
+            closeOnOutsideClick
+            container={scrollContainer}
+            popperOptions={{
+              modifiers: {
+                hide: {
+                  enabled: false,
+                },
+                preventOverflow: {
+                  enabled: false,
+                },
+                flip: {
+                  enabled: false,
+                },
               },
-              preventOverflow: {
-                enabled: false,
-              },
-              flip: {
-                enabled: false,
-              },
-            },
-          }}
-        >
-          <FocusTrap {...focusTrapProps}>
-            <Menu
-              style={{ maxHeight: 200, overflow: 'auto', width: menuWidth }}
-              onSelect={(event, itemId: number) => {
-                const text = options[itemId];
-                if (text) {
-                  insertAutoComplete(text);
-                }
-              }}
-            >
-              <MenuList>
-                {options.length === 0 ? (
-                  // There is a tab-index problem with the Menus from PF. If the first option is removed, it breaks tab indexes
-                  // Need key 0 because of PF bug
-                  (<MenuItem key={0} itemId={-1} isDisabled>
-                    {t('No options matching your criteria')}
-                  </MenuItem>)
-                ) : (
-                  options.map((value, idx) => (
-                    // Using index-based keys to get around PF bug, see above
-                    // eslint-disable-next-line react/no-array-index-key
-                    (<MenuItem key={idx} itemId={idx}>
-                      {value}
-                    </MenuItem>)
-                  ))
-                )}
-              </MenuList>
-            </Menu>
-          </FocusTrap>
-        </Popper>
-      )}
-    </WithScrollContainer>
-  </>);
+            }}
+          >
+            <FocusTrap {...focusTrapProps}>
+              <Menu
+                style={{ maxHeight: 200, overflow: 'auto', width: menuWidth }}
+                onSelect={(event, itemId: number) => {
+                  const text = options[itemId];
+                  if (text) {
+                    insertAutoComplete(text);
+                  }
+                }}
+              >
+                <MenuList>
+                  {options.length === 0 ? (
+                    // There is a tab-index problem with the Menus from PF. If the first option is removed, it breaks tab indexes
+                    // Need key 0 because of PF bug
+                    <MenuItem key={0} itemId={-1} isDisabled>
+                      {t('No options matching your criteria')}
+                    </MenuItem>
+                  ) : (
+                    options.map((value, idx) => (
+                      // Using index-based keys to get around PF bug, see above
+                      // eslint-disable-next-line react/no-array-index-key
+                      <MenuItem key={idx} itemId={idx}>
+                        {value}
+                      </MenuItem>
+                    ))
+                  )}
+                </MenuList>
+              </Menu>
+            </FocusTrap>
+          </Popper>
+        )}
+      </WithScrollContainer>
+    </>
+  );
 };
 
 export default AutoCompletePopover;

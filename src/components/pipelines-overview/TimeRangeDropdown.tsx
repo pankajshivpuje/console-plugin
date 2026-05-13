@@ -37,7 +37,7 @@ const TimeRangeDropdown: FC<TimeRangeDropdownProps> = ({
     ? TimeRangeOptions()
     : TimeRangeOptionsK8s();
   return (
-    (<div className="form-group">
+    <div className="form-group">
       <label>{t('Time Range')}</label>
       <div>
         <Dropdown
@@ -66,7 +66,7 @@ const TimeRangeDropdown: FC<TimeRangeDropdownProps> = ({
           </DropdownList>
         </Dropdown>
       </div>
-    </div>)
+    </div>
   );
 };
 

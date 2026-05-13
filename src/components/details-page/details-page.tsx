@@ -33,9 +33,9 @@ export const pluralize = (
 export const detailsPage = <T extends Record<string, any>>(
   Component: ComponentType<T>,
 ) =>
-  (function DetailsPage(props: T) {
+  function DetailsPage(props: T) {
     return <Component {...props} />;
-  });
+  };
 
 export const ResourceSummary: FC<ResourceSummaryProps> = ({
   children,

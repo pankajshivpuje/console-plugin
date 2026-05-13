@@ -16,11 +16,7 @@ interface TestComponentProps {
   rerenderRef: RerenderRef;
 }
 
-const TestHook: FC<TestComponentProps> = ({
-  hook,
-  result,
-  rerenderRef,
-}) => {
+const TestHook: FC<TestComponentProps> = ({ hook, result, rerenderRef }) => {
   result.current = hook();
   rerenderRef.current = useRerender();
   return null;

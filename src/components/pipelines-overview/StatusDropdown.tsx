@@ -16,7 +16,7 @@ const StatusDropdown = () => {
   const setClosed = useCallback(() => setValue(false), []);
   const statusOptions = StatusOptions();
   return (
-    (<div className="form-group">
+    <div className="form-group">
       <div>
         <Dropdown
           isOpen={isOpen}
@@ -42,7 +42,7 @@ const StatusDropdown = () => {
           </DropdownList>
         </Dropdown>
       </div>
-    </div>)
+    </div>
   );
 };
 

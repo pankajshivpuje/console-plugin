@@ -25,7 +25,7 @@ const OptionalableWorkspace: FC<OptionalableWorkspace> = ({
         isReadOnly={isReadOnly}
         aria-label={t('Name')}
       />
-      <div style={{ marginBottom: "var(--pf-t--global--spacer--xs)" }} />
+      <div style={{ marginBottom: 'var(--pf-t--global--spacer--xs)' }} />
       <CheckboxField
         name={`${namePrefix}.optional`}
         label={t('Optional workspace')}

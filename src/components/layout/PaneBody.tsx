@@ -10,7 +10,8 @@ const PaneBody: FC<PaneBodyProps> = ({
   ...props
 }) => {
   return (
-    <PageSection hasBodyWrapper={false}
+    <PageSection
+      hasBodyWrapper={false}
       className={className}
       isFilled={fullHeight}
       style={style}

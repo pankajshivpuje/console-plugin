@@ -39,7 +39,11 @@ const PipelineRunStatusContent: FC<PipelineRunStatusProps> = ({
             shouldOpen={() => setIsPopoverOpen(true)}
             position={PopoverPosition.auto}
           >
-            <Button icon={<PipelineResourceStatus status={status} title={title} />} variant="plain" className="odc-status-column-text" />
+            <Button
+              icon={<PipelineResourceStatus status={status} title={title} />}
+              variant="plain"
+              className="odc-status-column-text"
+            />
           </Popover>
         ) : (
           <PipelineResourceStatus status={status} title={title} />

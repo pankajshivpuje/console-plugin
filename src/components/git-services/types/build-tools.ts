@@ -48,7 +48,9 @@ export const NodeJS: BuildTool = {
   name: 'NodeJS',
   type: 'nodejs',
   language: 'javascript',
-  expectedRegexps: RegExp([`app.json`, `package.json`, `gulpfile.js`, `Gruntfile.js`].join('|')),
+  expectedRegexps: RegExp(
+    [`app.json`, `package.json`, `gulpfile.js`, `Gruntfile.js`].join('|'),
+  ),
   expectedFiles: ['app.json', 'package.json', 'gulpfile.js', 'Gruntfile.js'],
 };
 
@@ -56,7 +58,9 @@ export const ModernWebApp: BuildTool = {
   name: 'Modern Web App',
   type: 'modern-webapp',
   language: 'javascript',
-  expectedRegexps: RegExp([`app.json`, `package.json`, `gulpfile.js`, `Gruntfile.js`].join('|')),
+  expectedRegexps: RegExp(
+    [`app.json`, `package.json`, `gulpfile.js`, `Gruntfile.js`].join('|'),
+  ),
   expectedFiles: ['app.json', 'package.json', 'gulpfile.js', 'Gruntfile.js'],
 };
 

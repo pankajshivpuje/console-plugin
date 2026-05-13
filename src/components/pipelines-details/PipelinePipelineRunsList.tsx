@@ -9,9 +9,7 @@ type PipelinePipelineRunsListProps = {
   obj?: K8sResourceKind;
 };
 
-const PipelinePipelineRunsList: FC<PipelinePipelineRunsListProps> = (
-  props,
-) => {
+const PipelinePipelineRunsList: FC<PipelinePipelineRunsListProps> = (props) => {
   const { ns, obj } = props;
   return (
     <PipelineRunsList

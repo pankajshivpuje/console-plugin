@@ -29,13 +29,15 @@ const GitProviderList: GitProviderType[] = [
   },
 ];
 
-const hasDomain = (url: string) => (provider: GitProviderType): boolean => {
-  return (
-    url.startsWith(`https://${provider.domain}/`) ||
-    url.startsWith(`https://www.${provider.domain}/`) ||
-    url.includes(`@${provider.domain}:`)
-  );
-};
+const hasDomain =
+  (url: string) =>
+  (provider: GitProviderType): boolean => {
+    return (
+      url.startsWith(`https://${provider.domain}/`) ||
+      url.startsWith(`https://www.${provider.domain}/`) ||
+      url.includes(`@${provider.domain}:`)
+    );
+  };
 
 export const detectGitProvider = (url: string): GitProvider => {
   const gitProvider = GitProviderList.find(hasDomain(url));

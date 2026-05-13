@@ -11,14 +11,22 @@ const CatalogBadges: FC<CatalogBadgesProps> = ({ badges }) => (
   <div className="odc-catalog-badges">
     {badges?.map((badge, index) => {
       // Map colors for PF6 compatibility
-      const validColors = ['blue', 'teal', 'green', 'orange', 'purple', 'red', 'grey'];
+      const validColors = [
+        'blue',
+        'teal',
+        'green',
+        'orange',
+        'purple',
+        'red',
+        'grey',
+      ];
       const color = badge.color as string;
       // Map cyan to blue, and default any invalid color to blue
       const validColor = validColors.includes(color)
         ? color
         : color === 'cyan'
-          ? 'blue'
-          : 'blue';
+        ? 'blue'
+        : 'blue';
       return (
         <Label
           className="odc-catalog-badges__label"

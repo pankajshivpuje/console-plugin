@@ -47,17 +47,20 @@ const TaskRunDetailsPage = () => {
     () => loaded && data && taskRunStatus(data),
     [loaded, data],
   );
-  const customActionMenu = useCallback((_kindObj, obj) => {
-    const reference = getReferenceForModel(TaskRunModel);
-    const context = { [reference]: obj };
-    return (
-      <LazyActionMenu
-        context={context}
-        variant={ActionMenuVariant.DROPDOWN}
-        label={t('Actions')}
-      />
-    );
-  }, [t]);
+  const customActionMenu = useCallback(
+    (_kindObj, obj) => {
+      const reference = getReferenceForModel(TaskRunModel);
+      const context = { [reference]: obj };
+      return (
+        <LazyActionMenu
+          context={context}
+          variant={ActionMenuVariant.DROPDOWN}
+          label={t('Actions')}
+        />
+      );
+    },
+    [t],
+  );
 
   const resourceTitleFunc = useMemo(() => {
     return (

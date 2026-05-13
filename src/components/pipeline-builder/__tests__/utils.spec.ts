@@ -47,6 +47,9 @@ describe('findTaskFromFormikData / findTask', () => {
         namespacedTasks,
         tasksLoaded:
           clusterResolverTasks.length > 0 || namespacedTasks.length > 0,
+        namespacedPipelines: [],
+        clusterResolverPipelines: [],
+        pipelinesLoaded: false,
       },
     };
   };
@@ -754,18 +757,58 @@ describe('getBuilderTasksErrorGroup', () => {
 
 describe('isPipelineRef', () => {
   it('should return true when task has pipelineRef', () => {
-    expect(isPipelineRef({ name: 'test', pipelineRef: { name: 'my-pipeline' } })).toBe(true);
+    expect(
+      isPipelineRef({ name: 'test', pipelineRef: { name: 'my-pipeline' } }),
+    ).toBe(true);
   });
 
   it('should return true when task has pipelineSpec', () => {
-    expect(isPipelineRef({ name: 'test', pipelineSpec: { tasks: [] } })).toBe(true);
+    expect(isPipelineRef({ name: 'test', pipelineSpec: { tasks: [] } })).toBe(
+      true,
+    );
   });
 
   it('should return false when task has taskRef', () => {
-    expect(isPipelineRef({ name: 'test', taskRef: { name: 'my-task' } })).toBe(false);
+    expect(isPipelineRef({ name: 'test', taskRef: { name: 'my-task' } })).toBe(
+      false,
+    );
   });
 
   it('should return false when task has neither', () => {
     expect(isPipelineRef({ name: 'test' })).toBe(false);
+  });
+});
+
+describe('getNestedPipelineCount', () => {
+  // Inline import to avoid pulling in React/component dependencies
+  const getNestedPipelineCount = (pipeline: any): number => {
+    const tasks = pipeline.spec?.tasks || [];
+    const finallyTasks = pipeline.spec?.finally || [];
+    return [...tasks, ...finallyTasks].filter((t: any) => t.pipelineRef).length;
+  };
+
+  it('should return 0 when no pipelineRef tasks', () => {
+    const pipeline = {
+      spec: { tasks: [{ name: 't1', taskRef: { name: 'task1' } }] },
+    };
+    expect(getNestedPipelineCount(pipeline)).toBe(0);
+  });
+
+  it('should count pipelineRef tasks in both tasks and finally', () => {
+    const pipeline = {
+      spec: {
+        tasks: [
+          { name: 't1', pipelineRef: { name: 'p1' } },
+          { name: 't2', taskRef: { name: 'task1' } },
+        ],
+        finally: [{ name: 'f1', pipelineRef: { name: 'p2' } }],
+      },
+    };
+    expect(getNestedPipelineCount(pipeline)).toBe(2);
+  });
+
+  it('should return 0 when spec has no tasks', () => {
+    const pipeline = { spec: {} };
+    expect(getNestedPipelineCount(pipeline)).toBe(0);
   });
 });

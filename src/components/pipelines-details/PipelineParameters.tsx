@@ -33,7 +33,7 @@ const PipelineParameters: FC<PipelineParametersProps> = ({
   className,
 }) => {
   return (
-    <PageSection hasBodyWrapper={false}  isFilled className={className}>
+    <PageSection hasBodyWrapper={false} isFilled className={className}>
       <MultiColumnField
         data-test="pipeline-parameters"
         name={fieldName}

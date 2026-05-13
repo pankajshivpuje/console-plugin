@@ -9,4 +9,3 @@ export const setInterval = (interval: number) => ({
   type: ActionType.SET_INTERVAL,
   payload: { interval },
 });
-

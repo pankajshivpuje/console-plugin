@@ -63,9 +63,7 @@ const EditButton: FC<EditButtonProps> = (props) => {
   );
 };
 
-export const LinkifyExternal: FC<{ children: ReactNode }> = ({
-  children,
-}) => (
+export const LinkifyExternal: FC<{ children: ReactNode }> = ({ children }) => (
   <Linkify properties={{ target: '_blank', rel: 'noopener noreferrer' }}>
     {children}
   </Linkify>

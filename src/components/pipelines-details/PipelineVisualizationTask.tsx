@@ -76,9 +76,7 @@ interface PipelineVisualizationTaskProp {
 
 const FILTER_ID = 'SvgTaskDropShadowFilterId';
 
-export const PipelineVisualizationTask: FC<
-  PipelineVisualizationTaskProp
-> = ({
+export const PipelineVisualizationTask: FC<PipelineVisualizationTaskProp> = ({
   pipelineRunName,
   task,
   namespace,
@@ -304,12 +302,7 @@ interface SvgTaskStatusProps {
   width: number;
 }
 
-const SvgTaskStatus: FC<SvgTaskStatusProps> = ({
-  steps,
-  x,
-  y,
-  width,
-}) => {
+const SvgTaskStatus: FC<SvgTaskStatusProps> = ({ steps, x, y, width }) => {
   if (steps.length === 0) {
     return null;
   }

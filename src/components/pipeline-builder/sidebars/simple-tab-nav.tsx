@@ -37,7 +37,7 @@ export const SimpleTabNav: FC<SimpleTabNavProps> = ({
   };
 
   return (
-    (<div>
+    <div>
       <Tabs
         activeKey={activeKey}
         onSelect={handleTabClick}
@@ -49,12 +49,8 @@ export const SimpleTabNav: FC<SimpleTabNavProps> = ({
       >
         {tabs.map((tab) => {
           const content =
-            !isValidElement(tab.component) &&
-            !Array.isArray(tab.component)
-              ? createElement(
-                  tab.component as FunctionComponent,
-                  tabProps,
-                )
+            !isValidElement(tab.component) && !Array.isArray(tab.component)
+              ? createElement(tab.component as FunctionComponent, tabProps)
               : tab.component;
 
           return (
@@ -69,6 +65,6 @@ export const SimpleTabNav: FC<SimpleTabNavProps> = ({
           );
         })}
       </Tabs>
-    </div>)
+    </div>
   );
 };

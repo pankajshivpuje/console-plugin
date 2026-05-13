@@ -134,9 +134,7 @@ const useArtifactHubTasksProvider: ExtensionHook<CatalogItem[]> = ({
     canCreateTask && canUpdateTask && artifactHubIntegration,
     isDevConsoleProxyAvailable,
   );
-  const normalizedArtifactHubTasks = useMemo<
-    CatalogItem<TektonHubTask>[]
-  >(
+  const normalizedArtifactHubTasks = useMemo<CatalogItem<TektonHubTask>[]>(
     () => normalizeArtifactHubTasks(artifactHubTasks, tektonTasks),
     [artifactHubTasks, tektonTasks],
   );

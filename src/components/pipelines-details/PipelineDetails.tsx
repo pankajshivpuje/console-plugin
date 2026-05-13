@@ -12,9 +12,7 @@ import { getPipelineTaskLinks } from './utils';
 import TriggerTemplateResourceLink from './TriggerTemplateResourceLink';
 import { usePipelineTriggerTemplateNames } from '../utils/triggers';
 
-const PipelineDetails: FC<PipelineDetailsTabProps> = ({
-  obj: pipeline,
-}) => {
+const PipelineDetails: FC<PipelineDetailsTabProps> = ({ obj: pipeline }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const templateNames =
     usePipelineTriggerTemplateNames(
@@ -26,7 +24,7 @@ const PipelineDetails: FC<PipelineDetailsTabProps> = ({
 
   return (
     <>
-      <PageSection hasBodyWrapper={false} isFilled >
+      <PageSection hasBodyWrapper={false} isFilled>
         <Title headingLevel="h2">{t('Pipeline details')}</Title>
         <PipelineVisualization pipeline={pipeline} />
         <Grid hasGutter>

@@ -719,11 +719,9 @@ export const getWhenExpressionDiamondState = (
       diamondColor = getRunStatusColor(status, t).pftoken.value;
     }
   } else if (!isFinallyTask) {
-    diamondColor =
-      'var(--pf-t--global--background--color--secondary--default)';
+    diamondColor = 'var(--pf-t--global--background--color--secondary--default)';
   } else {
-    diamondColor =
-      'var(--pf-t--global--background--color--primary--default)';
+    diamondColor = 'var(--pf-t--global--background--color--primary--default)';
   }
 
   let tooltipContent: string;

@@ -8,9 +8,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { referenceForOwnerRef } from '../utils/k8s-utils';
 
-export const OwnerReferences: FC<OwnerReferencesProps> = ({
-  resource,
-}) => {
+export const OwnerReferences: FC<OwnerReferencesProps> = ({ resource }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const owners = (_.get(resource.metadata, 'ownerReferences') || []).map(
     (o: OwnerReference) => (

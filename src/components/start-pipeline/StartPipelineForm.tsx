@@ -9,9 +9,7 @@ import PipelineWorkspacesSection from './form-sections/PipelineWorkspacesSection
 import PipelineSecretSection from '../common/PipelineSecretSection';
 import PipelineTimeoutSection from './form-sections/PipelineTimeoutSection';
 
-const StartPipelineForm: FC<
-  FormikProps<StartPipelineFormValues>
-> = () => {
+const StartPipelineForm: FC<FormikProps<StartPipelineFormValues>> = () => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   return (
     <>

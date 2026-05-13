@@ -14,7 +14,7 @@ export interface TaskDetailsProps {
 const TaskDetails: FC<TaskDetailsProps> = ({ obj: task }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   return (
-    <PageSection hasBodyWrapper={false} isFilled >
+    <PageSection hasBodyWrapper={false} isFilled>
       <SectionHeading
         text={t('{{taskLabel}} details', {
           taskLabel: t(TaskModel.labelKey),

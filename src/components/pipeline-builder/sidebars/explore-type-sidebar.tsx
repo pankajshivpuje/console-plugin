@@ -99,10 +99,7 @@ export const ExploreType: FC<ExploreTypeProps> = (props) => {
     }
   };
 
-  const breadcrumbClicked = (
-    e: MouseEvent<HTMLButtonElement>,
-    i: number,
-  ) => {
+  const breadcrumbClicked = (e: MouseEvent<HTMLButtonElement>, i: number) => {
     e.preventDefault();
     setDrilldownHistory(_.take(drilldownHistory, i));
   };
@@ -163,8 +160,11 @@ export const ExploreType: FC<ExploreTypeProps> = (props) => {
           </p>
         )}
         {_.isEmpty(currentProperties) ? (
-          <EmptyState variant={EmptyStateVariant.xs} headingLevel="h4" titleText={t('No Properties found')}>
-          </EmptyState>
+          <EmptyState
+            variant={EmptyStateVariant.xs}
+            headingLevel="h4"
+            titleText={t('No Properties found')}
+          ></EmptyState>
         ) : (
           <ul className="co-resource-sidebar-list pf-v6-c-list">
             {_.map(

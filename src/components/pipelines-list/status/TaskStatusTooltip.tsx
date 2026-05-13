@@ -9,12 +9,10 @@ interface TaskStatusToolTipProps {
   taskStatus: TaskStatus;
 }
 
-const TaskStatusToolTip: FC<TaskStatusToolTipProps> = ({
-  taskStatus,
-}) => {
+const TaskStatusToolTip: FC<TaskStatusToolTipProps> = ({ taskStatus }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   return (
-    (<div className="odc-task-status-tooltip">
+    <div className="odc-task-status-tooltip">
       {Object.keys(ComputedStatus).map((status) => {
         const { message, pftoken } = getRunStatusColor(status, t);
         return taskStatus[status] ? (
@@ -32,7 +30,7 @@ const TaskStatusToolTip: FC<TaskStatusToolTipProps> = ({
           </Fragment>
         ) : null;
       })}
-    </div>)
+    </div>
   );
 };
 

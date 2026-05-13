@@ -10,9 +10,7 @@ type RepositoryWebhookSecretProps = {
   obj: K8sResourceKind;
 };
 
-const RepositoryWebhookSecret: FC<RepositoryWebhookSecretProps> = ({
-  obj,
-}) => {
+const RepositoryWebhookSecret: FC<RepositoryWebhookSecretProps> = ({ obj }) => {
   return (
     <ResourceLink
       groupVersionKind={getGroupVersionKindForModel(SecretModel)}

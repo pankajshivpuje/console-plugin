@@ -91,8 +91,7 @@ const useOpenMenuKeyWatcher = (): MenuKeyWatcherHook => {
 const useFilterOptions = (options: string[]): FilterOptionsHook => {
   type FilterMap = { [singleValue: string]: string };
 
-  const [filteredOptions, setFilteredOptions] =
-    useState<string[]>(options);
+  const [filteredOptions, setFilteredOptions] = useState<string[]>(options);
   const filterMappings = useRef<FilterMap>({});
 
   useEffect(() => {

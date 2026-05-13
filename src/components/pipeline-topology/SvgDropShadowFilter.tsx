@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { t_chart_color_black_500 as globalBlack1000 } from "@patternfly/react-tokens/dist/js/t_chart_color_black_500";
+import { t_chart_color_black_500 as globalBlack1000 } from '@patternfly/react-tokens/dist/js/t_chart_color_black_500';
 import { SVGDefs } from '@patternfly/react-topology';
 
 interface SvgDropShadowFilterProps {

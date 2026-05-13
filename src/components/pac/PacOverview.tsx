@@ -39,8 +39,7 @@ const PacOverview: FC<PacOverviewProps> = ({
   showSuccessAlert = false,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  const [alertVisible, setAlertVisible] =
-    useState<boolean>(showSuccessAlert);
+  const [alertVisible, setAlertVisible] = useState<boolean>(showSuccessAlert);
 
   useEffect(() => {
     setAlertVisible(showSuccessAlert);

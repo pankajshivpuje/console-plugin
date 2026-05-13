@@ -2,7 +2,10 @@ import type { ReactElement } from 'react';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { PipeLineRunWithRepoMetadata } from '../../../test-data/pipeline-data';
-import { getLabelValue, sanitizeBranchName } from '../../utils/repository-utils';
+import {
+  getLabelValue,
+  sanitizeBranchName,
+} from '../../utils/repository-utils';
 import RepositoryLinkList from '../../pipelineRuns-details/RepositoryLinkList';
 
 jest.mock('../../utils/repository-utils', () => ({
@@ -44,7 +47,9 @@ describe('RepositoryLinkList', () => {
         pipelineRun={PipeLineRunWithRepoMetadata.PipelineRunWithRepoLabel}
       />,
     );
-    expect(container.querySelector('[data-test="pl-repository-link"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-test="pl-repository-link"]'),
+    ).not.toBeNull();
   });
 
   it('should render repository branch details when repo & branch label are present', () => {
@@ -53,7 +58,9 @@ describe('RepositoryLinkList', () => {
         pipelineRun={PipeLineRunWithRepoMetadata.PipelineRunWithBranchLabel}
       />,
     );
-    expect(container.querySelector('[data-test="pl-repository-branch"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-test="pl-repository-branch"]'),
+    ).not.toBeNull();
   });
 
   it('should render commit id when repo & sha label are present', () => {
@@ -62,7 +69,11 @@ describe('RepositoryLinkList', () => {
         pipelineRun={PipeLineRunWithRepoMetadata.PipelineRunWithSHALabel}
       />,
     );
-    expect(container.querySelector('a[href="https://www.github.com/dummy/commit/3212345"]')).not.toBeNull();
+    expect(
+      container.querySelector(
+        'a[href="https://www.github.com/dummy/commit/3212345"]',
+      ),
+    ).not.toBeNull();
   });
 
   it('should render event type when repo & EventType label are present', () => {
@@ -71,6 +82,8 @@ describe('RepositoryLinkList', () => {
         pipelineRun={PipeLineRunWithRepoMetadata.PipelineRunWithEventTypeLabel}
       />,
     );
-    expect(container.querySelector('[data-test="pl-event-type"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-test="pl-event-type"]'),
+    ).not.toBeNull();
   });
 });

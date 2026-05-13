@@ -103,7 +103,8 @@ export const useMultiClusterTaskRuns = <Kind extends K8sResourceCommon>(
   }, [namespace, pipelineRunName]);
 
   // Should we fetch from multi-cluster API?
-  const shouldFetch = isResourceManagedByKueue && !!namespace && !!pipelineRunName;
+  const shouldFetch =
+    isResourceManagedByKueue && !!namespace && !!pipelineRunName;
 
   // Should we continue polling after initial fetch?
   const shouldContinuePolling =

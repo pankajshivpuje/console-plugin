@@ -118,13 +118,15 @@ const CodeEditorField: FC<CodeEditorFieldProps> = ({
             toolbarLinks={
               !sidebarOpen &&
               hasSidebarContent && [
-                <Button icon={<InfoCircleIcon className="co-icon-space-r odc-p-has-sidebar__sidebar-link-icon" />}
+                <Button
+                  icon={
+                    <InfoCircleIcon className="co-icon-space-r odc-p-has-sidebar__sidebar-link-icon" />
+                  }
                   isInline
                   variant="link"
                   onClick={() => setSidebarOpen(true)}
                   key=""
                 >
-                  
                   {t('View sidebar')}
                 </Button>,
               ]

@@ -16,10 +16,7 @@ interface QuickSearchBarProps {
   itemsLoaded: boolean;
   autoFocus: boolean;
   searchTerm: string;
-  onSearch: (
-    event: FormEvent<HTMLInputElement>,
-    searchTerm: string,
-  ) => void;
+  onSearch: (event: FormEvent<HTMLInputElement>, searchTerm: string) => void;
   searchPlaceholder: string;
   icon?: ReactNode;
   showError: boolean;
@@ -33,7 +30,7 @@ const QuickSearchBar: FC<QuickSearchBarProps> = ({
   searchPlaceholder,
   onSearch,
   icon,
-  showError
+  showError,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,9 +42,7 @@ const QuickSearchBar: FC<QuickSearchBarProps> = ({
       data-test="quick-search-bar"
     >
       <Bullseye className="ocs-quick-search-bar__icon">
-        <InputGroupText isPlain >
-          {icon || <QuickSearchIcon />}
-        </InputGroupText>
+        <InputGroupText isPlain>{icon || <QuickSearchIcon />}</InputGroupText>
       </Bullseye>
       <div className="ocs-quick-search-bar__input-wrapper">
         {/* <span> is only used to calculate the width of input based on the text in search */}

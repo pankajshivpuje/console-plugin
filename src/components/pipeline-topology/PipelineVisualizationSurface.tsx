@@ -36,9 +36,7 @@ type PipelineVisualizationSurfaceProps = {
   noScrollbar?: boolean;
 };
 
-const PipelineVisualizationSurface: FC<
-  PipelineVisualizationSurfaceProps
-> = ({
+const PipelineVisualizationSurface: FC<PipelineVisualizationSurfaceProps> = ({
   model,
   componentFactory,
   showControlBar = false,

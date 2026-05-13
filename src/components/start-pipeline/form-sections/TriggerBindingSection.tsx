@@ -19,8 +19,7 @@ import './TriggerBindingSection.scss';
 const TriggerBindingSection: FC = () => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const { setFieldValue } = useFormikContext<AddTriggerFormValues>();
-  const [bindingVars, setBindingVars] =
-    useState<TriggerBindingParam[]>(null);
+  const [bindingVars, setBindingVars] = useState<TriggerBindingParam[]>(null);
 
   const paramPrefix = 'tt.params.';
 

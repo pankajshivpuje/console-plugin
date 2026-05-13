@@ -31,9 +31,7 @@ type TriggerBindingSelectorProps = {
 
 const KEY_DIVIDER = '~';
 
-const TriggerBindingSelector: FC<TriggerBindingSelectorProps> = (
-  props,
-) => {
+const TriggerBindingSelector: FC<TriggerBindingSelectorProps> = (props) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const {
     description,
@@ -48,10 +46,8 @@ const TriggerBindingSelector: FC<TriggerBindingSelectorProps> = (
   const errorMessage = !isValid ? error : '';
   useFormikValidationFix(field.value);
 
-  const autoCompleteFilter = (
-    strText: string,
-    item: ReactElement,
-  ): boolean => fuzzy(strText, item?.props?.name);
+  const autoCompleteFilter = (strText: string, item: ReactElement): boolean =>
+    fuzzy(strText, item?.props?.name);
   const onTriggerChange = (
     key: string,
     value: string,

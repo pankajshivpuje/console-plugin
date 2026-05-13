@@ -28,10 +28,7 @@ const secretTypes = [
   SecretType.sshAuth,
 ];
 
-export const Secrets: FC<SecretsProps> = ({
-  secrets,
-  serviceaccounts,
-}) => {
+export const Secrets: FC<SecretsProps> = ({ secrets, serviceaccounts }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const serviceAccountSecrets = _.map(serviceaccounts.data?.secrets, 'name');
   const filterData = _.filter(

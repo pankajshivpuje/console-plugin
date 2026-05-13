@@ -8,10 +8,7 @@ export enum EditorType {
   YAML = 'yaml',
 }
 
-export const EditorToggle: FC<EditorToggleProps> = ({
-  value,
-  onChange,
-}) => {
+export const EditorToggle: FC<EditorToggleProps> = ({ value, onChange }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const handleChange = (event: FormEvent<HTMLInputElement>) => {
     onChange(event?.currentTarget?.value as EditorType);

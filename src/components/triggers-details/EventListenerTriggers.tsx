@@ -18,9 +18,7 @@ interface EventListenerTriggersProps {
   obj: EventListenerKind;
 }
 
-const EventListenerTriggers: FC<EventListenerTriggersProps> = ({
-  obj,
-}) => {
+const EventListenerTriggers: FC<EventListenerTriggersProps> = ({ obj }) => {
   const namespace = obj?.metadata.namespace;
   const triggers: EventListenerKindTrigger[] =
     obj.spec.triggers?.filter(

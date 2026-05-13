@@ -12,9 +12,7 @@ export interface WorkspaceDefinitionListProps {
   obj: TaskKind | PipelineKind;
 }
 
-const WorkspaceDefinitionList: FC<WorkspaceDefinitionListProps> = ({
-  obj,
-}) => {
+const WorkspaceDefinitionList: FC<WorkspaceDefinitionListProps> = ({ obj }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   if (!obj?.spec?.workspaces || obj?.spec?.workspaces?.length === 0)
     return null;
