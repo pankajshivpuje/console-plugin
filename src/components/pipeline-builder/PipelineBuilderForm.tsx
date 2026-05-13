@@ -27,6 +27,7 @@ import RemoveTaskModal from './modals';
 import PipelineBuilderFormEditor from './PipelineBuilderFormEditor';
 import PipelineBuilderHeader from './PipelineBuilderHeader';
 import TaskSidebar from './task-sidebar/TaskSidebar';
+import PipelineSidebar from './sidebars/PipelineSidebar';
 import {
   CleanupResults,
   PipelineBuilderTaskGroup,
@@ -37,6 +38,7 @@ import {
   EditorType,
 } from './types';
 import { applyChange } from './update-utils';
+import { findPipeline, isPipelineRef } from './utils';
 
 import './PipelineBuilderForm.scss';
 import CodeEditorField from './CodeEditorField';
@@ -106,6 +108,7 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
       isFinallyTask,
       taskIndex: builderNodes.findIndex(({ name }) => name === task.name),
       resource,
+      isPipelineRef: isPipelineRef(task),
     });
   };
 
@@ -205,37 +208,64 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
         panelContent={
           selectedTask ? (
             <DrawerPanelContent>
-              <TaskSidebar
-                // Intentional remount when selection changes
-                key={
-                  selectedTask?.resource?.metadata?.name +
-                  selectedTask?.taskIndex +
-                  String(selectedTask?.isFinallyTask)
-                }
-                onClose={() => setSelectedTask(null)}
-                resourceList={formData.resources || []}
-                workspaceList={formData.workspaces || []}
-                errorMap={status?.tasks || {}}
-                onRenameTask={(data: UpdateOperationRenameTaskData) => {
-                  updateTasks(
-                    applyChange(
-                      taskGroup,
-                      {
-                        type: UpdateOperationType.RENAME_TASK,
-                        data,
-                      },
-                      namespace,
-                    ),
-                  );
-                }}
-                onRemoveTask={(taskName: string) => {
-                  launchOverlay(RemoveTaskModal, {
-                    taskName,
-                    onRemove: () => handleRemoveTask(taskName),
-                  });
-                }}
-                selectedData={selectedTask}
-              />
+              {selectedTask?.isPipelineRef ? (
+                <PipelineSidebar
+                  key={selectedTask?.taskIndex + String(selectedTask?.isFinallyTask)}
+                  pipeline={findPipeline(
+                    taskResources,
+                    formData[nodeType][selectedTask?.taskIndex],
+                  )}
+                  onClose={() => setSelectedTask(null)}
+                  workspaceList={formData.workspaces || []}
+                  onRenameTask={(data: UpdateOperationRenameTaskData) => {
+                    updateTasks(
+                      applyChange(
+                        taskGroup,
+                        { type: UpdateOperationType.RENAME_TASK, data },
+                        namespace,
+                      ),
+                    );
+                  }}
+                  onRemoveTask={(taskName: string) => {
+                    launchOverlay(RemoveTaskModal, {
+                      taskName,
+                      onRemove: () => handleRemoveTask(taskName),
+                    });
+                  }}
+                  selectedData={selectedTask}
+                />
+              ) : (
+                <TaskSidebar
+                  key={
+                    selectedTask?.resource?.metadata?.name +
+                    selectedTask?.taskIndex +
+                    String(selectedTask?.isFinallyTask)
+                  }
+                  onClose={() => setSelectedTask(null)}
+                  resourceList={formData.resources || []}
+                  workspaceList={formData.workspaces || []}
+                  errorMap={status?.tasks || {}}
+                  onRenameTask={(data: UpdateOperationRenameTaskData) => {
+                    updateTasks(
+                      applyChange(
+                        taskGroup,
+                        {
+                          type: UpdateOperationType.RENAME_TASK,
+                          data,
+                        },
+                        namespace,
+                      ),
+                    );
+                  }}
+                  onRemoveTask={(taskName: string) => {
+                    launchOverlay(RemoveTaskModal, {
+                      taskName,
+                      onRemove: () => handleRemoveTask(taskName),
+                    });
+                  }}
+                  selectedData={selectedTask}
+                />
+              )}
             </DrawerPanelContent>
           ) : null
         }
