@@ -7,6 +7,7 @@ import {
   TaskErrorType,
 } from '../const';
 import { EditorType } from '../types';
+import { detectCircularPipelineRef } from '../utils';
 import { validationSchema } from '../validation-utils';
 import {
   createSafeTask,
@@ -22,6 +23,7 @@ import {
   withFormData,
   workspaceTask,
 } from './validation-utils-data';
+import { PipelineKind } from '../../../types';
 
 const requiredMessage = 'Required';
 
@@ -147,7 +149,7 @@ describe('Pipeline Build validation schema', () => {
         .catch(
           hasError(
             'formData.tasks[0]',
-            'TaskSpec or TaskRef must be provided.',
+            'Exactly one of TaskSpec, TaskRef, or PipelineRef must be provided.',
           ),
         );
     });
@@ -929,5 +931,51 @@ describe('Pipeline Build validation schema', () => {
           .catch(shouldHavePassed);
       });
     });
+  });
+});
+
+describe('detectCircularPipelineRef', () => {
+  it('should return false when no cycle exists', () => {
+    const pipelines: PipelineKind[] = [
+      {
+        metadata: { name: 'a' },
+        apiVersion: 'tekton.dev/v1',
+        kind: 'Pipeline',
+        spec: { tasks: [{ name: 't1', taskRef: { name: 'some-task' } }] },
+      },
+    ];
+    expect(detectCircularPipelineRef('a', pipelines)).toBe(false);
+  });
+
+  it('should return true for direct self-reference', () => {
+    const pipelines: PipelineKind[] = [
+      {
+        metadata: { name: 'a' },
+        apiVersion: 'tekton.dev/v1',
+        kind: 'Pipeline',
+        spec: {
+          tasks: [{ name: 't1', pipelineRef: { name: 'a' } }],
+        },
+      },
+    ];
+    expect(detectCircularPipelineRef('a', pipelines)).toBe(true);
+  });
+
+  it('should return true for transitive cycle', () => {
+    const pipelines: PipelineKind[] = [
+      {
+        metadata: { name: 'a' },
+        apiVersion: 'tekton.dev/v1',
+        kind: 'Pipeline',
+        spec: { tasks: [{ name: 't1', pipelineRef: { name: 'b' } }] },
+      },
+      {
+        metadata: { name: 'b' },
+        apiVersion: 'tekton.dev/v1',
+        kind: 'Pipeline',
+        spec: { tasks: [{ name: 't1', pipelineRef: { name: 'a' } }] },
+      },
+    ];
+    expect(detectCircularPipelineRef('a', pipelines)).toBe(true);
   });
 });

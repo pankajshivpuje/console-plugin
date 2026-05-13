@@ -218,6 +218,12 @@ const taskValidation = (
           })
           .default(undefined),
         taskSpec: yup.object(),
+        pipelineRef: yup
+          .object({
+            name: yup.string(),
+          })
+          .default(undefined),
+        pipelineSpec: yup.object().default(undefined),
         runAfter: validRunAfter(formValues.formData, t),
         params: yup
           .array()
@@ -303,10 +309,11 @@ const taskValidation = (
           ),
       })
       .test(
-        'taskRef-or-taskSpec',
-        t('TaskSpec or TaskRef must be provided.'),
+        'taskRef-or-taskSpec-or-pipelineRef',
+        t('Exactly one of TaskSpec, TaskRef, or PipelineRef must be provided.'),
         function (task) {
-          return !!task.taskRef || !!task.taskSpec;
+          const refs = [!!task.taskRef, !!task.taskSpec, !!task.pipelineRef, !!task.pipelineSpec];
+          return refs.filter(Boolean).length === 1;
         },
       ),
   );

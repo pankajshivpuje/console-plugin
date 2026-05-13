@@ -636,3 +636,34 @@ export const getResourceSidebarSamples = (
 
   return { snippets, samples };
 };
+
+export const detectCircularPipelineRef = (
+  pipelineName: string,
+  allPipelines: PipelineKind[],
+): boolean => {
+  const visited = new Set<string>();
+  const stack = [pipelineName];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (visited.has(current)) return true;
+    visited.add(current);
+
+    const pipeline = allPipelines.find((p) => p.metadata?.name === current);
+    if (!pipeline) continue;
+
+    const allTasks = [
+      ...(pipeline.spec?.tasks || []),
+      ...(pipeline.spec?.finally || []),
+    ];
+
+    for (const task of allTasks) {
+      if (task.pipelineRef?.name) {
+        if (task.pipelineRef.name === pipelineName) return true;
+        stack.push(task.pipelineRef.name);
+      }
+    }
+  }
+
+  return false;
+};
