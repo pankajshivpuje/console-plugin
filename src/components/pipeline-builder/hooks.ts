@@ -41,7 +41,7 @@ import {
   UpdateOperationFixInvalidTaskListData,
   UpdateTasksCallback,
 } from './types';
-import { findTask, getTopLevelErrorMessage } from './utils';
+import { findPipeline, findTask, getTopLevelErrorMessage, isPipelineRef } from './utils';
 
 export const useFormikFetchAndSaveTasks = (
   namespace: string,
@@ -415,10 +415,18 @@ export const useNodes = (
       },
     });
 
-  const invalidTaskList = taskGroup.tasks.filter(
+  // Separate pipeline ref tasks from regular tasks
+  const pipelineRefTasks = taskGroup.tasks.filter(
+    (task) => isPipelineRef(task) && !!findPipeline(taskResources, task),
+  );
+  const regularTasks = taskGroup.tasks.filter(
+    (task) => !isPipelineRef(task),
+  );
+
+  const invalidTaskList = regularTasks.filter(
     (task) => !findTask(taskResources, task),
   );
-  const validTaskList = taskGroup.tasks.filter(
+  const validTaskList = regularTasks.filter(
     (task) => !!findTask(taskResources, task),
   );
 
@@ -429,6 +437,19 @@ export const useNodes = (
   const loadingNodes: PipelineTaskListNodeModel[] = loadingTasks.map((task) =>
     newLoadingNode(task.name, task.runAfter),
   );
+
+  // Pipeline ref tasks rendered as builder nodes (clicking opens PipelineSidebar)
+  const pipelineRefNodes: PipelineBuilderTaskNodeModel[] =
+    pipelineRefTasks.length > 0
+      ? tasksToBuilderNodes(
+          pipelineRefTasks,
+          onNewListNode,
+          (task) => onTaskSelection(task, null, false),
+          getTopLevelErrorMessage(tasksInError.tasks),
+          taskGroup.highlightedIds,
+        )
+      : [];
+
   const taskNodes: PipelineBuilderTaskNodeModel[] =
     validTaskList.length > 0
       ? tasksToBuilderNodes(
@@ -450,6 +471,7 @@ export const useNodes = (
 
   const nodes: PipelineMixedNodeModel[] = handleParallelToParallelNodes([
     ...taskNodes,
+    ...pipelineRefNodes,
     ...taskListNodes,
     ...invalidTaskListNodes,
     ...loadingNodes,
