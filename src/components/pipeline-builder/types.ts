@@ -47,11 +47,7 @@ export type PipelineBuilderTaskGrouping = {
   finallyListTasks: PipelineBuilderListTask[];
 };
 
-export type PipelineBuilderTaskResources = {
-  namespacedTasks: TaskKind[];
-  clusterResolverTasks: TaskKind[];
-  tasksLoaded: boolean;
-};
+export type { PipelineBuilderTaskResources } from '../../types';
 
 export type PipelineBuilderTaskGroup = PipelineBuilderTaskGrouping & {
   highlightedIds: string[];

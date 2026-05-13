@@ -19,6 +19,7 @@ import {
   findTask,
   findTaskFromFormikData,
   getBuilderTasksErrorGroup,
+  isPipelineRef,
   mapAddRelatedToOthers,
   mapBeRelated,
   mapRemoveRelatedInOthers,
@@ -748,5 +749,23 @@ describe('getBuilderTasksErrorGroup', () => {
       ],
       finally: [],
     });
+  });
+});
+
+describe('isPipelineRef', () => {
+  it('should return true when task has pipelineRef', () => {
+    expect(isPipelineRef({ name: 'test', pipelineRef: { name: 'my-pipeline' } })).toBe(true);
+  });
+
+  it('should return true when task has pipelineSpec', () => {
+    expect(isPipelineRef({ name: 'test', pipelineSpec: { tasks: [] } })).toBe(true);
+  });
+
+  it('should return false when task has taskRef', () => {
+    expect(isPipelineRef({ name: 'test', taskRef: { name: 'my-task' } })).toBe(false);
+  });
+
+  it('should return false when task has neither', () => {
+    expect(isPipelineRef({ name: 'test' })).toBe(false);
   });
 });

@@ -11,6 +11,7 @@ export type SelectedBuilderTask = {
   resource: TaskKind;
   taskIndex: number;
   isFinallyTask: boolean;
+  isPipelineRef?: boolean;
 };
 
 export type CustomRunKind = K8sResourceCommon & {

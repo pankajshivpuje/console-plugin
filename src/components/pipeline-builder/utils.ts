@@ -58,6 +58,9 @@ const isTaskArrayErrors = (
   );
 };
 
+export const isPipelineRef = (task: PipelineTask): boolean =>
+  !!task.pipelineRef || !!task.pipelineSpec;
+
 export const getBuilderTasksErrorGroup = (
   formikFormErrors?: FormikErrors<PipelineBuilderFormValues>,
   status?: PipelineBuilderFormikStatus,

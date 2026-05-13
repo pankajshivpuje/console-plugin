@@ -16,6 +16,12 @@ export type PipelineTaskRef = {
   params?: PipelineTaskParam[];
 };
 
+export type PipelineTaskPipelineRef = {
+  name?: string;
+  resolver?: string;
+  params?: PipelineTaskParam[];
+};
+
 export type PipelineTaskWorkspace = {
   name: string;
   workspace: string;
@@ -52,6 +58,8 @@ export type PipelineTask = {
   runAfter?: string[];
   taskRef?: PipelineTaskRef;
   taskSpec?: TektonTaskSpec;
+  pipelineRef?: PipelineTaskPipelineRef;
+  pipelineSpec?: PipelineSpec;
   when?: WhenExpression[];
   workspaces?: PipelineTaskWorkspace[];
 };
@@ -90,4 +98,7 @@ export type PipelineBuilderTaskResources = {
   namespacedTasks: TaskKind[];
   clusterResolverTasks: TaskKind[];
   tasksLoaded: boolean;
+  namespacedPipelines?: PipelineKind[];
+  clusterResolverPipelines?: PipelineKind[];
+  pipelinesLoaded?: boolean;
 };
