@@ -33,14 +33,6 @@ function sdkAliasPlugin() {
       if (source === '@openshift-console/dynamic-plugin-sdk') {
         return sdkMock;
       }
-      // Resolve @patternfly/* from demo's node_modules to avoid parent hoisting issues
-      if (source.startsWith('@patternfly/')) {
-        try {
-          return require.resolve(source, { paths: [path.resolve(__dirname, 'node_modules')] });
-        } catch {
-          return null;
-        }
-      }
       return null;
     },
   };
@@ -58,6 +50,14 @@ export default defineConfig({
       'react-router': path.resolve(__dirname, 'node_modules/react-router'),
       'react-redux': path.resolve(__dirname, 'node_modules/react-redux'),
       '@reduxjs/toolkit': path.resolve(__dirname, 'node_modules/@reduxjs/toolkit'),
+      '@patternfly/react-core': path.resolve(__dirname, 'node_modules/@patternfly/react-core'),
+      '@patternfly/react-icons': path.resolve(__dirname, 'node_modules/@patternfly/react-icons'),
+      '@patternfly/react-table': path.resolve(__dirname, 'node_modules/@patternfly/react-table'),
+      '@patternfly/react-tokens': path.resolve(__dirname, 'node_modules/@patternfly/react-tokens'),
+      '@patternfly/react-styles': path.resolve(__dirname, 'node_modules/@patternfly/react-styles'),
+      '@patternfly/react-charts': path.resolve(__dirname, 'node_modules/@patternfly/react-charts'),
+      '@patternfly/react-topology': path.resolve(__dirname, 'node_modules/@patternfly/react-topology'),
+      '@patternfly/react-component-groups': path.resolve(__dirname, 'node_modules/@patternfly/react-component-groups'),
     },
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
