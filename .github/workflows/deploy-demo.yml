@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Install parent project dependencies
+        run: yarn install --frozen-lockfile
       - name: Install demo dependencies
         working-directory: demo
         run: npm install
