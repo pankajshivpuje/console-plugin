@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 function sdkAliasPlugin() {
   const sdkMock = path.resolve(__dirname, 'src/mocks/sdk.tsx');
@@ -29,6 +32,14 @@ function sdkAliasPlugin() {
       }
       if (source === '@openshift-console/dynamic-plugin-sdk') {
         return sdkMock;
+      }
+      // Resolve @patternfly/* from demo's node_modules to avoid parent hoisting issues
+      if (source.startsWith('@patternfly/')) {
+        try {
+          return require.resolve(source, { paths: [path.resolve(__dirname, 'node_modules')] });
+        } catch {
+          return null;
+        }
       }
       return null;
     },
