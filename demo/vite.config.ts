@@ -44,6 +44,7 @@ export default defineConfig({
       'react-i18next': path.resolve(__dirname, 'node_modules/react-i18next'),
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'react-router': path.resolve(__dirname, 'node_modules/react-router'),
       'react-redux': path.resolve(__dirname, 'node_modules/react-redux'),
       '@reduxjs/toolkit': path.resolve(__dirname, 'node_modules/@reduxjs/toolkit'),
     },
