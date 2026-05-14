@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2020",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@openshift-console/dynamic-plugin-sdk": ["./src/mocks/sdk"],
+      "@openshift-console/dynamic-plugin-sdk/*": ["./src/mocks/sdk"],
+      "@openshift-console/dynamic-plugin-sdk-internal": ["./src/mocks/sdk-internal"],
+      "@openshift-console/dynamic-plugin-sdk-internal/*": ["./src/mocks/sdk-internal"],
+      "@openshift-console/dynamic-plugin-sdk-webpack": ["./src/mocks/sdk"]
+    }
+  },
+  "include": ["src", "../src", "../custom.d.ts"],
+  "exclude": ["node_modules"]
+}
