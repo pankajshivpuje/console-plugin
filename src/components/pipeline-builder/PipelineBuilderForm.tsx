@@ -295,7 +295,7 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
                     formContext={{
                       name: 'formData',
                       editor: formEditor,
-                      label: t('Pipeline builder'),
+                      label: t('Form view'),
                       sanitizeTo: (yamlPipeline: PipelineKind) =>
                         sanitizeToForm(formData, yamlPipeline),
                     }}

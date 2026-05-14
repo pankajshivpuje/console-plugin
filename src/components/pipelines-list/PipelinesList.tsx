@@ -15,6 +15,95 @@ import { PipelineKind } from '../../types/pipeline';
 import { useGetActiveUser } from '../hooks/hooks';
 import { ConsoleDataView } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { useEffect, useMemo } from 'react';
+
+const MOCK_PIPELINES: PropPipelineData[] = [
+  {
+    metadata: {
+      name: 'buildah-deploy',
+      namespace: 'default',
+      uid: 'mock-pipeline-buildah-deploy',
+      creationTimestamp: '2025-11-01T10:00:00Z',
+    },
+    spec: {
+      tasks: [
+        { name: 'fetch-source', taskRef: { name: 'git-clone' } },
+        { name: 'build-image', taskRef: { name: 'buildah' } },
+        { name: 'deploy', pipelineRef: { name: 'deploy-to-cluster' } },
+      ],
+      workspaces: [{ name: 'shared-workspace' }, { name: 'docker-credentials' }],
+    },
+  },
+  {
+    metadata: {
+      name: 's2i-java',
+      namespace: 'default',
+      uid: 'mock-pipeline-s2i-java',
+      creationTimestamp: '2025-10-15T08:30:00Z',
+    },
+    spec: {
+      tasks: [
+        { name: 'fetch-repo', taskRef: { name: 'git-clone' } },
+        { name: 'build', taskRef: { name: 's2i-java' } },
+        { name: 'deploy', taskRef: { name: 'openshift-client' } },
+        { name: 'verify', pipelineRef: { name: 'integration-tests' } },
+      ],
+      workspaces: [{ name: 'workspace' }],
+    },
+  },
+  {
+    metadata: {
+      name: 'docker-build-push',
+      namespace: 'default',
+      uid: 'mock-pipeline-docker-build-push',
+      creationTimestamp: '2025-09-20T14:00:00Z',
+    },
+    spec: {
+      tasks: [
+        { name: 'clone', taskRef: { name: 'git-clone' } },
+        { name: 'build-and-push', taskRef: { name: 'kaniko' } },
+      ],
+      workspaces: [{ name: 'source' }, { name: 'dockerconfig' }],
+    },
+  },
+  {
+    metadata: {
+      name: 'nodejs-deploy',
+      namespace: 'default',
+      uid: 'mock-pipeline-nodejs-deploy',
+      creationTimestamp: '2025-08-10T09:15:00Z',
+    },
+    spec: {
+      tasks: [
+        { name: 'fetch-source', taskRef: { name: 'git-clone' } },
+        { name: 'install-deps', taskRef: { name: 'npm' } },
+        { name: 'run-tests', pipelineRef: { name: 'test-suite' } },
+        { name: 'build-image', taskRef: { name: 'buildah' } },
+        { name: 'deploy-app', taskRef: { name: 'openshift-client' } },
+      ],
+      workspaces: [{ name: 'shared-workspace' }, { name: 'npm-cache' }],
+    },
+  },
+  {
+    metadata: {
+      name: 'scan-and-deploy',
+      namespace: 'default',
+      uid: 'mock-pipeline-scan-and-deploy',
+      creationTimestamp: '2025-07-05T16:45:00Z',
+    },
+    spec: {
+      tasks: [
+        { name: 'fetch-source', taskRef: { name: 'git-clone' } },
+        { name: 'build-image', taskRef: { name: 'buildah' } },
+        { name: 'scan-image', taskRef: { name: 'trivy-scanner' } },
+        { name: 'deploy', taskRef: { name: 'kubernetes-actions' } },
+      ],
+      finally: [
+        { name: 'notify', pipelineRef: { name: 'slack-notify' } },
+      ],
+      workspaces: [{ name: 'workspace' }, { name: 'scan-results' }],
+    },
+  },
+] as any;
 import { DataViewFilterToolbar } from '../common/DataViewFilterToolbar';
 import { useDataViewFilter } from '../hooks/useDataViewFilter';
 
@@ -54,7 +143,13 @@ const PipelinesList: FC<PipelineListProps> = ({
   });
   const [pipelineRuns, k8sPLRLoaded, trPLRLoaded, pipelineRunsLoadError] =
     useGetPipelineRuns(namespace);
-  const pipelinesData = augmentRunsToData(pipelines, pipelineRuns);
+  const pipelinesData = [
+    ...augmentRunsToData(pipelines, pipelineRuns),
+    ...MOCK_PIPELINES.filter(
+      (mock) =>
+        !pipelines?.some((p) => p.metadata?.name === mock.metadata.name),
+    ),
+  ];
 
   const nestedIn = searchParams.get('nestedIn');
 

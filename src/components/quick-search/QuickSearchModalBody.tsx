@@ -6,6 +6,7 @@ import {
   useCallback,
   useMemo,
 } from 'react';
+import { Title } from '@patternfly/react-core';
 import { debounce } from 'lodash-es';
 import { useNavigate } from 'react-router';
 import { ResizeDirection } from 're-resizable';
@@ -30,6 +31,13 @@ import useTasksProvider from '../catalog/providers/useTasksProvider';
 import './QuickSearchModalBody.scss';
 import { FLAGS } from '../../types';
 
+export type FooterRendererProps = {
+  selectedItem: CatalogItem | null;
+  selectedVersion: string;
+  closeModal: () => void;
+};
+export type FooterRenderer = (props: FooterRendererProps) => ReactNode;
+
 interface QuickSearchModalBodyProps {
   allCatalogItemsLoaded: boolean;
   searchCatalog: (searchTerm: string) => QuickSearchData;
@@ -45,6 +53,8 @@ interface QuickSearchModalBodyProps {
   viewContainer?: HTMLElement; // pass the html container element to specifythe movement boundary
   callback?: TaskSearchCallback;
   setFailedTasks?: Dispatch<SetStateAction<string[]>>;
+  title?: string;
+  footerRenderer?: FooterRenderer;
 }
 
 const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
@@ -62,9 +72,11 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   viewContainer,
   callback,
   setFailedTasks,
+  title,
+  footerRenderer,
 }) => {
-  const DEFAULT_HEIGHT_WITH_NO_ITEMS = 60;
-  const DEFAULT_HEIGHT_WITH_ITEMS = 483;
+  const DEFAULT_HEIGHT_WITH_NO_ITEMS = title || footerRenderer ? 250 : 60;
+  const DEFAULT_HEIGHT_WITH_ITEMS = 520;
   const MIN_HEIGHT = 240;
   const MIN_WIDTH = 225;
   const navigate = useNavigate();
@@ -80,6 +92,7 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   );
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<CatalogItem>(null);
+  const [selectedVersion, setSelectedVersion] = useState<string>('');
   const [viewAll, setViewAll] = useState<CatalogLinkData[]>(null);
   const [items, setItems] = useState<number>(limitItemCount);
   const [modalSize, setModalSize] = useState<{
@@ -115,7 +128,7 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   const getModalHeight = () => {
     let height: number = DEFAULT_HEIGHT_WITH_NO_ITEMS;
     if (filteredCatalogItems?.length > 0) {
-      if (modalSize?.height >= minHeight) {
+      if (modalSize?.height >= DEFAULT_HEIGHT_WITH_ITEMS) {
         return modalSize?.height;
       }
       setModalSize({ ...modalSize, height: DEFAULT_HEIGHT_WITH_ITEMS });
@@ -276,6 +289,7 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
         navigate(activeViewAllLink.to);
       } else if (selectedItem) {
         handleCta(e, selectedItem, closeModal, navigate, {
+          selectedVersion,
           callback,
           setFailedTasks,
           namespace,
@@ -283,7 +297,7 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
         });
       }
     },
-    [closeModal, selectedItem, viewAll],
+    [closeModal, selectedItem, selectedVersion, viewAll],
   );
 
   const selectPrevious = useCallback(() => {
@@ -390,6 +404,13 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
           height: getModalHeight(),
         }}
       >
+        {title && (
+          <div className="pipelines-ocs-quick-search-modal-body__header">
+            <Title headingLevel="h1" size="xl">
+              {title}
+            </Title>
+          </div>
+        )}
         {headerContent}
         <QuickSearchBar
           searchTerm={searchTerm}
@@ -422,7 +443,14 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
             }}
             callback={callback}
             setFailedTasks={setFailedTasks}
+            selectedVersion={selectedVersion}
+            onVersionChange={setSelectedVersion}
           />
+        )}
+        {footerRenderer && (
+          <div className="pipelines-ocs-quick-search-modal-body__footer">
+            {footerRenderer({ selectedItem, selectedVersion, closeModal })}
+          </div>
         )}
       </div>
     </Rnd>

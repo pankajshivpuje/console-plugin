@@ -4,6 +4,7 @@ import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';
 import { useTranslation } from 'react-i18next';
 import { DetailsRendererFunction } from './QuickSearchDetails';
 import QuickSearchModal from './QuickSearchModal';
+import { FooterRenderer } from './QuickSearchModalBody';
 import {
   QuickSearchData,
   QuickSearchProviders,
@@ -27,6 +28,8 @@ type QuickSearchControllerProps = {
   detailsRenderer?: DetailsRendererFunction;
   callback?: TaskSearchCallback;
   setFailedTasks?: Dispatch<SetStateAction<string[]>>;
+  title?: string;
+  footerRenderer?: FooterRenderer;
 };
 
 const QuickSearchController: FC<QuickSearchControllerProps> = ({
@@ -45,6 +48,8 @@ const QuickSearchController: FC<QuickSearchControllerProps> = ({
   detailsRenderer,
   callback,
   setFailedTasks,
+  title,
+  footerRenderer,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
 
@@ -129,6 +134,8 @@ const QuickSearchController: FC<QuickSearchControllerProps> = ({
       detailsRenderer={detailsRenderer}
       callback={callback}
       setFailedTasks={setFailedTasks}
+      title={title}
+      footerRenderer={footerRenderer}
     />
   );
 };

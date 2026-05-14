@@ -3,4 +3,22 @@
   flex-direction: column;
   background: var(--pf-t--global--background--color--primary--default);
   box-shadow: var(--pf-v6-c-modal-box--BoxShadow);
+  border-radius: var(--pf-t--global--border--radius--medium);
+  border: 1px solid var(--pf-t--global--border--color--default);
+  overflow: hidden;
+
+  &__header {
+    padding: var(--pf-t--global--spacer--md) var(--pf-t--global--spacer--md)
+      var(--pf-t--global--spacer--sm);
+    border-bottom: 1px solid var(--pf-t--global--border--color--default);
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-start;
+    gap: var(--pf-t--global--spacer--sm);
+    padding: var(--pf-t--global--spacer--md);
+    border-top: 1px solid var(--pf-t--global--border--color--default);
+    margin-top: auto;
+  }
 }

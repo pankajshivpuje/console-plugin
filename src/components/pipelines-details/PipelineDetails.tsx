@@ -20,7 +20,7 @@ const PipelineDetails: FC<PipelineDetailsTabProps> = ({ obj: pipeline }) => {
       pipeline?.metadata?.namespace,
     ) || [];
 
-  const { taskLinks, finallyTaskLinks } = getPipelineTaskLinks(pipeline);
+  const { taskLinks, finallyTaskLinks, pipelineLinks, finallyPipelineLinks } = getPipelineTaskLinks(pipeline);
 
   return (
     <>
@@ -46,6 +46,16 @@ const PipelineDetails: FC<PipelineDetailsTabProps> = ({ obj: pipeline }) => {
               namespace={pipeline.metadata.namespace}
               links={finallyTaskLinks}
               title={t('Finally tasks')}
+            />
+            <DynamicResourceLinkList
+              namespace={pipeline.metadata.namespace}
+              links={pipelineLinks}
+              title={t('Pipelines')}
+            />
+            <DynamicResourceLinkList
+              namespace={pipeline.metadata.namespace}
+              links={finallyPipelineLinks}
+              title={t('Finally pipelines')}
             />
             <WorkspaceDefinitionList obj={pipeline} />
           </GridItem>

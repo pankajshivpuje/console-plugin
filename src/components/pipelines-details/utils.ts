@@ -13,6 +13,8 @@ import { getSafeTaskResourceKind } from '../utils/pipeline-augment';
 type PipelineTaskLinks = {
   taskLinks: ResourceModelLink[];
   finallyTaskLinks: ResourceModelLink[];
+  pipelineLinks: ResourceModelLink[];
+  finallyPipelineLinks: ResourceModelLink[];
 };
 
 export const getPipelineTaskLinks = (
@@ -61,9 +63,22 @@ export const getPipelineTaskLinks = (
       };
     });
   };
+  const toPipelineLinkData = (tasks: PipelineTask[]): ResourceModelLink[] => {
+    if (!tasks) return [];
+    return tasks
+      .filter((task) => task.pipelineRef?.name)
+      .map((task) => ({
+        resourceKind: 'Pipeline',
+        name: task.pipelineRef.name,
+        qualifier: task.name,
+      }));
+  };
+
   return {
     taskLinks: toResourceLinkData(pipeline.spec.tasks),
     finallyTaskLinks: toResourceLinkData(pipeline.spec.finally),
+    pipelineLinks: toPipelineLinkData(pipeline.spec.tasks),
+    finallyPipelineLinks: toPipelineLinkData(pipeline.spec.finally),
   };
 };
 

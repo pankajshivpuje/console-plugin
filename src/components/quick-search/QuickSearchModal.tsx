@@ -3,7 +3,7 @@ import { Modal, ModalVariant } from '@patternfly/react-core';
 import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';
 import { useTranslation } from 'react-i18next';
 import { DetailsRendererFunction } from './QuickSearchDetails';
-import QuickSearchModalBody from './QuickSearchModalBody';
+import QuickSearchModalBody, { FooterRenderer } from './QuickSearchModalBody';
 import { QuickSearchData } from './utils/quick-search-types';
 import './QuickSearchModal.scss';
 import { useBoundingClientRect } from './useBoundingClientRect';
@@ -24,6 +24,8 @@ interface QuickSearchModalProps {
   detailsRenderer?: DetailsRendererFunction;
   callback?: TaskSearchCallback;
   setFailedTasks?: Dispatch<SetStateAction<string[]>>;
+  title?: string;
+  footerRenderer?: FooterRenderer;
 }
 
 const QuickSearchModal: FC<QuickSearchModalProps> = ({
@@ -41,6 +43,8 @@ const QuickSearchModal: FC<QuickSearchModalProps> = ({
   detailsRenderer,
   callback,
   setFailedTasks,
+  title,
+  footerRenderer,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const clientRect = useBoundingClientRect(viewContainer);
@@ -72,6 +76,8 @@ const QuickSearchModal: FC<QuickSearchModalProps> = ({
         viewContainer={viewContainer}
         callback={callback}
         setFailedTasks={setFailedTasks}
+        title={title}
+        footerRenderer={footerRenderer}
       />
     </Modal>
   ) : null;

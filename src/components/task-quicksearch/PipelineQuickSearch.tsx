@@ -1,12 +1,17 @@
 import type { FC } from 'react';
 import { useRef, useState, memo, useMemo, useCallback } from 'react';
-import { PlusCircleIcon } from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
+import { SearchIcon } from '@patternfly/react-icons/dist/esm/icons/search-icon';
 import {
-  ToggleGroup,
-  ToggleGroupItem,
+  Button,
+  ButtonVariant,
+  Radio,
 } from '@patternfly/react-core';
-import { CatalogItem } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  CatalogItem,
+  ResourceIcon,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import {
   useCleanupOnFailure,
@@ -20,6 +25,7 @@ import {
 import {
   createTask,
   findInstalledTask,
+  getCtaButtonText,
   getSelectedVersionUrl,
   isArtifactHubTask,
   isTaskSearchable,
@@ -32,12 +38,202 @@ import PipelineQuickSearchPipelineDetails from './PipelineQuickSearchPipelineDet
 import { CatalogServiceProvider } from '../catalog/service';
 import { CatalogService } from '../catalog/types';
 import { QuickSearchProviders } from './quick-search-types';
-import { QuickSearchController } from '../quick-search';
+import { QuickSearchController, handleCta } from '../quick-search';
 import {
   createArtifactHubTask,
   updateArtifactHubTask,
 } from '../catalog/apis/artifactHub';
 import { FLAGS } from '../../types';
+
+const MOCK_PIPELINE_CATALOG_ITEMS: CatalogItem[] = [
+  {
+    uid: 'mock-pipeline-buildah-deploy',
+    type: 'Red Hat',
+    name: 'buildah-deploy',
+    description:
+      'Pipeline to build an application image using Buildah and deploy it to a Kubernetes cluster.',
+    provider: 'Red Hat',
+    tags: ['buildah', 'deploy', 'kubernetes'],
+    creationTimestamp: '2025-11-01T10:00:00Z',
+    icon: {
+      node: <ResourceIcon kind="tekton.dev~v1~Pipeline" />,
+    },
+    attributes: {
+      installed: '0.1',
+      versions: [{ id: '0.1', version: '0.1' }],
+      categories: ['Build', 'Deploy'],
+      resourceKind: 'pipeline',
+    },
+    cta: { label: 'Add' },
+    data: {
+      apiVersion: 'tekton.dev/v1',
+      kind: 'Pipeline',
+      metadata: { name: 'buildah-deploy', uid: 'mock-pipeline-buildah-deploy' },
+      spec: {
+        tasks: [
+          { name: 'fetch-source', taskRef: { name: 'git-clone' } },
+          { name: 'build-image', taskRef: { name: 'buildah' } },
+          { name: 'deploy', taskRef: { name: 'kubernetes-actions' } },
+        ],
+        workspaces: [
+          { name: 'shared-workspace' },
+          { name: 'docker-credentials' },
+        ],
+      },
+    },
+  },
+  {
+    uid: 'mock-pipeline-s2i-java',
+    type: 'Red Hat',
+    name: 's2i-java',
+    description:
+      'Source-to-Image pipeline for building and deploying Java applications using Maven and OpenShift S2I.',
+    provider: 'Red Hat',
+    tags: ['java', 's2i', 'maven'],
+    creationTimestamp: '2025-10-15T08:30:00Z',
+    icon: {
+      node: <ResourceIcon kind="tekton.dev~v1~Pipeline" />,
+    },
+    attributes: {
+      installed: '0.2',
+      versions: [
+        { id: '0.1', version: '0.1' },
+        { id: '0.2', version: '0.2' },
+      ],
+      categories: ['Build', 'Java'],
+      resourceKind: 'pipeline',
+    },
+    cta: { label: 'Add' },
+    data: {
+      apiVersion: 'tekton.dev/v1',
+      kind: 'Pipeline',
+      metadata: { name: 's2i-java', uid: 'mock-pipeline-s2i-java' },
+      spec: {
+        tasks: [
+          { name: 'fetch-repo', taskRef: { name: 'git-clone' } },
+          { name: 'build', taskRef: { name: 's2i-java' } },
+          { name: 'deploy', taskRef: { name: 'openshift-client' } },
+          { name: 'verify', taskRef: { name: 'curl' } },
+        ],
+        workspaces: [{ name: 'workspace' }],
+      },
+    },
+  },
+  {
+    uid: 'mock-pipeline-docker-build-push',
+    type: 'Red Hat',
+    name: 'docker-build-push',
+    description:
+      'Pipeline to build a Docker image from source and push it to an external container registry.',
+    provider: 'Red Hat',
+    tags: ['docker', 'build', 'push', 'registry'],
+    creationTimestamp: '2025-09-20T14:00:00Z',
+    icon: {
+      node: <ResourceIcon kind="tekton.dev~v1~Pipeline" />,
+    },
+    attributes: {
+      installed: '0.3',
+      versions: [
+        { id: '0.1', version: '0.1' },
+        { id: '0.2', version: '0.2' },
+        { id: '0.3', version: '0.3' },
+      ],
+      categories: ['Build', 'Image'],
+      resourceKind: 'pipeline',
+    },
+    cta: { label: 'Add' },
+    data: {
+      apiVersion: 'tekton.dev/v1',
+      kind: 'Pipeline',
+      metadata: {
+        name: 'docker-build-push',
+        uid: 'mock-pipeline-docker-build-push',
+      },
+      spec: {
+        tasks: [
+          { name: 'clone', taskRef: { name: 'git-clone' } },
+          { name: 'build-and-push', taskRef: { name: 'kaniko' } },
+        ],
+        workspaces: [
+          { name: 'source' },
+          { name: 'dockerconfig' },
+        ],
+      },
+    },
+  },
+  {
+    uid: 'mock-pipeline-nodejs-deploy',
+    type: 'Red Hat',
+    name: 'nodejs-deploy',
+    description:
+      'Pipeline to build, test, and deploy a Node.js application with npm, including linting and unit tests.',
+    provider: 'Red Hat',
+    tags: ['nodejs', 'npm', 'deploy'],
+    creationTimestamp: '2025-08-10T09:15:00Z',
+    icon: {
+      node: <ResourceIcon kind="tekton.dev~v1~Pipeline" />,
+    },
+    attributes: {
+      installed: '0.1',
+      versions: [{ id: '0.1', version: '0.1' }],
+      categories: ['Build', 'Deploy', 'Node.js'],
+      resourceKind: 'pipeline',
+    },
+    cta: { label: 'Add' },
+    data: {
+      apiVersion: 'tekton.dev/v1',
+      kind: 'Pipeline',
+      metadata: { name: 'nodejs-deploy', uid: 'mock-pipeline-nodejs-deploy' },
+      spec: {
+        tasks: [
+          { name: 'fetch-source', taskRef: { name: 'git-clone' } },
+          { name: 'install-deps', taskRef: { name: 'npm' } },
+          { name: 'run-tests', taskRef: { name: 'npm' } },
+          { name: 'build-image', taskRef: { name: 'buildah' } },
+          { name: 'deploy-app', taskRef: { name: 'openshift-client' } },
+        ],
+        workspaces: [{ name: 'shared-workspace' }, { name: 'npm-cache' }],
+      },
+    },
+  },
+  {
+    uid: 'mock-pipeline-scan-and-deploy',
+    type: 'Red Hat',
+    name: 'scan-and-deploy',
+    description:
+      'Security-focused pipeline that scans container images for vulnerabilities before deploying to production.',
+    provider: 'Red Hat',
+    tags: ['security', 'scan', 'deploy'],
+    creationTimestamp: '2025-07-05T16:45:00Z',
+    icon: {
+      node: <ResourceIcon kind="tekton.dev~v1~Pipeline" />,
+    },
+    attributes: {
+      installed: '0.1',
+      versions: [{ id: '0.1', version: '0.1' }],
+      categories: ['Security', 'Deploy'],
+      resourceKind: 'pipeline',
+    },
+    cta: { label: 'Add' },
+    data: {
+      apiVersion: 'tekton.dev/v1',
+      kind: 'Pipeline',
+      metadata: {
+        name: 'scan-and-deploy',
+        uid: 'mock-pipeline-scan-and-deploy',
+      },
+      spec: {
+        tasks: [
+          { name: 'fetch-source', taskRef: { name: 'git-clone' } },
+          { name: 'build-image', taskRef: { name: 'buildah' } },
+          { name: 'scan-image', taskRef: { name: 'trivy-scanner' } },
+          { name: 'deploy', taskRef: { name: 'kubernetes-actions' } },
+        ],
+        workspaces: [{ name: 'workspace' }, { name: 'scan-results' }],
+      },
+    },
+  },
+];
 
 interface QuickSearchProps {
   namespace: string;
@@ -66,6 +262,7 @@ const Contents: FC<
   taskGroup,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
+  const navigate = useNavigate();
   const savedCallback = useRef(null);
   const isDevConsoleProxyAvailable = useFlag(FLAGS.DEVCONSOLE_PROXY);
   savedCallback.current = callback;
@@ -223,23 +420,23 @@ const Contents: FC<
     return acc;
   }, []);
 
-  const pipelineCatalogItems = pipelineCatalogService.items.reduce(
-    (acc, item) => {
-      item.attributes.resourceKind = 'pipeline';
+  const pipelineCatalogItems = [
+    ...pipelineCatalogService.items,
+    ...MOCK_PIPELINE_CATALOG_ITEMS,
+  ].reduce((acc, item) => {
+    item.attributes.resourceKind = 'pipeline';
 
-      item.cta.callback = () => {
-        return new Promise((resolve) => {
-          resolve(savedCallback.current(item.data));
-        });
-      };
+    item.cta.callback = () => {
+      return new Promise((resolve) => {
+        resolve(savedCallback.current(item.data));
+      });
+    };
 
-      if (isTaskSearchable(pipelineCatalogService.items, item)) {
-        acc.push(item);
-      }
-      return acc;
-    },
-    [],
-  );
+    if (isTaskSearchable(pipelineCatalogService.items, item)) {
+      acc.push(item);
+    }
+    return acc;
+  }, []);
 
   const quickSearchProviders: QuickSearchProviders = [
     {
@@ -272,22 +469,57 @@ const Contents: FC<
   );
 
   const headerContent = (
-    <div className="pf-v6-u-px-md pf-v6-u-pt-md pf-v6-u-pb-sm">
-      <ToggleGroup aria-label={t('Resource type filter')}>
-        <ToggleGroupItem
-          text={t('Task')}
-          isSelected={resourceKindFilter === 'task'}
-          onChange={() => setResourceKindFilter('task')}
-          data-test="toggle-task"
-        />
-        <ToggleGroupItem
-          text={t('Pipeline')}
-          isSelected={resourceKindFilter === 'pipeline'}
-          onChange={() => setResourceKindFilter('pipeline')}
-          data-test="toggle-pipeline"
-        />
-      </ToggleGroup>
+    <div className="pf-v6-u-px-md pf-v6-u-py-md pf-v6-u-display-flex pf-v6-u-flex-direction-row" style={{ gap: '2rem' }}>
+      <Radio
+        id="resource-type-task"
+        name="resource-type"
+        label={t('Task')}
+        isChecked={resourceKindFilter === 'task'}
+        onChange={() => setResourceKindFilter('task')}
+        data-test="radio-task"
+      />
+      <Radio
+        id="resource-type-pipeline"
+        name="resource-type"
+        label={t('Pipeline')}
+        isChecked={resourceKindFilter === 'pipeline'}
+        onChange={() => setResourceKindFilter('pipeline')}
+        data-test="radio-pipeline"
+      />
     </div>
+  );
+
+  const footerRenderer = useCallback(
+    ({ selectedItem: item, selectedVersion: version, closeModal: close }) => {
+      return (
+        <>
+          <Button
+            data-test="quick-search-cta"
+            variant={ButtonVariant.primary}
+            isDisabled={!item}
+            onClick={(e) => {
+              handleCta(e, item, close, navigate, {
+                selectedVersion: version,
+                namespace,
+                callback: savedCallback.current,
+                setFailedTasks,
+                isDevConsoleProxyAvailable,
+              });
+            }}
+          >
+            {item ? getCtaButtonText(item, version) : t('Add')}
+          </Button>
+          <Button
+            data-test="quick-search-cancel"
+            variant={ButtonVariant.link}
+            onClick={close}
+          >
+            {t('Cancel')}
+          </Button>
+        </>
+      );
+    },
+    [navigate, namespace, setFailedTasks, isDevConsoleProxyAvailable, t],
   );
 
   const detailsRenderer = useCallback(
@@ -304,18 +536,20 @@ const Contents: FC<
     <QuickSearchController
       quickSearchProviders={quickSearchProviders}
       allItemsLoaded={allItemsLoaded}
-      searchPlaceholder={`${t('Add')}...`}
+      searchPlaceholder={t('Find by name...')}
       namespace={namespace}
       viewContainer={viewContainer}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       disableKeyboardOpen
-      icon={<PlusCircleIcon width="1.5em" height="1.5em" />}
+      icon={<SearchIcon />}
+      title={t('Select')}
       headerContent={headerContent}
       itemFilter={itemFilter}
       callback={savedCallback.current}
       setFailedTasks={setFailedTasks}
       detailsRenderer={detailsRenderer}
+      footerRenderer={footerRenderer}
     />
   );
 };

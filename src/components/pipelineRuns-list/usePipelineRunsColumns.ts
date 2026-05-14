@@ -12,6 +12,10 @@ import { sortPipelineAndTaskRunsByDuration } from '../pipelines-details/pipeline
 export const tableColumnInfo = [
   { id: 'name', classNames: 'pf-v6-m-width-20' },
   {
+    id: 'nested-pipelineruns',
+    classNames: 'pf-v6-m-hidden pf-m-visible-on-lg',
+  },
+  {
     id: 'commit-id',
     classNames: 'pf-v6-m-hidden pf-m-visible-on-sm pf-m-width-10',
   },
@@ -43,14 +47,19 @@ const usePipelineRunsColumns = (
       sort: 'metadata.name',
       props: { className: tableColumnInfo[0].classNames, modifier: 'nowrap' },
     },
+    {
+      id: tableColumnInfo[1].id,
+      title: t('Nested PipelineRuns'),
+      props: { className: tableColumnInfo[1].classNames, modifier: 'nowrap' },
+    },
     ...(repositoryPLRs
       ? [
           {
-            id: tableColumnInfo[1].id,
+            id: tableColumnInfo[2].id,
             title: t('Commit id'),
             sort: `metadata.labels.${RepositoryLabels[RepositoryFields.SHA]}`,
             props: {
-              className: tableColumnInfo[1].classNames,
+              className: tableColumnInfo[2].classNames,
               modifier: 'nowrap',
             },
           },
@@ -59,65 +68,65 @@ const usePipelineRunsColumns = (
     ...(!namespace
       ? [
           {
-            id: tableColumnInfo[2].id,
+            id: tableColumnInfo[3].id,
             title: t('Namespace'),
             sort: 'metadata.namespace',
             props: {
-              className: tableColumnInfo[2].classNames,
+              className: tableColumnInfo[3].classNames,
               modifier: 'nowrap',
             },
           },
         ]
       : []),
     {
-      id: tableColumnInfo[3].id,
+      id: tableColumnInfo[4].id,
       title: t('Vulnerabilities'),
       sortFunc: 'vulnerabilities',
-      props: { className: tableColumnInfo[3].classNames, modifier: 'nowrap' },
-    },
-    {
-      id: tableColumnInfo[4].id,
-      title: t('Status'),
-      sort: 'status.conditions[0].reason',
       props: { className: tableColumnInfo[4].classNames, modifier: 'nowrap' },
     },
     {
       id: tableColumnInfo[5].id,
-      title: t('Task status'),
+      title: t('Status'),
       sort: 'status.conditions[0].reason',
       props: { className: tableColumnInfo[5].classNames, modifier: 'nowrap' },
     },
     {
       id: tableColumnInfo[6].id,
-      title: t('Started'),
-      sort: 'status.startTime',
+      title: t('Task status'),
+      sort: 'status.conditions[0].reason',
       props: { className: tableColumnInfo[6].classNames, modifier: 'nowrap' },
     },
     {
       id: tableColumnInfo[7].id,
+      title: t('Started'),
+      sort: 'status.startTime',
+      props: { className: tableColumnInfo[7].classNames, modifier: 'nowrap' },
+    },
+    {
+      id: tableColumnInfo[8].id,
       title: t('Duration'),
       sort: sortPipelineAndTaskRunsByDuration,
-      props: { className: tableColumnInfo[7].classNames, modifier: 'nowrap' },
+      props: { className: tableColumnInfo[8].classNames, modifier: 'nowrap' },
     },
     ...(repositoryPLRs
       ? [
           {
-            id: tableColumnInfo[8].id,
+            id: tableColumnInfo[9].id,
             title: t('Branch/Tag'),
             sort: `metadata.annotations.${
               RepositoryAnnotations[RepoAnnotationFields.BRANCH]
             }`,
             props: {
-              className: tableColumnInfo[8].classNames,
+              className: tableColumnInfo[9].classNames,
               modifier: 'nowrap',
             },
           },
         ]
       : []),
     {
-      id: tableColumnInfo[9].id,
+      id: tableColumnInfo[10].id,
       title: '',
-      props: { className: tableColumnInfo[9].classNames },
+      props: { className: tableColumnInfo[10].classNames },
     },
   ];
   return columns;

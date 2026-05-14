@@ -130,13 +130,9 @@ const TaskList: FC<any> = ({
                 />
               </g>
             )}
-            {unselectedTaskText !== truncatedTaskText ? (
-              <Tooltip content={unselectedTaskText} triggerRef={textRef}>
-                {renderText}
-              </Tooltip>
-            ) : (
-              renderText
-            )}
+            <Tooltip content={unselectedText ? unselectedTaskText : t('Add task or pipeline')} triggerRef={textRef}>
+              {renderText}
+            </Tooltip>
           </g>
         )}
       </g>

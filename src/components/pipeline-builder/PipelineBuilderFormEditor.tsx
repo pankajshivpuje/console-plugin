@@ -51,7 +51,7 @@ const PipelineBuilderFormEditor: FC<PipelineBuilderFormEditorProps> = (
 
       <Card isCompact isPlain>
         <CardHeader>
-          <CardTitle>{t('Pipelines and tasks')}</CardTitle>
+          <CardTitle>{t('Pipeline builder')}<span className="pf-v6-c-form__label-required" aria-hidden="true"> *</span></CardTitle>
         </CardHeader>
         <CardBody>
           <PipelineBuilderVisualization

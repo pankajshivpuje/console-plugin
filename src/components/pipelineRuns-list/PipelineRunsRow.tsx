@@ -40,6 +40,12 @@ import {
 import { getReferenceForModel } from '../pipelines-overview/utils';
 import { GetDataViewRows } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import { tableColumnInfo } from './usePipelineRunsColumns';
+import { DASH } from '../../consts';
+
+const getNestedPipelineRunCount = (pipelineRun: PipelineRunKind): number => {
+  const tasks = pipelineRun.status?.pipelineSpec?.tasks || [];
+  return tasks.filter((task) => (task as any).pipelineRef).length;
+};
 
 type PLRStatusProps = {
   obj: PipelineRunKind;
@@ -109,6 +115,12 @@ export const getPipelineRunsListDataViewRows: GetDataViewRows<
         props: { ...getNameCellProps('pipelineruns-list'), modifier: 'nowrap' },
       },
       [tableColumnInfo[1].id]: {
+        cell: (() => {
+          const count = getNestedPipelineRunCount(obj);
+          return count > 0 ? count : DASH;
+        })(),
+      },
+      [tableColumnInfo[2].id]: {
         cell: repositoryPLRs && (
           <Tooltip
             data-test="tooltip-msg"
@@ -140,7 +152,7 @@ export const getPipelineRunsListDataViewRows: GetDataViewRows<
         ),
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[2].id]: {
+      [tableColumnInfo[3].id]: {
         cell: (
           <ResourceLink
             groupVersionKind={getGroupVersionKindForModel(NamespaceModel)}
@@ -149,31 +161,31 @@ export const getPipelineRunsListDataViewRows: GetDataViewRows<
         ),
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[3].id]: {
+      [tableColumnInfo[4].id]: {
         cell: <PipelineRunVulnerabilities pipelineRun={obj} condensed />,
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[4].id]: {
+      [tableColumnInfo[5].id]: {
         cell: <PLRStatus obj={obj} />,
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[5].id]: {
+      [tableColumnInfo[6].id]: {
         cell: <LinkedPipelineRunTaskStatus pipelineRun={obj} />,
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[6].id]: {
+      [tableColumnInfo[7].id]: {
         cell: <Timestamp timestamp={obj.status && obj.status.startTime} />,
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[7].id]: {
+      [tableColumnInfo[8].id]: {
         cell: pipelineRunDuration(obj),
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[8].id]: {
+      [tableColumnInfo[9].id]: {
         cell: repositoryPLRs && sanitizeBranchName(branchName),
         props: { modifier: 'nowrap' },
       },
-      [tableColumnInfo[9].id]: {
+      [tableColumnInfo[10].id]: {
         cell: (
           <LazyActionMenu
             context={{ [getReferenceForModel(PipelineRunModel)]: obj }}

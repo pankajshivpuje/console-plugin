@@ -1,8 +1,6 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import {
-  Button,
-  ButtonVariant,
   Label,
   LabelGroup,
   Level,
@@ -16,30 +14,29 @@ import {
 } from '@patternfly/react-core';
 import { CheckCircleIcon } from '@patternfly/react-icons/dist/esm/icons/check-circle-icon';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import {
-  getCtaButtonText,
-  isOneVersionInstalled,
-} from './pipeline-quicksearch-utils';
+import { isOneVersionInstalled } from './pipeline-quicksearch-utils';
 import PipelineQuickSearchVersionDropdown from './PipelineQuickSearchVersionDropdown';
-import { handleCta } from '../quick-search';
 import { QuickSearchDetailsRendererProps } from '../quick-search/QuickSearchDetails';
 
 import './PipelineQuickSearchDetails.scss';
 
 const PipelineQuickSearchPipelineDetails: FC<
   QuickSearchDetailsRendererProps
-> = ({ selectedItem, closeModal, namespace, callback, setFailedTasks }) => {
+> = ({
+  selectedItem,
+  selectedVersion: controlledVersion,
+  onVersionChange,
+}) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  const navigate = useNavigate();
-  const [selectedVersion, setSelectedVersion] = useState<string>(
-    selectedItem?.attributes?.installed ?? '',
-  );
   const versions = selectedItem?.attributes?.versions ?? [];
   const hasInstalledVersion = isOneVersionInstalled(selectedItem);
 
   const taskCount = selectedItem?.data?.spec?.tasks?.length ?? 0;
   const workspaceCount = selectedItem?.data?.spec?.workspaces?.length ?? 0;
+
+  useEffect(() => {
+    onVersionChange?.(selectedItem?.attributes?.installed ?? '');
+  }, [selectedItem, onVersionChange]);
 
   return (
     <div className="opp-quick-search-details">
@@ -55,38 +52,17 @@ const PipelineQuickSearchPipelineDetails: FC<
       </Level>
       <Level hasGutter>
         <LevelItem>
-          <Split hasGutter>
-            <SplitItem>
-              <Button
-                data-test="pipeline-cta"
-                variant={ButtonVariant.primary}
-                className="opp-quick-search-details__form-button"
-                onClick={(e) => {
-                  handleCta(e, selectedItem, closeModal, navigate, {
-                    selectedVersion,
-                    selectedItem,
-                    isDevConsoleProxyAvailable: false,
-                    namespace,
-                    callback,
-                    setFailedTasks,
-                  });
-                }}
-              >
-                {getCtaButtonText(selectedItem, selectedVersion)}
-              </Button>
+          {versions.length > 0 && (
+            <SplitItem data-test="pipeline-version-dropdown">
+              <PipelineQuickSearchVersionDropdown
+                key={selectedItem.uid}
+                versions={versions}
+                item={selectedItem}
+                selectedVersion={controlledVersion}
+                onChange={(v) => onVersionChange?.(v)}
+              />
             </SplitItem>
-            {versions.length > 0 && (
-              <SplitItem data-test="pipeline-version-dropdown">
-                <PipelineQuickSearchVersionDropdown
-                  key={selectedItem.uid}
-                  versions={versions}
-                  item={selectedItem}
-                  selectedVersion={selectedVersion}
-                  onChange={setSelectedVersion}
-                />
-              </SplitItem>
-            )}
-          </Split>
+          )}
         </LevelItem>
         {hasInstalledVersion && (
           <LevelItem>

@@ -4,7 +4,6 @@ import {
   getGroupVersionKindForModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { FC } from 'react';
-import { Link } from 'react-router';
 import { PipelineWithLatest } from '../../types/pipelineRun';
 import { PipelineKind } from '../../types/pipeline';
 import LinkedPipelineRunTaskStatus from './status/LinkedPipelineRunTaskStatus';
@@ -72,16 +71,7 @@ export const getPipelineListDataViewRows: GetDataViewRows<
       [tableColumnInfo[2].id]: {
         cell: (() => {
           const count = getNestedPipelineCount(obj);
-          if (count > 0) {
-            return (
-              <Link
-                to={`/k8s/ns/${obj.metadata.namespace}/tekton.dev~v1~Pipeline?nestedIn=${obj.metadata.name}`}
-              >
-                {count}
-              </Link>
-            );
-          }
-          return DASH;
+          return count > 0 ? count : DASH;
         })(),
       },
       [tableColumnInfo[3].id]: {

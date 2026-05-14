@@ -26,6 +26,8 @@ interface QuickSearchContentProps {
   onListChange?: (items: number) => void;
   callback?: TaskSearchCallback;
   setFailedTasks?: Dispatch<SetStateAction<string[]>>;
+  selectedVersion?: string;
+  onVersionChange?: (version: string) => void;
 }
 
 const QuickSearchContent: FC<QuickSearchContentProps> = ({
@@ -43,6 +45,8 @@ const QuickSearchContent: FC<QuickSearchContentProps> = ({
   onListChange,
   callback,
   setFailedTasks,
+  selectedVersion,
+  onVersionChange,
 }) => {
   return (
     <Split className="ocs-quick-search-content">
@@ -74,6 +78,8 @@ const QuickSearchContent: FC<QuickSearchContentProps> = ({
           namespace={namespace}
           callback={callback}
           setFailedTasks={setFailedTasks}
+          selectedVersion={selectedVersion}
+          onVersionChange={onVersionChange}
         />
       </SplitItem>
     </Split>
