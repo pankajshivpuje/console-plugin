@@ -449,6 +449,7 @@
   "Requester": "Requester",
   "Required": "Required",
   "Rerun": "Rerun",
+  "Resolved pipeline": "Resolved pipeline",
   "Reset view": "Reset view",
   "Resource is being fetched from Tekton Results.": "Resource is being fetched from Tekton Results.",
   "Resource is deleted.": "Resource is deleted.",

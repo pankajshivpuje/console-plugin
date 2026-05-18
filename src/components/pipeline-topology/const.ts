@@ -38,6 +38,7 @@ export enum NodeType {
   FINALLY_NODE = 'finally-node',
   BUILDER_FINALLY_NODE = 'builder-finally-node',
   FINALLY_GROUP = 'finally-group',
+  PIPELINE_TASK_NODE = 'pipeline-task',
   EDGE = 'edge',
 }
 export enum DrawDesign {

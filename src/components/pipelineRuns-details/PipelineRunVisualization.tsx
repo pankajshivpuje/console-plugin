@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Alert } from '@patternfly/react-core';
 import { useTranslation } from 'react-i18next';
+import { useChildPipelineRuns } from '../hooks/useChildPipelineRuns';
 import { usePipelineFromPipelineRun } from '../hooks/usePipelineFromPipelineRun';
 import { useTaskRuns } from '../hooks/useTaskRuns';
 import { ComputedStatus, PipelineKind, PipelineRunKind } from '../../types';
@@ -34,6 +35,11 @@ const PipelineRunVisualization: FC<PipelineRunVisualizationProps> = ({
         pipelineRunManagedBy: pipelineRun?.spec?.managedBy,
       },
     );
+  const [childPipelineRuns] = useChildPipelineRuns(
+    pipelineRun?.metadata?.namespace,
+    pipelineRun?.metadata?.name,
+    pipelineRun,
+  );
   /* this needs decoupling */
   const taskRunsLoaded = k8sLoaded || trLoaded;
   const pipeline: PipelineKind = usePipelineFromPipelineRun(pipelineRun);
@@ -67,6 +73,7 @@ const PipelineRunVisualization: FC<PipelineRunVisualizationProps> = ({
           pipeline={pipeline}
           pipelineRun={pipelineRun}
           taskRuns={taskRuns}
+          childPipelineRuns={childPipelineRuns}
         />
       )}
     </>

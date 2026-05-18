@@ -12,9 +12,7 @@ import { getSafeTaskResourceKind } from '../utils/pipeline-augment';
 
 type PipelineTaskLinks = {
   taskLinks: ResourceModelLink[];
-  finallyTaskLinks: ResourceModelLink[];
   pipelineLinks: ResourceModelLink[];
-  finallyPipelineLinks: ResourceModelLink[];
 };
 
 export const getPipelineTaskLinks = (
@@ -24,61 +22,93 @@ export const getPipelineTaskLinks = (
     const { t } = useTranslation('plugin__pipelines-console-plugin');
     if (!tasks) return [];
     const { version } = groupVersionFor(pipeline.apiVersion);
-    return tasks?.map((task) => {
-      if (task.taskRef) {
-        if (task.taskRef.resolver === 'cluster') {
-          const nameParam = task.taskRef.params?.find(
+    const taskBadge = { text: 'T', color: '#009596' };
+    return tasks
+      ?.filter((task) => !task.pipelineRef)
+      .map((task) => {
+        if (task.taskRef) {
+          const kind = task.taskRef.kind || 'Task';
+          if (task.taskRef.resolver === 'cluster') {
+            const nameParam = task.taskRef.params?.find(
+              (param) => param.name === 'name',
+            )?.value;
+            return {
+              resourceKind: getSafeTaskResourceKind(kind),
+              name: nameParam,
+              qualifier: task.name,
+              namespace: PIPELINE_NAMESPACE,
+              resourceApiVersion: version,
+              badge: taskBadge,
+            };
+          }
+          return kind === 'Task'
+            ? {
+                resourceKind: getSafeTaskResourceKind(kind),
+                name: task.taskRef.name,
+                qualifier: task.name,
+                resourceApiVersion: version,
+                badge: taskBadge,
+              }
+            : {
+                resourceKind: kind,
+                name:
+                  kind === 'ApprovalTask'
+                    ? t('Approval Task')
+                    : t('Custom Task'),
+                qualifier: task.name,
+                disableLink: true,
+                badge: taskBadge,
+              };
+        }
+        return {
+          resourceKind: 'EmbeddedTask',
+          name: t('Embedded task'),
+          qualifier: task.name,
+          disableLink: true,
+          badge: taskBadge,
+        };
+      });
+  };
+  const toPipelineLinkData = (tasks: PipelineTask[]): ResourceModelLink[] => {
+    const { t } = useTranslation('plugin__pipelines-console-plugin');
+    if (!tasks) return [];
+    const pipelineBadge = { text: 'P', color: '#0066cc' };
+    return tasks
+      .filter((task) => !!task.pipelineRef)
+      .map((task) => {
+        if (task.pipelineRef.resolver === 'cluster') {
+          const nameParam = task.pipelineRef.params?.find(
             (param) => param.name === 'name',
           )?.value;
           return {
-            resourceKind: getSafeTaskResourceKind(task.taskRef.kind),
+            resourceKind: 'Pipeline',
             name: nameParam,
             qualifier: task.name,
             namespace: PIPELINE_NAMESPACE,
-            resourceApiVersion: version,
+            badge: pipelineBadge,
           };
         }
-        return task.taskRef.kind === 'Task'
-          ? {
-              resourceKind: getSafeTaskResourceKind(task.taskRef.kind),
-              name: task.taskRef.name,
-              qualifier: task.name,
-              resourceApiVersion: version,
-            }
-          : {
-              resourceKind: task.taskRef?.kind,
-              name:
-                task.taskRef?.kind === 'ApprovalTask'
-                  ? t('Approval Task')
-                  : t('Custom Task'),
-              qualifier: task.name,
-              disableLink: true,
-            };
-      }
-      return {
-        resourceKind: 'EmbeddedTask',
-        name: t('Embedded task'),
-        qualifier: task.name,
-        disableLink: true,
-      };
-    });
-  };
-  const toPipelineLinkData = (tasks: PipelineTask[]): ResourceModelLink[] => {
-    if (!tasks) return [];
-    return tasks
-      .filter((task) => task.pipelineRef?.name)
-      .map((task) => ({
-        resourceKind: 'Pipeline',
-        name: task.pipelineRef.name,
-        qualifier: task.name,
-      }));
+        if (task.pipelineRef.name) {
+          return {
+            resourceKind: 'Pipeline',
+            name: task.pipelineRef.name,
+            qualifier: task.name,
+            badge: pipelineBadge,
+          };
+        }
+        return {
+          resourceKind: 'Pipeline',
+          name: t('Resolved pipeline'),
+          qualifier: task.name,
+          disableLink: true,
+          badge: pipelineBadge,
+        };
+      });
   };
 
   return {
     taskLinks: toResourceLinkData(pipeline.spec.tasks),
-    finallyTaskLinks: toResourceLinkData(pipeline.spec.finally),
     pipelineLinks: toPipelineLinkData(pipeline.spec.tasks),
-    finallyPipelineLinks: toPipelineLinkData(pipeline.spec.finally),
   };
 };
 

@@ -17,6 +17,10 @@ export type ResourceModelLink = {
   disableLink?: boolean;
   namespace?: string;
   resourceApiVersion?: string;
+  badge?: {
+    text: string;
+    color: string;
+  };
 };
 
 type DynamicResourceLinkListProps = {
@@ -53,13 +57,25 @@ const DynamicResourceLinkList: FC<DynamicResourceLinkListProps> = ({
                 disableLink = false,
                 namespace: namespaceForTask,
                 resourceApiVersion,
+                badge,
               }) => {
                 let linkName = qualifier;
                 if (qualifier?.length > 0 && name !== qualifier) {
                   linkName += ` (${name})`;
                 }
                 return (
-                  <div key={`${resourceKind}/${linkName}`}>
+                  <div
+                    key={`${resourceKind}/${linkName}`}
+                    className="odc-dynamic-resource-link-list__item"
+                  >
+                    {badge && (
+                      <span
+                        className="odc-dynamic-resource-link-list__badge"
+                        style={{ backgroundColor: badge.color }}
+                      >
+                        {badge.text}
+                      </span>
+                    )}
                     <PipelineResourceRef
                       resourceKind={resourceKind}
                       resourceName={name}
@@ -67,6 +83,7 @@ const DynamicResourceLinkList: FC<DynamicResourceLinkListProps> = ({
                       namespace={namespaceForTask || namespace}
                       disableLink={disableLink}
                       resourceApiVersion={resourceApiVersion}
+                      hideIcon={!!badge}
                     />
                   </div>
                 );

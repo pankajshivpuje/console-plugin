@@ -76,6 +76,8 @@ export const dagreViewerComponentFactory: ComponentFactory = (
           return PipelineTaskNode;
         case NodeType.CUSTOM_TASK_NODE:
           return CustomTaskNode;
+        case NodeType.PIPELINE_TASK_NODE:
+          return PipelineTaskNode;
         case NodeType.APPROVAL_TASK_NODE:
           return ApprovalTaskNode;
         case NodeType.FINALLY_GROUP:

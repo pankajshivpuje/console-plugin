@@ -138,6 +138,7 @@ export const appendPipelineRunStatus = (
   pipelineRun,
   taskRuns: TaskRunKind[],
   isFinallyTasks = false,
+  childPipelineRuns?: Record<string, PipelineRunKind>,
 ) => {
   const tasks =
     (isFinallyTasks ? pipeline.spec.finally : pipeline.spec.tasks) || [];
@@ -146,6 +147,29 @@ export const appendPipelineRunStatus = (
     if (!pipelineRun.status) {
       return task;
     }
+
+    if (task.pipelineRef && childPipelineRuns?.[task.name]) {
+      const childPLR = childPipelineRuns[task.name];
+      const status = pipelineRunStatus(childPLR) || ComputedStatus.Pending;
+      const mTask = {
+        ...task,
+        status: {
+          reason: status,
+          startTime: childPLR.status?.startTime,
+          completionTime: childPLR.status?.completionTime,
+          conditions: childPLR.status?.conditions,
+        },
+        childPipelineRunName: childPLR.metadata?.name,
+      };
+      if (mTask.status.completionTime && mTask.status.startTime) {
+        const date =
+          new Date(mTask.status.completionTime).getTime() -
+          new Date(mTask.status.startTime).getTime();
+        mTask.status.duration = formatPrometheusDuration(date);
+      }
+      return mTask;
+    }
+
     if (!taskRuns || taskRuns.length === 0) {
       if (
         pipelineRun.spec.status === SucceedConditionReason.PipelineRunCancelled
@@ -202,13 +226,20 @@ export const getPipelineTasks = (
     spec: {},
   },
   taskRuns: TaskRunKind[],
+  childPipelineRuns?: Record<string, PipelineRunKind>,
 ): PipelineTask[][] => {
   // Each unit in 'out' array is termed as stage | out = [stage1 = [task1], stage2 = [task2,task3], stage3 = [task4]]
   const out = [];
   if (!pipeline.spec?.tasks || _.isEmpty(pipeline.spec.tasks)) {
     return out;
   }
-  const taskList = appendPipelineRunStatus(pipeline, pipelineRun, taskRuns);
+  const taskList = appendPipelineRunStatus(
+    pipeline,
+    pipelineRun,
+    taskRuns,
+    false,
+    childPipelineRuns,
+  );
 
   // Step 1: Push all nodes without any dependencies in different stages
   taskList.forEach((task) => {
@@ -293,7 +324,15 @@ export const getFinallyTasksWithStatus = (
   pipeline: PipelineKind,
   pipelineRun: PipelineRunKind,
   taskRuns: TaskRunKind[],
-) => appendPipelineRunStatus(pipeline, pipelineRun, taskRuns, true);
+  childPipelineRuns?: Record<string, PipelineRunKind>,
+) =>
+  appendPipelineRunStatus(
+    pipeline,
+    pipelineRun,
+    taskRuns,
+    true,
+    childPipelineRuns,
+  );
 
 export const containerToLogSourceStatus = (
   container: ContainerStatus,

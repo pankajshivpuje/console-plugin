@@ -35,6 +35,7 @@ import { usePipelineRuns } from '../hooks/useTaskRuns';
 import { getReferenceForModel } from '../pipelines-overview/utils';
 import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/internal-types';
+import { MOCK_PIPELINE_RUNS } from '../__demo__/mock-data';
 
 type PipelineRunDetailsPageProps = {
   name: string;
@@ -50,7 +51,10 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
     name,
     limit: 1,
   });
-  const pipelineRun = pipelineRuns?.[0];
+  const clusterPipelineRun = pipelineRuns?.[0];
+  const pipelineRun =
+    clusterPipelineRun ||
+    MOCK_PIPELINE_RUNS.find((mock) => mock.metadata.name === name);
   /* this needs decoupling */
   const pipelineRunLoaded = k8sLoaded || trLoaded;
 

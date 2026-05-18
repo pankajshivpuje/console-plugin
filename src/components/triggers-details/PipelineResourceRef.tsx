@@ -26,6 +26,7 @@ type PipelineResourceRefProps = {
   largeIcon?: boolean;
   namespace?: string;
   resourceApiVersion?: string;
+  hideIcon?: boolean;
 };
 
 const PipelineResourceRef: FC<PipelineResourceRefProps> = ({
@@ -36,6 +37,7 @@ const PipelineResourceRef: FC<PipelineResourceRefProps> = ({
   resourceKind,
   resourceName,
   resourceApiVersion,
+  hideIcon,
 }) => {
   const modelKey = resourceApiVersion
     ? `${resourceKind}-${resourceApiVersion}`
@@ -56,9 +58,23 @@ const PipelineResourceRef: FC<PipelineResourceRefProps> = ({
   if (disableLink || !model) {
     return (
       <>
-        <ResourceIcon className={classNames} kind={kind} />
+        {!hideIcon && <ResourceIcon className={classNames} kind={kind} />}
         {displayName || resourceName}
       </>
+    );
+  }
+
+  if (hideIcon) {
+    return (
+      <ResourceLink
+        className={classNames}
+        kind={kind}
+        name={resourceName}
+        displayName={displayName || resourceName}
+        title={resourceName}
+        namespace={namespace}
+        hideIcon
+      />
     );
   }
 

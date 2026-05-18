@@ -5,8 +5,7 @@ import * as _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Tooltip } from '@patternfly/react-core';
-import TaskTypeBadge from './TaskTypeBadge';
-import { t_chart_color_black_500 as customTaskColor } from '@patternfly/react-tokens/dist/js/t_chart_color_black_500';
+import BundleIcon from '@patternfly/react-icons/dist/js/icons/bundle-icon';
 import {
   observer,
   Node,
@@ -14,67 +13,50 @@ import {
   useHover,
   createSvgIdUrl,
 } from '@patternfly/react-topology';
-import {
-  K8sResourceKind,
-  WatchK8sResults,
-  getGroupVersionKindForModel,
-  useK8sWatchResources,
-} from '@openshift-console/dynamic-plugin-sdk';
-import { CustomRunKind, TaskKind } from '../../types';
 import { truncateMiddle } from './truncate-middle';
 import SvgDropShadowFilter from './SvgDropShadowFilter';
-import { CustomRunModelV1Beta1 } from '../../models';
 import { TaskNodeModelData } from './types';
 import { resourcePathFromModel } from '../utils/utils';
+import { PipelineModel } from '../../models';
 
 import './CustomTaskNode.scss';
 
-type CustomTaskNodeProps = {
+const FILTER_ID = 'SvgPipelineRefDropShadowFilterId';
+const PIPELINE_REF_COLOR = '#0066cc';
+
+type PipelineRefTaskNodeProps = {
   element: Node<NodeModel, TaskNodeModelData>;
   disableTooltip?: boolean;
 };
 
-type WatchResource = {
-  [key: string]: K8sResourceKind[] | K8sResourceKind;
-};
-
-interface CustomTaskProps {
+interface PipelineRefTaskComponentProps {
   pipelineRunName?: string;
   name: string;
-  loaded?: boolean;
-  task?: {
-    data: TaskKind;
-  };
   namespace: string;
+  pipelineRefName?: string;
   disableVisualizationTooltip?: boolean;
   width: number;
   height: number;
-  customTask?: K8sResourceKind;
 }
 
-const FILTER_ID = 'SvgTaskDropShadowFilterId';
-
-const CustomTaskComponent: FC<CustomTaskProps> = ({
+const PipelineRefTaskComponent: FC<PipelineRefTaskComponentProps> = ({
   pipelineRunName,
   namespace,
-  task,
   name,
+  pipelineRefName,
   disableVisualizationTooltip,
   width,
   height,
-  customTask,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const showStatusState = !!pipelineRunName;
-  const visualName = name || _.get(task, ['metadata', 'name'], '');
+  const visualName = name;
   const nameRef = useRef();
   const pillRef = useRef();
 
-  const path = `${resourcePathFromModel(
-    CustomRunModelV1Beta1,
-    customTask?.metadata?.name,
-    namespace,
-  )}`;
+  const path = pipelineRefName
+    ? resourcePathFromModel(PipelineModel, pipelineRefName, namespace)
+    : undefined;
   const enableLogLink = !!path;
   const [hover, hoverRef] = useHover();
   const truncatedVisualName = useMemo(
@@ -89,10 +71,9 @@ const CustomTaskComponent: FC<CustomTaskProps> = ({
   const renderVisualName = (
     <text
       ref={nameRef}
-      x={showStatusState ? 30 : width / 2}
+      x={30}
       y={height / 2 + 1}
       className={cx('odc-pipeline-vis-task-text', {
-        'is-text-center': !pipelineRunName,
         'is-linked': enableLogLink,
       })}
     >
@@ -109,11 +90,12 @@ const CustomTaskComponent: FC<CustomTaskProps> = ({
         height={height}
         rx={5}
         className={cx('odc-pipeline-vis-task', {
-          'is-selected': !!pipelineRunName && hover,
-          'is-linked': !!pipelineRunName && enableLogLink,
+          'is-selected': hover,
+          'is-linked': enableLogLink,
         })}
         style={{
-          stroke: customTaskColor.value,
+          stroke: PIPELINE_REF_COLOR,
+          strokeWidth: 2,
         }}
       />
       {visualName !== truncatedVisualName && disableVisualizationTooltip ? (
@@ -123,12 +105,16 @@ const CustomTaskComponent: FC<CustomTaskProps> = ({
       ) : (
         renderVisualName
       )}
-
-      {showStatusState && (
-        <svg width={30} height={30} viewBox="-4 -1 30 30">
-          <TaskTypeBadge text="ET" backgroundColor="#6a6e73" />
-        </svg>
-      )}
+      <svg
+        width={30}
+        height={30}
+        viewBox="-10 -7 30 30"
+        style={{
+          color: PIPELINE_REF_COLOR,
+        }}
+      >
+        <BundleIcon />
+      </svg>
     </g>
   );
 
@@ -138,7 +124,7 @@ const CustomTaskComponent: FC<CustomTaskProps> = ({
         triggerRef={pillRef}
         position="bottom"
         enableFlip={false}
-        content={t('Custom Task')}
+        content={t('Nested Pipeline')}
       >
         <g ref={pillRef}>{taskPill}</g>
       </Tooltip>
@@ -155,41 +141,24 @@ const CustomTaskComponent: FC<CustomTaskProps> = ({
   );
 };
 
-const CustomTaskNode: FC<CustomTaskNodeProps> = ({
+const PipelineRefTaskNode: FC<PipelineRefTaskNodeProps> = ({
   element,
   disableTooltip,
 }) => {
   const { height, width } = element.getBounds();
-
   const { pipeline, pipelineRun, task } = element.getData();
 
-  const customTaskName = `${pipelineRun?.metadata?.name}-${task?.name}`;
-
-  const watchedResources = {
-    customRun: {
-      groupVersionKind: getGroupVersionKindForModel(CustomRunModelV1Beta1),
-      name: customTaskName,
-      namespace: pipeline?.metadata?.namespace,
-      prop: 'task',
-    },
-  };
-
-  const resourcesData: WatchK8sResults<WatchResource> =
-    useK8sWatchResources<WatchResource>(watchedResources);
-
-  const taskComponent: JSX.Element = (
-    <CustomTaskComponent
+  return (
+    <PipelineRefTaskComponent
       pipelineRunName={pipelineRun?.metadata?.name}
       name={task.name || ''}
-      task={task.taskSpec && { data: { spec: task.taskSpec } }}
       namespace={pipeline?.metadata?.namespace}
+      pipelineRefName={task.pipelineRef?.name}
       disableVisualizationTooltip={disableTooltip}
       width={width}
       height={height}
-      customTask={resourcesData.customRun?.data as CustomRunKind}
     />
   );
-  return taskComponent;
 };
 
-export default memo(observer(CustomTaskNode));
+export default memo(observer(PipelineRefTaskNode));

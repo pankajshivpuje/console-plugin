@@ -22,6 +22,8 @@ import {
 } from '@patternfly/react-core';
 import PipelinesPage from './pages/PipelinesPage';
 import PipelineRunsPage from './pages/PipelineRunsPage';
+import PipelineDetailsPage from './pages/PipelineDetailsPage';
+import PipelineRunDetailsPage from './pages/PipelineRunDetailsPage';
 
 const sdkCoreSlice = createSlice({
   name: 'sdkCore',
@@ -74,7 +76,9 @@ const App: FC = () => (
       <Page masthead={<DemoMasthead />} sidebar={<DemoSidebar />}>
         <Routes>
           <Route path="/pipelines" element={<PipelinesPage />} />
+          <Route path="/pipelines/:name" element={<PipelineDetailsPage />} />
           <Route path="/pipeline-runs" element={<PipelineRunsPage />} />
+          <Route path="/pipeline-runs/:name" element={<PipelineRunDetailsPage />} />
           <Route path="*" element={<Navigate to="/pipelines" replace />} />
         </Routes>
       </Page>

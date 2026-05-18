@@ -387,6 +387,7 @@ export const getGraphDataModel = (
     spec: {},
   },
   taskRuns: TaskRunKind[],
+  childPipelineRuns?: Record<string, PipelineRunKind>,
 ): {
   graph: GraphModel;
   nodes: PipelineMixedNodeModel[];
@@ -396,7 +397,9 @@ export const getGraphDataModel = (
     return null;
   }
 
-  const taskList = _.flatten(getPipelineTasks(pipeline, pipelineRun, taskRuns));
+  const taskList = _.flatten(
+    getPipelineTasks(pipeline, pipelineRun, taskRuns, childPipelineRuns),
+  );
 
   const dag = new DAG();
   taskList?.forEach((task: PipelineTask) => {
@@ -482,23 +485,25 @@ export const getGraphDataModel = (
     const isTaskSkipped = pipelineRun?.status?.skippedTasks?.some(
       (t) => t.name === task.name,
     );
-    const getNodeType = (taskKind: string) => {
-      if (!taskKind || taskKind === 'Task' || taskKind === 'task') {
+    const getNodeType = (t: typeof task) => {
+      if (t.pipelineRef) {
+        return NodeType.PIPELINE_TASK_NODE;
+      }
+      const kind =
+        t?.taskRef?.resolver === 'cluster'
+          ? t?.taskRef?.params?.find((param) => param.name === 'kind')?.value
+          : t?.taskRef?.kind;
+      if (!kind || kind === 'Task' || kind === 'task') {
         return NodeType.TASK_NODE;
       }
-      if (taskKind === 'ApprovalTask') {
+      if (kind === 'ApprovalTask') {
         return NodeType.APPROVAL_TASK_NODE;
       }
       return NodeType.CUSTOM_TASK_NODE;
     };
 
-    const taskKind =
-      task?.taskRef?.resolver === 'cluster'
-        ? task?.taskRef?.params?.find((param) => param.name === 'kind')?.value
-        : task?.taskRef?.kind;
-
     nodes.push(
-      createPipelineTaskNode(getNodeType(taskKind), {
+      createPipelineTaskNode(getNodeType(task), {
         id: vertex.name,
         label: vertex.name,
         width:
@@ -521,6 +526,7 @@ export const getGraphDataModel = (
     pipelineRun,
     taskRuns,
     true,
+    childPipelineRuns,
   );
 
   const maxFinallyNodeName =
@@ -531,7 +537,11 @@ export const getGraphDataModel = (
       (t) => t.name === fTask.name,
     );
 
-    return createPipelineTaskNode(NodeType.FINALLY_NODE, {
+    const finallyNodeType = fTask.pipelineRef
+      ? NodeType.PIPELINE_TASK_NODE
+      : NodeType.FINALLY_NODE;
+
+    return createPipelineTaskNode(finallyNodeType, {
       id: fTask.name,
       label: fTask.name,
       width:
@@ -559,10 +569,13 @@ export const getGraphDataModel = (
         },
       ]
     : [];
+  const finallyNodeTypes: string[] = [
+    ...new Set<string>(finallyNodes.map((n) => n.type as string)),
+  ];
   const spacerNodes: PipelineMixedNodeModel[] = getSpacerNodes(
     [...nodes, ...finallyNodes],
     NodeType.SPACER_NODE,
-    [NodeType.FINALLY_NODE],
+    finallyNodeTypes,
   ).map(getSpacerNode);
 
   const edges: PipelineEdgeModel[] = getEdgesFromNodes(
@@ -570,7 +583,7 @@ export const getGraphDataModel = (
     NodeType.SPACER_NODE,
     NodeType.EDGE,
     NodeType.EDGE,
-    [NodeType.FINALLY_NODE],
+    finallyNodeTypes,
     NodeType.EDGE,
   );
 

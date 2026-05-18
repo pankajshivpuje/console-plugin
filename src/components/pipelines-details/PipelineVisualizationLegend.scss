@@ -1,12 +1,14 @@
-.odc-dynamic-resource-link-list {
-  &--addSpaceBelow {
-    margin-bottom: var(--pf-t--global--spacer--lg);
-  }
+.odc-pipeline-visualization-legend {
+  display: flex;
+  gap: var(--pf-t--global--spacer--lg);
+  padding: var(--pf-t--global--spacer--sm) var(--pf-t--global--spacer--md);
 
   &__item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: var(--pf-t--global--spacer--xs);
+    font-size: var(--pf-t--global--font--size--sm);
+    color: var(--pf-t--global--text--color--subtle);
   }
 
   &__badge {
@@ -20,6 +22,5 @@
     color: #fff;
     font-size: 10px;
     font-weight: 700;
-    flex-shrink: 0;
   }
 }

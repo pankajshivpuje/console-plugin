@@ -19,6 +19,7 @@ import {
 } from '@patternfly/react-topology';
 import classNames from 'classnames';
 import { Link } from 'react-router';
+import TaskTypeBadge from './TaskTypeBadge';
 import { NodeType } from './const';
 import { PipelineRunModel, TaskModel } from '../../models';
 import { getReferenceForModel } from '../pipelines-overview/utils';
@@ -51,8 +52,11 @@ const PipelineTaskNode: FunctionComponent<PipelineTaskNodeProps> = ({
   const taskRef = useRef();
   const detailsLevel = useDetailsLevel();
   const isFinallyTask = element.getType() === NodeType.FINALLY_NODE;
+  const isPipelineRef = !!data.task?.pipelineRef;
   let resources;
-  if (data.task?.taskRef?.resolver === 'cluster') {
+  if (isPipelineRef) {
+    resources = null;
+  } else if (data.task?.taskRef?.resolver === 'cluster') {
     const taskName = data.task.taskRef?.params?.find(
       (param) => param.name === 'name',
     )?.value;
@@ -121,7 +125,7 @@ const PipelineTaskNode: FunctionComponent<PipelineTaskNodeProps> = ({
   ).length;
 
   const badge =
-    stepStatusList.length > 0 && data.status
+    !isPipelineRef && stepStatusList.length > 0 && data.status
       ? `${succeededStepsCount}/${stepStatusList.length}`
       : null;
 
@@ -152,13 +156,17 @@ const PipelineTaskNode: FunctionComponent<PipelineTaskNodeProps> = ({
 
   // eslint-disable-next-line no-unsafe-optional-chaining
   const { name: plrName, namespace } = pipelineRun?.metadata;
-  const path = plrName
-    ? `${resourcePathFromModel(
-        PipelineRunModel,
-        plrName,
-        namespace,
-      )}/logs?taskName=${element.getLabel()}`
-    : undefined;
+  const childPipelineRunName = data.task?.childPipelineRunName;
+  const path =
+    isPipelineRef && childPipelineRunName
+      ? resourcePathFromModel(PipelineRunModel, childPipelineRunName, namespace)
+      : plrName
+      ? `${resourcePathFromModel(
+          PipelineRunModel,
+          plrName,
+          namespace,
+        )}/logs?taskName=${element.getLabel()}`
+      : undefined;
 
   const enableLogLink =
     data.status !== ComputedStatus.Idle &&
@@ -169,7 +177,9 @@ const PipelineTaskNode: FunctionComponent<PipelineTaskNodeProps> = ({
 
   const taskNode = (
     <TaskNode
-      className="odc-pipeline-topology__task-node"
+      className={classNames('odc-pipeline-topology__task-node', {
+        'odc-pipeline-topology__pipeline-ref-node': isPipelineRef,
+      })}
       element={element}
       onContextMenu={data.showContextMenu ? onContextMenu : undefined}
       contextMenuOpen={contextMenuOpen}
@@ -181,6 +191,13 @@ const PipelineTaskNode: FunctionComponent<PipelineTaskNodeProps> = ({
       {...rest}
       badge={badge}
       truncateLength={element.getData()?.label?.length}
+      leadIcon={
+        isPipelineRef ? (
+          <TaskTypeBadge text="P" backgroundColor="#0066cc" />
+        ) : (
+          <TaskTypeBadge text="T" backgroundColor="#009596" />
+        )
+      }
     >
       {whenDecorator}
     </TaskNode>

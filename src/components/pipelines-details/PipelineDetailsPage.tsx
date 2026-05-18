@@ -22,16 +22,26 @@ import { PipelineKind } from '../../types';
 import { getReferenceForModel } from '../pipelines-overview/utils';
 import PipelineParamatersTab from './PipelineParamatersTab';
 import { ErrorPage404 } from '../common/error';
+import { MOCK_PIPELINES } from '../__demo__/mock-data';
 
 const PipelineDetailsPage = () => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const params = useParams();
   const { name, ns: namespace } = params;
-  const [pipeline, loaded, loadError] = useK8sWatchResource<PipelineKind>({
+  const [k8sPipeline, loaded, loadError] = useK8sWatchResource<PipelineKind>({
     groupVersionKind: getGroupVersionKindForModel(PipelineModel),
     namespace,
     name,
   });
+  const pipeline = useMemo(() => {
+    if (k8sPipeline?.metadata?.name) return k8sPipeline;
+    if (loadError || (loaded && !k8sPipeline?.metadata?.name)) {
+      return (MOCK_PIPELINES.find(
+        (m) => m.metadata?.name === name && m.metadata?.namespace === namespace,
+      ) as PipelineKind) || k8sPipeline;
+    }
+    return k8sPipeline;
+  }, [k8sPipeline, loaded, loadError, name, namespace]);
 
   const resourceTitleFunc = useMemo(() => {
     return (
@@ -51,8 +61,11 @@ const PipelineDetailsPage = () => {
     );
   }, []);
 
-  if (!loaded) {
-    return loadError ? <ErrorPage404 /> : <LoadingBox />;
+  if (!loaded && !pipeline?.metadata?.name) {
+    return <LoadingBox />;
+  }
+  if (loadError && !pipeline?.metadata?.name) {
+    return <ErrorPage404 />;
   }
   return (
     <DetailsPage

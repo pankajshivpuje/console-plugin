@@ -103,6 +103,30 @@ export const RedExclamationCircleIcon: FC = () => (
   <span style={{ color: '#c9190b' }}>&#9888;</span>
 );
 
+export type StatusComponentProps = {
+  title?: string;
+  iconOnly?: boolean;
+  noTooltip?: boolean;
+  className?: string;
+  popoverTitle?: string;
+};
+
+export const SuccessStatus: FC<PropsWithChildren<StatusComponentProps>> = ({
+  title,
+}) => <span style={{ color: '#3e8635' }}>{title || 'Succeeded'}</span>;
+
+export const ErrorStatus: FC<PropsWithChildren<StatusComponentProps>> = ({
+  title,
+}) => <span style={{ color: '#c9190b' }}>{title || 'Error'}</span>;
+
+export const InfoStatus: FC<PropsWithChildren<StatusComponentProps>> = ({
+  title,
+}) => <span style={{ color: '#2b9af3' }}>{title || 'Info'}</span>;
+
+export const ProgressStatus: FC<PropsWithChildren<StatusComponentProps>> = ({
+  title,
+}) => <span style={{ color: '#2b9af3' }}>{title || 'In Progress'}</span>;
+
 export const Selector: FC<{ selector?: any; namespace?: string }> = () => (
   <span>-</span>
 );

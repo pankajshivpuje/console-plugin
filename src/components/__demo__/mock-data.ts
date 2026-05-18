@@ -4,6 +4,8 @@ import { PropPipelineData } from '../utils/pipeline-augment';
 
 export const MOCK_PIPELINES: PropPipelineData[] = [
   {
+    apiVersion: 'tekton.dev/v1',
+    kind: 'Pipeline',
     metadata: {
       name: 'buildah-deploy',
       namespace: 'default',
@@ -13,8 +15,16 @@ export const MOCK_PIPELINES: PropPipelineData[] = [
     spec: {
       tasks: [
         { name: 'fetch-source', taskRef: { name: 'git-clone' } },
-        { name: 'build-image', taskRef: { name: 'buildah' } },
-        { name: 'deploy', pipelineRef: { name: 'deploy-to-cluster' } },
+        {
+          name: 'build-image',
+          taskRef: { name: 'buildah' },
+          runAfter: ['fetch-source'],
+        },
+        {
+          name: 'deploy',
+          pipelineRef: { name: 'deploy-to-cluster' },
+          runAfter: ['build-image'],
+        },
       ],
       workspaces: [
         { name: 'shared-workspace' },
@@ -23,6 +33,8 @@ export const MOCK_PIPELINES: PropPipelineData[] = [
     },
   },
   {
+    apiVersion: 'tekton.dev/v1',
+    kind: 'Pipeline',
     metadata: {
       name: 's2i-java',
       namespace: 'default',
@@ -32,14 +44,28 @@ export const MOCK_PIPELINES: PropPipelineData[] = [
     spec: {
       tasks: [
         { name: 'fetch-repo', taskRef: { name: 'git-clone' } },
-        { name: 'build', taskRef: { name: 's2i-java' } },
-        { name: 'deploy', taskRef: { name: 'openshift-client' } },
-        { name: 'verify', pipelineRef: { name: 'integration-tests' } },
+        {
+          name: 'build',
+          taskRef: { name: 's2i-java' },
+          runAfter: ['fetch-repo'],
+        },
+        {
+          name: 'deploy',
+          taskRef: { name: 'openshift-client' },
+          runAfter: ['build'],
+        },
+        {
+          name: 'verify',
+          pipelineRef: { name: 'integration-tests' },
+          runAfter: ['deploy'],
+        },
       ],
       workspaces: [{ name: 'workspace' }],
     },
   },
   {
+    apiVersion: 'tekton.dev/v1',
+    kind: 'Pipeline',
     metadata: {
       name: 'docker-build-push',
       namespace: 'default',
@@ -49,12 +75,18 @@ export const MOCK_PIPELINES: PropPipelineData[] = [
     spec: {
       tasks: [
         { name: 'clone', taskRef: { name: 'git-clone' } },
-        { name: 'build-and-push', taskRef: { name: 'kaniko' } },
+        {
+          name: 'build-and-push',
+          taskRef: { name: 'kaniko' },
+          runAfter: ['clone'],
+        },
       ],
       workspaces: [{ name: 'source' }, { name: 'dockerconfig' }],
     },
   },
   {
+    apiVersion: 'tekton.dev/v1',
+    kind: 'Pipeline',
     metadata: {
       name: 'nodejs-deploy',
       namespace: 'default',
@@ -64,15 +96,33 @@ export const MOCK_PIPELINES: PropPipelineData[] = [
     spec: {
       tasks: [
         { name: 'fetch-source', taskRef: { name: 'git-clone' } },
-        { name: 'install-deps', taskRef: { name: 'npm' } },
-        { name: 'run-tests', pipelineRef: { name: 'test-suite' } },
-        { name: 'build-image', taskRef: { name: 'buildah' } },
-        { name: 'deploy-app', taskRef: { name: 'openshift-client' } },
+        {
+          name: 'install-deps',
+          taskRef: { name: 'npm' },
+          runAfter: ['fetch-source'],
+        },
+        {
+          name: 'run-tests',
+          pipelineRef: { name: 'test-suite' },
+          runAfter: ['install-deps'],
+        },
+        {
+          name: 'build-image',
+          taskRef: { name: 'buildah' },
+          runAfter: ['install-deps'],
+        },
+        {
+          name: 'deploy-app',
+          taskRef: { name: 'openshift-client' },
+          runAfter: ['run-tests', 'build-image'],
+        },
       ],
       workspaces: [{ name: 'shared-workspace' }, { name: 'npm-cache' }],
     },
   },
   {
+    apiVersion: 'tekton.dev/v1',
+    kind: 'Pipeline',
     metadata: {
       name: 'scan-and-deploy',
       namespace: 'default',
@@ -82,11 +132,22 @@ export const MOCK_PIPELINES: PropPipelineData[] = [
     spec: {
       tasks: [
         { name: 'fetch-source', taskRef: { name: 'git-clone' } },
-        { name: 'build-image', taskRef: { name: 'buildah' } },
-        { name: 'scan-image', taskRef: { name: 'trivy-scanner' } },
-        { name: 'deploy', taskRef: { name: 'kubernetes-actions' } },
+        {
+          name: 'build-image',
+          taskRef: { name: 'buildah' },
+          runAfter: ['fetch-source'],
+        },
+        {
+          name: 'scan-image',
+          taskRef: { name: 'trivy-scanner' },
+          runAfter: ['build-image'],
+        },
+        {
+          name: 'deploy',
+          taskRef: { name: 'kubernetes-actions' },
+          runAfter: ['scan-image'],
+        },
       ],
-      finally: [{ name: 'notify', pipelineRef: { name: 'slack-notify' } }],
       workspaces: [{ name: 'workspace' }, { name: 'scan-results' }],
     },
   },
@@ -119,8 +180,16 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       pipelineSpec: {
         tasks: [
           { name: 'fetch-source', taskRef: { name: 'git-clone' } },
-          { name: 'build-image', taskRef: { name: 'buildah' } },
-          { name: 'deploy', pipelineRef: { name: 'deploy-to-cluster' } },
+          {
+            name: 'build-image',
+            taskRef: { name: 'buildah' },
+            runAfter: ['fetch-source'],
+          },
+          {
+            name: 'deploy',
+            pipelineRef: { name: 'deploy-to-cluster' },
+            runAfter: ['build-image'],
+          },
         ],
       },
     },
@@ -152,8 +221,16 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       pipelineSpec: {
         tasks: [
           { name: 'fetch-source', taskRef: { name: 'git-clone' } },
-          { name: 'build-image', taskRef: { name: 'buildah' } },
-          { name: 'deploy', taskRef: { name: 'kubernetes-actions' } },
+          {
+            name: 'build-image',
+            taskRef: { name: 'buildah' },
+            runAfter: ['fetch-source'],
+          },
+          {
+            name: 'deploy',
+            taskRef: { name: 'kubernetes-actions' },
+            runAfter: ['build-image'],
+          },
         ],
       },
     },
@@ -185,9 +262,21 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       pipelineSpec: {
         tasks: [
           { name: 'fetch-repo', taskRef: { name: 'git-clone' } },
-          { name: 'build', taskRef: { name: 's2i-java' } },
-          { name: 'deploy', taskRef: { name: 'openshift-client' } },
-          { name: 'verify', pipelineRef: { name: 'integration-tests' } },
+          {
+            name: 'build',
+            taskRef: { name: 's2i-java' },
+            runAfter: ['fetch-repo'],
+          },
+          {
+            name: 'deploy',
+            taskRef: { name: 'openshift-client' },
+            runAfter: ['build'],
+          },
+          {
+            name: 'verify',
+            pipelineRef: { name: 'integration-tests' },
+            runAfter: ['deploy'],
+          },
         ],
       },
     },
@@ -218,7 +307,11 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       pipelineSpec: {
         tasks: [
           { name: 'clone', taskRef: { name: 'git-clone' } },
-          { name: 'build-and-push', taskRef: { name: 'kaniko' } },
+          {
+            name: 'build-and-push',
+            taskRef: { name: 'kaniko' },
+            runAfter: ['clone'],
+          },
         ],
       },
     },
@@ -250,10 +343,26 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       pipelineSpec: {
         tasks: [
           { name: 'fetch-source', taskRef: { name: 'git-clone' } },
-          { name: 'install-deps', taskRef: { name: 'npm' } },
-          { name: 'run-tests', pipelineRef: { name: 'test-suite' } },
-          { name: 'build-image', taskRef: { name: 'buildah' } },
-          { name: 'deploy-app', taskRef: { name: 'openshift-client' } },
+          {
+            name: 'install-deps',
+            taskRef: { name: 'npm' },
+            runAfter: ['fetch-source'],
+          },
+          {
+            name: 'run-tests',
+            pipelineRef: { name: 'test-suite' },
+            runAfter: ['install-deps'],
+          },
+          {
+            name: 'build-image',
+            taskRef: { name: 'buildah' },
+            runAfter: ['install-deps'],
+          },
+          {
+            name: 'deploy-app',
+            taskRef: { name: 'openshift-client' },
+            runAfter: ['run-tests', 'build-image'],
+          },
         ],
       },
     },
@@ -285,9 +394,21 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       pipelineSpec: {
         tasks: [
           { name: 'fetch-source', taskRef: { name: 'git-clone' } },
-          { name: 'build-image', taskRef: { name: 'buildah' } },
-          { name: 'scan-image', taskRef: { name: 'trivy-scanner' } },
-          { name: 'deploy', taskRef: { name: 'kubernetes-actions' } },
+          {
+            name: 'build-image',
+            taskRef: { name: 'buildah' },
+            runAfter: ['fetch-source'],
+          },
+          {
+            name: 'scan-image',
+            taskRef: { name: 'trivy-scanner' },
+            runAfter: ['build-image'],
+          },
+          {
+            name: 'deploy',
+            taskRef: { name: 'kubernetes-actions' },
+            runAfter: ['scan-image'],
+          },
         ],
       },
     },

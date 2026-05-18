@@ -182,6 +182,10 @@ export type ResourceModelLink = {
   resourceKind: string;
   name: string;
   qualifier?: string;
+  badge?: {
+    text: string;
+    color: string;
+  };
 };
 
 export type ResourceList = {
