@@ -1,16 +1,30 @@
 .pipelines-ocs-quick-search-modal-body {
   display: flex;
   flex-direction: column;
+  position: relative;
   background: var(--pf-t--global--background--color--primary--default);
   box-shadow: var(--pf-v6-c-modal-box--BoxShadow);
   border-radius: var(--pf-t--global--border--radius--medium);
   border: 1px solid var(--pf-t--global--border--color--default);
   overflow: hidden;
 
+  &__close-btn {
+    position: absolute;
+    top: var(--pf-t--global--spacer--sm);
+    right: var(--pf-t--global--spacer--sm);
+    z-index: 1;
+  }
+
   &__header {
     padding: var(--pf-t--global--spacer--md) var(--pf-t--global--spacer--md)
       var(--pf-t--global--spacer--sm);
     border-bottom: 1px solid var(--pf-t--global--border--color--default);
+  }
+
+  &__item-count {
+    padding: var(--pf-t--global--spacer--xs) var(--pf-t--global--spacer--md);
+    font-size: var(--pf-t--global--font--size--sm);
+    color: var(--pf-t--global--text--color--subtle);
   }
 
   &__footer {

@@ -6,8 +6,10 @@ import {
   useCallback,
   useMemo,
 } from 'react';
-import { Title } from '@patternfly/react-core';
+import { Button, ButtonVariant, Title } from '@patternfly/react-core';
+import { TimesIcon } from '@patternfly/react-icons/dist/esm/icons/times-icon';
 import { debounce } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { ResizeDirection } from 're-resizable';
 import { Rnd } from 'react-rnd';
@@ -79,6 +81,7 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   const DEFAULT_HEIGHT_WITH_ITEMS = 520;
   const MIN_HEIGHT = 240;
   const MIN_WIDTH = 225;
+  const { t } = useTranslation('plugin__pipelines-console-plugin');
   const navigate = useNavigate();
   const isDevConsoleProxyAvailable = useFlag(FLAGS.DEVCONSOLE_PROXY);
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>(null);
@@ -145,6 +148,16 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
   }, [viewContainer]);
 
   useEffect(() => {
+    if (allCatalogItemsLoaded && catalogItems === null && !searchTerm) {
+      const { filteredItems, viewAllLinks, catalogItemTypes } =
+        searchCatalog('');
+      setCatalogItems(filteredItems);
+      setCatalogTypes(catalogItemTypes);
+      setViewAll(viewAllLinks);
+    }
+  }, [allCatalogItemsLoaded, searchCatalog]);
+
+  useEffect(() => {
     if (filteredCatalogItems === null || filteredCatalogItems?.length === 0) {
       setMaxHeight(DEFAULT_HEIGHT_WITH_NO_ITEMS);
       setMinHeight(DEFAULT_HEIGHT_WITH_NO_ITEMS);
@@ -197,10 +210,15 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
       const currentVersion = ++searchVersion.current;
 
       if (!value) {
-        setCatalogItems(null);
+        const { filteredItems, viewAllLinks, catalogItemTypes } =
+          searchCatalog('');
+        setCatalogItems(filteredItems);
+        setCatalogTypes(catalogItemTypes);
+        setViewAll(viewAllLinks);
         removeQueryArgument('catalogSearch');
         setIsSearching(false);
         setIsSearchError(false);
+        setSelectedItemId(null);
         return;
       }
 
@@ -404,6 +422,15 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
           height: getModalHeight(),
         }}
       >
+        <Button
+          variant={ButtonVariant.plain}
+          aria-label={t('Close')}
+          onClick={closeModal}
+          className="pipelines-ocs-quick-search-modal-body__close-btn"
+          data-test="quick-search-close-btn"
+        >
+          <TimesIcon />
+        </Button>
         {title && (
           <div className="pipelines-ocs-quick-search-modal-body__header">
             <Title headingLevel="h1" size="xl">
@@ -422,6 +449,15 @@ const QuickSearchModalBody: FC<QuickSearchModalBodyProps> = ({
           icon={icon}
           autoFocus
         />
+        {filteredCatalogItems && filteredCatalogItems.length > 0 && (
+          <div className="pipelines-ocs-quick-search-modal-body__item-count">
+            {filteredCatalogItems[0]?.attributes?.resourceKind === 'pipeline'
+              ? t('{{count}} Pipelines', {
+                  count: filteredCatalogItems.length,
+                })
+              : t('{{count}} Tasks', { count: filteredCatalogItems.length })}
+          </div>
+        )}
         {filteredCatalogItems && selectedItem && (
           <QuickSearchContent
             catalogItems={filteredCatalogItems}
