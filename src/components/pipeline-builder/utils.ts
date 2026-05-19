@@ -147,6 +147,16 @@ export const findPipeline = (
   );
 };
 
+export const getPipelineRefName = (task: PipelineTask): string | null => {
+  if (!task?.pipelineRef) return null;
+  if (task.pipelineRef.resolver === 'cluster') {
+    return (
+      task.pipelineRef.params?.find((p) => p.name === 'name')?.value ?? null
+    );
+  }
+  return task.pipelineRef.name ?? null;
+};
+
 export const findTask = (
   resourceTasks: PipelineBuilderTaskResources,
   task: PipelineTask,

@@ -37,11 +37,12 @@ import {
   UpdateOperationAddData,
   UpdateOperationConvertToFinallyTaskData,
   UpdateOperationConvertToLoadingTaskData,
+  UpdateOperationConvertToPipelineData,
   UpdateOperationConvertToTaskData,
   UpdateOperationFixInvalidTaskListData,
   UpdateTasksCallback,
 } from './types';
-import { findPipeline, findTask, getTopLevelErrorMessage, isPipelineRef } from './utils';
+import { findTask, getTopLevelErrorMessage, isPipelineRef } from './utils';
 
 export const useFormikFetchAndSaveTasks = (
   namespace: string,
@@ -222,10 +223,16 @@ const useConnectFinally = (
   const finallyLoadingTasks = taskGroup.loadingTasks.filter(
     (lt) => lt.isFinallyTask,
   );
-  const finallyValidTasks = taskGroup.finallyTasks.filter(
+  const finallyPipelineRefTasks = taskGroup.finallyTasks.filter(
+    (task) => isPipelineRef(task),
+  );
+  const finallyRegularTasks = taskGroup.finallyTasks.filter(
+    (task) => !isPipelineRef(task),
+  );
+  const finallyValidTasks = finallyRegularTasks.filter(
     (task) => !!findTask(taskResources, task),
   );
-  const finallyInvalidTasks = taskGroup.finallyTasks.filter(
+  const finallyInvalidTasks = finallyRegularTasks.filter(
     (task) => !findTask(taskResources, task),
   );
 
@@ -238,10 +245,19 @@ const useConnectFinally = (
 
   const getInvalidFinallyListTaskData = (task) => ({
     ...task,
-    convertList: (resource: TaskKind) =>
-      resource.kind
-        ? convertInvalidListToFinallyTask(resource, task.name)
-        : onNewInstallingTask(resource, task.name, true, regularRunAfters),
+    convertList: (resource: TaskKind | PipelineKind) => {
+      if (!resource.kind) {
+        onNewInstallingTask(resource as TaskKind, task.name, true, regularRunAfters);
+      } else if (resource.kind === 'Pipeline') {
+        const data: UpdateOperationConvertToPipelineData = { resource: resource as PipelineKind, name: task.name };
+        onUpdateTasks(taskGroupRef.current, {
+          type: UpdateOperationType.CONVERT_LIST_TO_FINALLY_PIPELINE,
+          data,
+        });
+      } else {
+        convertInvalidListToFinallyTask(resource as TaskKind, task.name);
+      }
+    },
     onRemoveTask: () => {
       onUpdateTasks(taskGroupRef.current, {
         type: UpdateOperationType.REMOVE_TASK,
@@ -252,10 +268,19 @@ const useConnectFinally = (
 
   const getFinallyListTaskData = (task) => ({
     ...task,
-    convertList: (resource: TaskKind) =>
-      resource.kind
-        ? convertListToFinallyTask(resource, task.name)
-        : onNewInstallingTask(resource, task.name, true, regularRunAfters),
+    convertList: (resource: TaskKind | PipelineKind) => {
+      if (!resource.kind) {
+        onNewInstallingTask(resource as TaskKind, task.name, true, regularRunAfters);
+      } else if (resource.kind === 'Pipeline') {
+        const data: UpdateOperationConvertToPipelineData = { resource: resource as PipelineKind, name: task.name };
+        onUpdateTasks(taskGroupRef.current, {
+          type: UpdateOperationType.CONVERT_LIST_TO_FINALLY_PIPELINE,
+          data,
+        });
+      } else {
+        convertListToFinallyTask(resource as TaskKind, task.name);
+      }
+    },
     onRemoveTask: () => {
       onUpdateTasks(taskGroupRef.current, {
         type: UpdateOperationType.DELETE_LIST_TASK,
@@ -278,14 +303,23 @@ const useConnectFinally = (
       runAfter: regularRunAfters,
       addNewFinallyListNode,
       onTaskSearch,
-      finallyTasks: finallyValidTasks.map((ft, idx) => ({
-        ...ft,
-        onTaskSelection: () =>
-          onTaskSelection(ft, findTask(taskResources, ft), true),
-        error: getTopLevelErrorMessage(tasksInError)(idx),
-        selected: taskGroup.highlightedIds.includes(ft.name),
-        disableTooltip: true,
-      })),
+      finallyTasks: [
+        ...finallyValidTasks.map((ft, idx) => ({
+          ...ft,
+          onTaskSelection: () =>
+            onTaskSelection(ft, findTask(taskResources, ft), true),
+          error: getTopLevelErrorMessage(tasksInError)(idx),
+          selected: taskGroup.highlightedIds.includes(ft.name),
+          disableTooltip: true,
+        })),
+        ...finallyPipelineRefTasks.map((ft, idx) => ({
+          ...ft,
+          onTaskSelection: () => onTaskSelection(ft, null, true),
+          error: getTopLevelErrorMessage(tasksInError)(finallyValidTasks.length + idx),
+          selected: taskGroup.highlightedIds.includes(ft.name),
+          disableTooltip: true,
+        })),
+      ],
       finallyLoadingTasks,
       finallyInvalidListTasks: finallyInvalidTasks.map((ivlt) =>
         getInvalidFinallyListTaskData(ivlt),
@@ -350,10 +384,18 @@ export const useNodes = (
     createTaskListNode(name, {
       namespaceTaskList: namespacedTasks,
       clusterResolverTaskList: clusterResolverTasks,
-      onNewTask: (resource: TaskKind) => {
-        resource.kind
-          ? onNewTask(resource, name, runAfter)
-          : onNewInstallingTask(resource, name, runAfter);
+      onNewTask: (resource: TaskKind | PipelineKind) => {
+        if (!resource.kind) {
+          onNewInstallingTask(resource as TaskKind, name, runAfter);
+        } else if (resource.kind === 'Pipeline') {
+          const data: UpdateOperationConvertToPipelineData = { resource: resource as PipelineKind, name, runAfter };
+          onUpdateTasks(taskGroupRef.current, {
+            type: UpdateOperationType.CONVERT_LIST_TO_PIPELINE,
+            data,
+          });
+        } else {
+          onNewTask(resource as TaskKind, name, runAfter);
+        }
       },
       onTaskSearch,
       onRemoveTask: firstTask
@@ -378,18 +420,26 @@ export const useNodes = (
     createInvalidTaskListNode(name, {
       namespaceTaskList: namespacedTasks,
       clusterResolverTaskList: clusterResolverTasks,
-      onNewTask: (resource: TaskKind) => {
-        const data: UpdateOperationFixInvalidTaskListData = {
-          existingName: name,
-          resource,
-          runAfter,
-        };
-        resource.kind
-          ? onUpdateTasks(taskGroupRef.current, {
-              type: UpdateOperationType.FIX_INVALID_LIST_TASK,
-              data,
-            })
-          : onNewInstallingTask(resource, name, runAfter);
+      onNewTask: (resource: TaskKind | PipelineKind) => {
+        if (!resource.kind) {
+          onNewInstallingTask(resource as TaskKind, name, runAfter);
+        } else if (resource.kind === 'Pipeline') {
+          const data: UpdateOperationConvertToPipelineData = { resource: resource as PipelineKind, name, runAfter };
+          onUpdateTasks(taskGroupRef.current, {
+            type: UpdateOperationType.CONVERT_LIST_TO_PIPELINE,
+            data,
+          });
+        } else {
+          const data: UpdateOperationFixInvalidTaskListData = {
+            existingName: name,
+            resource: resource as TaskKind,
+            runAfter,
+          };
+          onUpdateTasks(taskGroupRef.current, {
+            type: UpdateOperationType.FIX_INVALID_LIST_TASK,
+            data,
+          });
+        }
       },
       onTaskSearch,
       onRemoveTask: () => {
@@ -417,7 +467,7 @@ export const useNodes = (
 
   // Separate pipeline ref tasks from regular tasks
   const pipelineRefTasks = taskGroup.tasks.filter(
-    (task) => isPipelineRef(task) && !!findPipeline(taskResources, task),
+    (task) => isPipelineRef(task),
   );
   const regularTasks = taskGroup.tasks.filter(
     (task) => !isPipelineRef(task),

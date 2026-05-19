@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Drawer,
   DrawerContent,
@@ -38,7 +38,7 @@ import {
   EditorType,
 } from './types';
 import { applyChange } from './update-utils';
-import { findPipeline, isPipelineRef } from './utils';
+import { findPipeline, getPipelineRefName, isPipelineRef } from './utils';
 
 import './PipelineBuilderForm.scss';
 import CodeEditorField from './CodeEditorField';
@@ -57,6 +57,7 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const launchOverlay = useOverlay();
   const [selectedTask, setSelectedTask] = useState<SelectedBuilderTask>(null);
+  const catalogPipelinesRef = useRef<Record<string, PipelineKind>>({});
   const selectedTaskRef = useRef<SelectedBuilderTask>(null);
   selectedTaskRef.current = selectedTask;
   const contentRef = useRef<HTMLDivElement>(null);
@@ -82,6 +83,40 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
   const savedCallback = useRef(() => {});
 
   statusRef.current = status;
+
+  const prevErrorsRef = useRef<Record<string, any>>({});
+
+  useEffect(() => {
+    const currentErrors = status?.tasks || {};
+    const prevErrors = prevErrorsRef.current;
+
+    const newlyErroredTasks = Object.keys(currentErrors).filter(
+      (taskName) => !prevErrors[taskName],
+    );
+
+    prevErrorsRef.current = currentErrors;
+
+    if (newlyErroredTasks.length > 0 && !selectedTask) {
+      const taskName = newlyErroredTasks[0];
+      const taskIdx = formData.tasks.findIndex((t) => t.name === taskName);
+      const isFinallyTask = taskIdx === -1;
+      const finalIndex = isFinallyTask
+        ? formData.finallyTasks.findIndex((t) => t.name === taskName)
+        : taskIdx;
+
+      if (finalIndex !== -1) {
+        const task = isFinallyTask
+          ? formData.finallyTasks[finalIndex]
+          : formData.tasks[finalIndex];
+        setSelectedTask({
+          isFinallyTask,
+          taskIndex: finalIndex,
+          resource: null,
+          isPipelineRef: isPipelineRef(task),
+        });
+      }
+    }
+  }, [status?.tasks]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetSelectedTask = (): void => {
     setSelectedTask(null);
@@ -135,6 +170,17 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
   };
 
   const onUpdateTasks = (updatedTaskGroup, op) => {
+    if (
+      (op.type === UpdateOperationType.CONVERT_LIST_TO_PIPELINE ||
+        op.type === UpdateOperationType.CONVERT_LIST_TO_FINALLY_PIPELINE) &&
+      op.data?.resource
+    ) {
+      const resource = op.data.resource as PipelineKind;
+      catalogPipelinesRef.current = {
+        ...catalogPipelinesRef.current,
+        [resource.metadata.name]: resource,
+      };
+    }
     updateTasks(applyChange(updatedTaskGroup, op, namespace));
   };
 
@@ -205,10 +251,16 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
               {selectedTask?.isPipelineRef ? (
                 <PipelineSidebar
                   key={selectedTask?.taskIndex + String(selectedTask?.isFinallyTask)}
-                  pipeline={findPipeline(
-                    taskResources,
-                    formData[nodeType][selectedTask?.taskIndex],
-                  )}
+                  pipeline={
+                    findPipeline(
+                      taskResources,
+                      formData[nodeType][selectedTask?.taskIndex],
+                    ) ??
+                    catalogPipelinesRef.current[
+                      getPipelineRefName(formData[nodeType][selectedTask?.taskIndex])
+                    ] ??
+                    null
+                  }
                   onClose={() => setSelectedTask(null)}
                   workspaceList={formData.workspaces || []}
                   onRenameTask={(data: UpdateOperationRenameTaskData) => {

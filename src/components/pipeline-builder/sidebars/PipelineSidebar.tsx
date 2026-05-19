@@ -1,7 +1,11 @@
-import type { FC } from 'react';
+import type { FC, Ref } from 'react';
+import { useState } from 'react';
 import {
-  Button,
-  ButtonVariant,
+  Dropdown,
+  DropdownItem,
+  DropdownList,
+  MenuToggle,
+  MenuToggleElement,
   Stack,
   StackItem,
   Title,
@@ -23,6 +27,9 @@ import TaskSidebarWorkspace from '../task-sidebar/TaskSidebarWorkspace';
 import TaskSidebarWhenExpression from '../task-sidebar/TaskSidebarWhenExpression';
 import { TaskType, UpdateOperationRenameTaskData } from '../types';
 import { CloseButton } from '@patternfly/react-component-groups';
+import DynamicResourceLinkList from '../../triggers-details/DynamicResourceLinkList';
+import { WorkspaceDefinitionList } from '../../pipelines-tasks';
+import { getPipelineTaskLinks } from '../../pipelines-details/utils';
 
 import '../task-sidebar/TaskSidebar.scss';
 
@@ -50,6 +57,7 @@ const PipelineSidebar: FC<PipelineSidebarProps> = ({
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const navigate = useNavigate();
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
   const { isFinallyTask, taskIndex } = selectedData;
   const taskType: TaskType = isFinallyTask ? 'finallyTasks' : 'tasks';
   const formikTaskReference = `formData.${taskType}.${taskIndex}`;
@@ -66,16 +74,57 @@ const PipelineSidebar: FC<PipelineSidebarProps> = ({
         <CloseButton onClick={onClose} dataTestID="sidebar-close-button" />
       </StackItem>
       <StackItem className="opp-task-sidebar__header">
-        <Title headingLevel="h2" size="lg">
-          {pipelineName}
+        <Title headingLevel="h2" className="opp-task-sidebar-header__title">
+          <span>{pipelineName}</span>
+          <div className="co-actions">
+            <Dropdown
+              isOpen={isActionsOpen}
+              onSelect={() => setIsActionsOpen(false)}
+              onOpenChange={(open: boolean) => setIsActionsOpen(open)}
+              toggle={(toggleRef: Ref<MenuToggleElement>) => (
+                <MenuToggle
+                  ref={toggleRef}
+                  onClick={() => setIsActionsOpen(!isActionsOpen)}
+                  isExpanded={isActionsOpen}
+                >
+                  {t('Actions')}
+                </MenuToggle>
+              )}
+            >
+              <DropdownList>
+                <DropdownItem
+                  key="view-pipeline"
+                  data-test="view-pipeline"
+                  onClick={() =>
+                    navigate(
+                      `/k8s/ns/${pipelineNamespace}/tekton.dev~v1~Pipeline/${pipelineName}`,
+                    )
+                  }
+                >
+                  {t('View pipeline')}
+                </DropdownItem>
+                <DropdownItem
+                  key="edit-pipeline"
+                  data-test="edit-pipeline"
+                  onClick={() =>
+                    navigate(
+                      `/k8s/ns/${pipelineNamespace}/tekton.dev~v1~Pipeline/${pipelineName}/builder`,
+                    )
+                  }
+                >
+                  {t('Edit pipeline')}
+                </DropdownItem>
+                <DropdownItem
+                  key="remove-pipeline"
+                  data-test="remove-pipeline"
+                  onClick={() => onRemoveTask(thisTask.name)}
+                >
+                  {t('Remove pipeline')}
+                </DropdownItem>
+              </DropdownList>
+            </Dropdown>
+          </div>
         </Title>
-        <Button
-          variant={ButtonVariant.link}
-          data-test="remove-pipeline-ref"
-          onClick={() => onRemoveTask(thisTask.name)}
-        >
-          {t('Remove')}
-        </Button>
       </StackItem>
       <StackItem className="opp-task-sidebar__content pf-v6-c-form">
         <TaskSidebarName
@@ -85,6 +134,27 @@ const PipelineSidebar: FC<PipelineSidebarProps> = ({
             onRenameTask({ preChangePipelineTask: thisTask, newName })
           }
         />
+
+        {pipeline && (() => {
+          const { taskLinks, pipelineLinks } = getPipelineTaskLinks(pipeline);
+          return (
+            <div className="opp-task-sidebar__details">
+              <DynamicResourceLinkList
+                namespace={pipelineNamespace}
+                links={taskLinks}
+                title={t('Tasks')}
+              />
+              {pipelineLinks.length > 0 && (
+                <DynamicResourceLinkList
+                  namespace={pipelineNamespace}
+                  links={pipelineLinks}
+                  title={t('Nested Pipelines')}
+                />
+              )}
+              <WorkspaceDefinitionList obj={pipeline} />
+            </div>
+          );
+        })()}
 
         {params.length > 0 && (
           <div>
@@ -140,19 +210,6 @@ const PipelineSidebar: FC<PipelineSidebarProps> = ({
           />
         </div>
 
-        <div>
-          <Button
-            variant={ButtonVariant.secondary}
-            data-test="view-pipeline-details"
-            onClick={() =>
-              navigate(
-                `/k8s/ns/${pipelineNamespace}/tekton.dev~v1~Pipeline/${pipelineName}`,
-              )
-            }
-          >
-            {t('View pipeline details')}
-          </Button>
-        </div>
       </StackItem>
     </Stack>
   );
