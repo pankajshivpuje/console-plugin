@@ -59,7 +59,7 @@ const TaskList: FC<any> = ({
     listOptions.map((task) => taskToOption(task, onNewTask)),
     (o) => o.label,
   );
-  const unselectedTaskText = unselectedText || t('Add');
+  const unselectedTaskText = unselectedText || t('Add task');
 
   const truncatedTaskText = useMemo(
     () =>
@@ -130,7 +130,7 @@ const TaskList: FC<any> = ({
                 />
               </g>
             )}
-            <Tooltip content={unselectedText ? unselectedTaskText : t('Add task or pipeline')} triggerRef={textRef}>
+            <Tooltip content={unselectedText ? unselectedTaskText : t('Add task')} triggerRef={textRef}>
               {renderText}
             </Tooltip>
           </g>

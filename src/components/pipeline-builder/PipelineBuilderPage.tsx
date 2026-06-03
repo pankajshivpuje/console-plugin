@@ -102,7 +102,7 @@ const PipelineBuilderPage: FC<PipelineBuilderPageProps> = (props) => {
 
   return (
     <div className="odc-pipeline-builder-page">
-      <DocumentTitle>{t('Pipeline builder')}</DocumentTitle>
+      <DocumentTitle>{t('Create pipeline')}</DocumentTitle>
       <Formik
         initialValues={initialValues}
         onSubmit={handleSubmit}

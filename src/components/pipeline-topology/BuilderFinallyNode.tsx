@@ -227,14 +227,14 @@ const BuilderFinallyNode: FC<BuilderFinallyNodeProps> = ({ element }) => {
             <PlusNodeDecorator
               x={0}
               y={FINALLY_ADD_LINK_TEXT_HEIGHT - FINALLY_ADD_LINK_SIZE}
-              tooltip={t('Add finally node')}
+              tooltip={t('Add finally task')}
             />
             <text
               x={FINALLY_ADD_LINK_SIZE}
               data-test="add-finally-node"
               className="opp-builder-finally-node__text"
             >
-              {t('Add finally node')}
+              {t('Add finally task')}
             </text>
           </g>
         </g>

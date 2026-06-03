@@ -1,10 +1,9 @@
 import type { FC } from 'react';
-import { useRef, useState, memo, useMemo, useCallback } from 'react';
+import { useRef, useState, memo, useCallback } from 'react';
 import { SearchIcon } from '@patternfly/react-icons/dist/esm/icons/search-icon';
 import {
   Button,
   ButtonVariant,
-  Radio,
 } from '@patternfly/react-core';
 import {
   CatalogItem,
@@ -267,10 +266,6 @@ const Contents: FC<
   const isDevConsoleProxyAvailable = useFlag(FLAGS.DEVCONSOLE_PROXY);
   savedCallback.current = callback;
   const [failedTasks, setFailedTasks] = useState<string[]>([]);
-  const [resourceKindFilter, setResourceKindFilter] = useState<
-    'task' | 'pipeline'
-  >('task');
-
   useLoadingTaskCleanup(onUpdateTasks, taskGroup);
   useCleanupOnFailure(failedTasks, onUpdateTasks, taskGroup);
 
@@ -462,33 +457,6 @@ const Contents: FC<
   const allItemsLoaded =
     taskCatalogService.loaded && pipelineCatalogService.loaded;
 
-  const itemFilter = useMemo(
-    () => (item: CatalogItem) =>
-      (item.attributes?.resourceKind || 'task') === resourceKindFilter,
-    [resourceKindFilter],
-  );
-
-  const headerContent = (
-    <div className="pf-v6-u-px-md pf-v6-u-py-md pf-v6-u-display-flex pf-v6-u-flex-direction-row" style={{ gap: '2rem' }}>
-      <Radio
-        id="resource-type-task"
-        name="resource-type"
-        label={t('Task')}
-        isChecked={resourceKindFilter === 'task'}
-        onChange={() => setResourceKindFilter('task')}
-        data-test="radio-task"
-      />
-      <Radio
-        id="resource-type-pipeline"
-        name="resource-type"
-        label={t('Pipeline')}
-        isChecked={resourceKindFilter === 'pipeline'}
-        onChange={() => setResourceKindFilter('pipeline')}
-        data-test="radio-pipeline"
-      />
-    </div>
-  );
-
   const footerRenderer = useCallback(
     ({ selectedItem: item, selectedVersion: version, closeModal: close }) => {
       return (
@@ -543,9 +511,7 @@ const Contents: FC<
       setIsOpen={setIsOpen}
       disableKeyboardOpen
       icon={<SearchIcon />}
-      title={t('Select')}
-      headerContent={headerContent}
-      itemFilter={itemFilter}
+      title={t('Select task')}
       callback={savedCallback.current}
       setFailedTasks={setFailedTasks}
       detailsRenderer={detailsRenderer}

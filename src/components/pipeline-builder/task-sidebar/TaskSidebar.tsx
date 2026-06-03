@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import { Stack, StackItem, Title } from '@patternfly/react-core';
+import { useState } from 'react';
+import { Stack, StackItem, Switch, Title } from '@patternfly/react-core';
 import { FormikErrors, useField } from 'formik';
 import { Trans, useTranslation } from 'react-i18next';
 import {
@@ -55,6 +56,8 @@ const TaskSidebar: FC<TaskSidebarProps> = (props) => {
   const taskType: TaskType = isFinallyTask ? 'finallyTasks' : 'tasks';
   const formikTaskReference = `formData.${taskType}.${taskIndex}`;
   const [{ value: thisTask }] = useField<PipelineTask>(formikTaskReference);
+
+  const [showCustomizedOnly, setShowCustomizedOnly] = useState(false);
 
   const params: TektonParam[] = getTaskParameters(taskResource) || [];
   const resources: TektonResourceGroup<TektonResource> =
@@ -112,29 +115,62 @@ const TaskSidebar: FC<TaskSidebarProps> = (props) => {
         {params.length > 0 && (
           <div>
             <Title headingLevel="h2">{t('Parameters')}</Title>
+            <Switch
+              id="show-customized-params"
+              label={t('Show customized only')}
+              isChecked={showCustomizedOnly}
+              onChange={(_event, checked) => setShowCustomizedOnly(checked)}
+              className="pf-v6-u-mb-sm"
+            />
             <p className="co-help-text opp-task-sidebar__paragraph">
               <Trans ns="plugin__pipelines-console-plugin">
                 Use this format when you reference variables in this form:{' '}
                 <code className="co-code">$(</code>
               </Trans>
             </p>
-            {params.map((param) => {
+            {(() => {
               const taskParams: PipelineTaskParam[] = thisTask.params || [];
-              const paramIdx = safeIndex(
-                taskParams,
-                (thisParam) => thisParam.name === param.name,
-              );
-              return (
-                <div key={param.name} className="opp-task-sidebar__param">
-                  <TaskSidebarParam
-                    hasParam={!!taskParams[paramIdx]}
-                    name={`${formikTaskReference}.params.${paramIdx}`}
-                    resourceParam={param}
-                    selectedData={selectedData}
-                  />
-                </div>
-              );
-            })}
+              const visibleParams = showCustomizedOnly
+                ? params.filter((param) => {
+                    const userParam = taskParams.find(
+                      (tp) => tp.name === param.name,
+                    );
+                    if (!userParam) return false;
+                    if (Array.isArray(param.default)) {
+                      return (
+                        JSON.stringify(userParam.value) !==
+                        JSON.stringify(param.default)
+                      );
+                    }
+                    return userParam.value !== (param.default ?? '');
+                  })
+                : params;
+
+              if (visibleParams.length === 0) {
+                return (
+                  <p className="co-help-text">
+                    {t('No customized parameters')}
+                  </p>
+                );
+              }
+
+              return visibleParams.map((param) => {
+                const paramIdx = safeIndex(
+                  taskParams,
+                  (thisParam) => thisParam.name === param.name,
+                );
+                return (
+                  <div key={param.name} className="opp-task-sidebar__param">
+                    <TaskSidebarParam
+                      hasParam={!!taskParams[paramIdx]}
+                      name={`${formikTaskReference}.params.${paramIdx}`}
+                      resourceParam={param}
+                      selectedData={selectedData}
+                    />
+                  </div>
+                );
+              });
+            })()}
           </div>
         )}
         {workspaces.length > 0 && (
