@@ -1,6 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
-import { Stack, StackItem, Switch, Title } from '@patternfly/react-core';
+import { Stack, StackItem, Title } from '@patternfly/react-core';
 import { FormikErrors, useField } from 'formik';
 import { Trans, useTranslation } from 'react-i18next';
 import {
@@ -23,7 +22,7 @@ import TaskSidebarWorkspace from './TaskSidebarWorkspace';
 
 import './TaskSidebar.scss';
 import { TaskType, UpdateOperationRenameTaskData } from '../types';
-import { getTaskParameters, getTaskResources } from '../utils';
+import { getTaskParameters, getTaskResources, isParamCustomized } from '../utils';
 import { CloseButton } from '@patternfly/react-component-groups';
 
 type TaskSidebarProps = {
@@ -33,6 +32,8 @@ type TaskSidebarProps = {
   resourceList: TektonResource[];
   workspaceList: TektonWorkspace[];
   selectedData: SelectedBuilderTask;
+  showCustomizedOnly: boolean;
+  onToggleCustomizedOnly: (value: boolean) => void;
   onClose: () => void;
 };
 
@@ -50,14 +51,14 @@ const TaskSidebar: FC<TaskSidebarProps> = (props) => {
     resourceList,
     workspaceList,
     selectedData,
+    showCustomizedOnly,
+    onToggleCustomizedOnly,
     onClose,
   } = props;
   const { isFinallyTask, taskIndex, resource: taskResource } = selectedData;
   const taskType: TaskType = isFinallyTask ? 'finallyTasks' : 'tasks';
   const formikTaskReference = `formData.${taskType}.${taskIndex}`;
   const [{ value: thisTask }] = useField<PipelineTask>(formikTaskReference);
-
-  const [showCustomizedOnly, setShowCustomizedOnly] = useState(false);
 
   const params: TektonParam[] = getTaskParameters(taskResource) || [];
   const resources: TektonResourceGroup<TektonResource> =
@@ -115,13 +116,6 @@ const TaskSidebar: FC<TaskSidebarProps> = (props) => {
         {params.length > 0 && (
           <div>
             <Title headingLevel="h2">{t('Parameters')}</Title>
-            <Switch
-              id="show-customized-params"
-              label={t('Show customized only')}
-              isChecked={showCustomizedOnly}
-              onChange={(_event, checked) => setShowCustomizedOnly(checked)}
-              className="pf-v6-u-mb-sm"
-            />
             <p className="co-help-text opp-task-sidebar__paragraph">
               <Trans ns="plugin__pipelines-console-plugin">
                 Use this format when you reference variables in this form:{' '}
@@ -136,13 +130,7 @@ const TaskSidebar: FC<TaskSidebarProps> = (props) => {
                       (tp) => tp.name === param.name,
                     );
                     if (!userParam) return false;
-                    if (Array.isArray(param.default)) {
-                      return (
-                        JSON.stringify(userParam.value) !==
-                        JSON.stringify(param.default)
-                      );
-                    }
-                    return userParam.value !== (param.default ?? '');
+                    return isParamCustomized(userParam, param.default);
                   })
                 : params;
 

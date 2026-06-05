@@ -1,6 +1,6 @@
 import type { ReactNode, FC } from 'react';
 import { useState, useEffect } from 'react';
-import { Alert, Button, AlertActionCloseButton } from '@patternfly/react-core';
+import { Alert, Button, AlertActionCloseButton, Switch } from '@patternfly/react-core';
 import cx from 'classnames';
 import { useField, useFormikContext, FormikValues } from 'formik';
 import * as _ from 'lodash';
@@ -34,6 +34,8 @@ type SyncedEditorFieldProps = {
   lastViewUserSettingKey: string;
   prune?: (data: any) => any;
   noMargin?: boolean;
+  showCustomizedOnly?: boolean;
+  onToggleCustomizedOnly?: (value: boolean) => void;
 };
 
 const SyncedEditorField: FC<SyncedEditorFieldProps> = ({
@@ -42,6 +44,8 @@ const SyncedEditorField: FC<SyncedEditorFieldProps> = ({
   yamlContext,
   prune,
   noMargin = false,
+  showCustomizedOnly,
+  onToggleCustomizedOnly,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const [editorType, setEditorType] = useState<EditorType>(
@@ -181,6 +185,7 @@ const SyncedEditorField: FC<SyncedEditorFieldProps> = ({
           margin: !noMargin,
         })}
         data-test="synced-editor-field"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
       >
         <RadioGroupField
           label={t('Configure via:')}
@@ -200,6 +205,14 @@ const SyncedEditorField: FC<SyncedEditorFieldProps> = ({
           onChange={(val: string) => onChangeType(val as EditorType)}
           isInline
         />
+        {onToggleCustomizedOnly && (
+          <Switch
+            id="show-customized-params-toggle"
+            label={t('Show customized params only')}
+            isChecked={showCustomizedOnly}
+            onChange={(_event, checked) => onToggleCustomizedOnly(checked)}
+          />
+        )}
       </div>
       {yamlWarning && (
         <Alert

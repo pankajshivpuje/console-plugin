@@ -57,6 +57,7 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const launchOverlay = useOverlay();
   const [selectedTask, setSelectedTask] = useState<SelectedBuilderTask>(null);
+  const [showCustomizedOnly, setShowCustomizedOnly] = useState(false);
   const catalogPipelinesRef = useRef<Record<string, PipelineKind>>({});
   const selectedTaskRef = useRef<SelectedBuilderTask>(null);
   selectedTaskRef.current = selectedTask;
@@ -291,6 +292,8 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
                   resourceList={formData.resources || []}
                   workspaceList={formData.workspaces || []}
                   errorMap={status?.tasks || {}}
+                  showCustomizedOnly={showCustomizedOnly}
+                  onToggleCustomizedOnly={setShowCustomizedOnly}
                   onRenameTask={(data: UpdateOperationRenameTaskData) => {
                     updateTasks(
                       applyChange(
@@ -355,11 +358,19 @@ const PipelineBuilderForm: FC<PipelineBuilderFormProps> = (props) => {
                       name: 'yamlData',
                       editor: yamlEditor,
                       sanitizeTo: () =>
-                        sanitizeToYaml(formData, namespace, existingPipeline),
+                        sanitizeToYaml(
+                          formData,
+                          namespace,
+                          existingPipeline,
+                          showCustomizedOnly,
+                          taskResources,
+                        ),
                     }}
                     lastViewUserSettingKey={
                       LAST_VIEWED_EDITOR_TYPE_USERSETTING_KEY
                     }
+                    showCustomizedOnly={showCustomizedOnly}
+                    onToggleCustomizedOnly={setShowCustomizedOnly}
                   />
                 </FormBody>
               </PageSection>

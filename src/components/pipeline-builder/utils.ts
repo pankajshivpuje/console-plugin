@@ -400,6 +400,16 @@ export const convertResourceToLoadingTask = (
   };
 };
 
+export const isParamCustomized = (
+  userParam: PipelineTaskParam,
+  specDefault: string | string[] | undefined,
+): boolean => {
+  if (Array.isArray(specDefault)) {
+    return JSON.stringify(userParam.value) !== JSON.stringify(specDefault);
+  }
+  return userParam.value !== (specDefault ?? '');
+};
+
 export const getTaskParameters = (taskResource: TaskKind): TektonParam[] => {
   return (
     _.get(taskResource, PATHS.alphaParameters) ||
@@ -499,10 +509,30 @@ export const removeEmptyFormFields = (task: PipelineTask): PipelineTask => {
   return trimmedTask;
 };
 
+const filterTaskParams = (
+  task: PipelineTask,
+  allTasks: TaskKind[],
+): PipelineTask => {
+  if (!task.params?.length || !task.taskRef?.name) return task;
+  const taskResource = allTasks.find(
+    (t) => t.metadata?.name === task.taskRef.name,
+  );
+  if (!taskResource) return task;
+  const specParams = getTaskParameters(taskResource);
+  const filteredParams = task.params.filter((userParam) => {
+    const specParam = specParams.find((sp) => sp.name === userParam.name);
+    if (!specParam) return true;
+    return isParamCustomized(userParam, specParam.default);
+  });
+  return { ...task, params: filteredParams };
+};
+
 export const convertBuilderFormToPipeline = (
   formValues: PipelineBuilderFormValues,
   namespace: string,
   existingPipeline?: PipelineKind,
+  showCustomizedOnly?: boolean,
+  taskResources?: PipelineBuilderTaskResources,
 ): PipelineKind => {
   const {
     name,
@@ -514,6 +544,20 @@ export const convertBuilderFormToPipeline = (
     ...others
   } = formValues;
   const listIds = listTasks.map((listTask) => listTask.name);
+
+  let filteredTasks = tasks;
+  let filteredFinallyTasks = finallyTasks;
+  if (showCustomizedOnly && taskResources) {
+    const allTasks = [
+      ...(taskResources.namespacedTasks || []),
+      ...(taskResources.clusterResolverTasks || []),
+    ];
+    filteredTasks = tasks.map((task) => filterTaskParams(task, allTasks));
+    filteredFinallyTasks = finallyTasks.map((task) =>
+      filterTaskParams(task, allTasks),
+    );
+  }
+
   // Strip remaining builder-only properties
   const unhandledSpec = _.omit(others, 'finallyListTasks', 'loadingTasks');
   const pipelineYAML = {
@@ -538,15 +582,15 @@ export const convertBuilderFormToPipeline = (
           ? workspaces
           : existingPipeline?.spec?.workspaces ?? [],
       tasks:
-        tasks.length > 0
-          ? tasks
+        filteredTasks.length > 0
+          ? filteredTasks
           : existingPipeline?.spec?.tasks ??
             [].map(
               (task) =>
                 task &&
                 removeEmptyFormFields(removeListRunAfters(task, listIds)),
             ),
-      finally: finallyTasks,
+      finally: filteredFinallyTasks,
     },
   };
   return pipelineYAML;

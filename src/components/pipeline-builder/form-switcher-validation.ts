@@ -3,7 +3,7 @@ import { ValidationError } from 'yup';
 import { PipelineKind } from '../../types';
 import { initialPipelineFormData } from './const';
 import { pipelineBuilderYAMLSchema } from './switch-to-form-validation-utils';
-import { PipelineBuilderFormValues, PipelineBuilderTaskBase } from './types';
+import { PipelineBuilderFormValues, PipelineBuilderTaskBase, PipelineBuilderTaskResources } from './types';
 import { convertBuilderFormToPipeline } from './utils';
 import { runAfterMatches } from './validation-utils';
 import { safeJSToYAML } from './yaml';
@@ -153,9 +153,17 @@ export const sanitizeToYaml = (
   formData: PipelineBuilderFormValues,
   namespace: string,
   existingPipeline?: PipelineKind,
+  showCustomizedOnly?: boolean,
+  taskResources?: PipelineBuilderTaskResources,
 ) =>
   safeJSToYAML(
-    convertBuilderFormToPipeline(formData, namespace, existingPipeline),
+    convertBuilderFormToPipeline(
+      formData,
+      namespace,
+      existingPipeline,
+      showCustomizedOnly,
+      taskResources,
+    ),
     'yamlData',
     {
       skipInvalid: true,
