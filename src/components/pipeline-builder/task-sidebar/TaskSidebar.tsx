@@ -52,7 +52,7 @@ const TaskSidebar: FC<TaskSidebarProps> = (props) => {
     workspaceList,
     selectedData,
     showCustomizedOnly,
-    onToggleCustomizedOnly,
+    onToggleCustomizedOnly: _onToggleCustomizedOnly,
     onClose,
   } = props;
   const { isFinallyTask, taskIndex, resource: taskResource } = selectedData;

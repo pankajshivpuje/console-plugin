@@ -1,6 +1,6 @@
 import type { ReactNode, FC } from 'react';
 import { useState, useEffect } from 'react';
-import { Alert, Button, AlertActionCloseButton, Switch } from '@patternfly/react-core';
+import { Alert, Button, AlertActionCloseButton, Divider, Switch } from '@patternfly/react-core';
 import cx from 'classnames';
 import { useField, useFormikContext, FormikValues } from 'formik';
 import * as _ from 'lodash';
@@ -185,7 +185,6 @@ const SyncedEditorField: FC<SyncedEditorFieldProps> = ({
           margin: !noMargin,
         })}
         data-test="synced-editor-field"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
       >
         <RadioGroupField
           label={t('Configure via:')}
@@ -206,12 +205,15 @@ const SyncedEditorField: FC<SyncedEditorFieldProps> = ({
           isInline
         />
         {onToggleCustomizedOnly && (
-          <Switch
-            id="show-customized-params-toggle"
-            label={t('Show customized params only')}
-            isChecked={showCustomizedOnly}
-            onChange={(_event, checked) => onToggleCustomizedOnly(checked)}
-          />
+          <>
+            <Divider component="div" orientation={{ default: 'vertical' }} />
+            <Switch
+              id="show-customized-params-toggle"
+              label={t('Show customized params only')}
+              isChecked={showCustomizedOnly}
+              onChange={(_event, checked) => onToggleCustomizedOnly(checked)}
+            />
+          </>
         )}
       </div>
       {yamlWarning && (
