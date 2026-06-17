@@ -14,6 +14,16 @@ import { UpdateOperationType } from './const';
 
 export type TaskType = 'tasks' | 'finallyTasks';
 
+export enum WorkspaceType {
+  Blank = 'blank',
+  PVC = 'pvc',
+}
+
+export type PipelineBuilderWorkspace = TektonWorkspace & {
+  type: WorkspaceType;
+  pvcName?: string;
+};
+
 export enum EditorType {
   Form = 'form',
   YAML = 'yaml',
@@ -59,7 +69,7 @@ export type PipelineBuilderFormValues = PipelineBuilderTaskGrouping & {
   name: string;
   params: TektonParam[];
   resources?: TektonResource[];
-  workspaces: TektonWorkspace[];
+  workspaces: PipelineBuilderWorkspace[];
   when?: WhenExpression[];
 };
 
