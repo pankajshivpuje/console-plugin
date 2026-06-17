@@ -35,11 +35,9 @@ import {
   PipelineBuilderLoadingTask,
   PipelineBuilderTaskBase,
   PipelineBuilderTaskResources,
-  PipelineBuilderWorkspace,
   Sample,
   TaskErrors,
   TaskType,
-  WorkspaceType,
 } from './types';
 
 enum PATHS {
@@ -581,10 +579,7 @@ export const convertBuilderFormToPipeline = (
       ),
       workspaces:
         workspaces.length > 0
-          ? workspaces.map(({ type, pvcName, ...ws }) => ({
-              ...ws,
-              name: ws.name || pvcName || `workspace-${getRandomChars()}`,
-            }))
+          ? workspaces
           : existingPipeline?.spec?.workspaces ?? [],
       tasks:
         filteredTasks.length > 0
@@ -621,9 +616,7 @@ export const convertPipelineToBuilderForm = (
     params,
     workspaces: workspaces.map((workspace) => ({
       ...workspace,
-      optional: !!workspace.optional,
-      type: (workspace as PipelineBuilderWorkspace).type || WorkspaceType.Blank,
-      pvcName: (workspace as PipelineBuilderWorkspace).pvcName || '',
+      optional: !!workspace.optional, // Formik fails to understand "undefined boolean" checkbox values
     })),
     tasks,
     listTasks: [],

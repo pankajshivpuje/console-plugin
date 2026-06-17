@@ -1,8 +1,7 @@
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { WorkspaceTypeSelector, WorkspaceNameField } from './WorkspaceTypeField';
+import OptionalableWorkspace from './OptionalableWorkspace';
 import MultiColumnField from '../pipelines-details/multi-column-field/MultiColumnField';
-import { WorkspaceType } from './types';
 
 type PipelineWorkspacesParam = {
   addLabel?: string;
@@ -24,15 +23,13 @@ const PipelineWorkspaces: FC<PipelineWorkspacesParam> = (props) => {
         data-test="pipeline-workspaces"
         name={fieldName}
         addLabel={addLabel}
-        headers={[{ name: t('Workspace type'), required: false }, { name: t('Name'), required: true }]}
-        emptyValues={{ name: '', optional: false, type: WorkspaceType.Blank, pvcName: '' }}
+        headers={[{ name: t('Name'), required: true }]}
+        emptyValues={{ name: '', optional: false }}
         emptyMessage={emptyMessage}
         isReadOnly={isReadOnly}
-        spans={[5, 6]}
-        complexFields={[true, true]}
+        complexFields={[true]}
       >
-        <WorkspaceTypeSelector />
-        <WorkspaceNameField />
+        <OptionalableWorkspace />
       </MultiColumnField>
     </div>
   );

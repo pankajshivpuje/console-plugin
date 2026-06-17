@@ -1,5 +1,5 @@
 import { t } from '../utils/common-utils';
-import { PipelineBuilderFormValues, WorkspaceType } from './types';
+import { PipelineBuilderFormValues } from './types';
 
 export const STATUS_KEY_NAME_ERROR = 'taskError';
 
@@ -68,7 +68,7 @@ export enum WhenExpressionOperatorType {
 export const initialPipelineFormData: PipelineBuilderFormValues = {
   name: 'new-pipeline',
   params: [],
-  workspaces: [{ name: '', optional: false, type: WorkspaceType.Blank, pvcName: '' }],
+  workspaces: [],
   tasks: [],
   listTasks: [],
   finallyTasks: [],
