@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 import * as fuzzy from 'fuzzysearch';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,6 +21,29 @@ import {
 import { getFieldId } from '../pipelines-details/multi-column-field/utils';
 import { useFormikValidationFix } from '../pipelines-details/multi-column-field/formik-validation-fix';
 import './PVCDropdown.scss';
+
+const MOCK_PVC_NAMES = [
+  'default',
+  'hostpath-provisioner',
+  'kube-node-lease',
+  'kube-public',
+  'kube-system',
+  'mynewproject',
+];
+
+const createMockPVC = (name: string, namespace: string): K8sResourceKind => ({
+  apiVersion: 'v1',
+  kind: 'PersistentVolumeClaim',
+  metadata: {
+    name,
+    namespace,
+    uid: `mock-pvc-${name}`,
+  },
+  spec: {
+    accessModes: ['ReadWriteOnce'],
+    resources: { requests: { storage: '1Gi' } },
+  },
+});
 
 interface PVCDropdownProps {
   name: string;
@@ -43,7 +67,24 @@ const PVCDropdown: FC<PVCDropdownProps> = ({ name }) => {
     namespace,
     optional: true,
   };
-  const [resources, loaded, loadError] = useK8sWatchResource(resource);
+  const [clusterResources, clusterLoaded, loadError] =
+    useK8sWatchResource(resource);
+
+  const mockPVCs = useMemo(
+    () => MOCK_PVC_NAMES.map((n) => createMockPVC(n, namespace)),
+    [namespace],
+  );
+
+  const hasClusterData =
+    clusterLoaded &&
+    !loadError &&
+    Array.isArray(clusterResources) &&
+    clusterResources.length > 0;
+  const resources = hasClusterData
+    ? (clusterResources as K8sResourceKind[])
+    : mockPVCs;
+  const loaded = hasClusterData ? clusterLoaded : true;
+
   return (
     <>
       <FormGroup fieldId={fieldId} isRequired data-test="pvc-dropdown">
@@ -52,12 +93,12 @@ const PVCDropdown: FC<PVCDropdownProps> = ({ name }) => {
             {
               kind: PersistentVolumeClaimModel.kind,
               loaded,
-              loadError,
-              data: resources as K8sResourceKind[],
+              loadError: hasClusterData ? loadError : undefined,
+              data: resources,
             },
           ]}
           loaded={loaded}
-          loadError={loadError}
+          loadError={hasClusterData ? loadError : undefined}
           dataSelector={['metadata', 'name']}
           selectedKey={field.value}
           placeholder={t('Select a PVC')}

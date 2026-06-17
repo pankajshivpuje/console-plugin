@@ -9,8 +9,14 @@ import {
   TektonWorkspace,
   WhenExpression,
 } from '../../types';
+import { VolumeTypes } from '../../consts';
 import { AddNodeDirection } from '../pipeline-topology/const';
 import { UpdateOperationType } from './const';
+
+export type PipelineBuilderWorkspace = TektonWorkspace & {
+  type?: VolumeTypes;
+  data?: Record<string, unknown>;
+};
 
 export type TaskType = 'tasks' | 'finallyTasks';
 
@@ -59,7 +65,7 @@ export type PipelineBuilderFormValues = PipelineBuilderTaskGrouping & {
   name: string;
   params: TektonParam[];
   resources?: TektonResource[];
-  workspaces: TektonWorkspace[];
+  workspaces: PipelineBuilderWorkspace[];
   when?: WhenExpression[];
 };
 

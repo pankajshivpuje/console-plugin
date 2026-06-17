@@ -30,13 +30,19 @@ export const getFormData = (
     'finallyListTasks',
     'loadingTasks',
   ]);
+  const workspaces = ((pipelineSpecProperties.workspaces || []) as PipelineBuilderFormValues['workspaces']).map((ws) => ({
+    ...ws,
+    type: ws.type || '',
+    data: ws.data || {},
+  }));
   return {
-    ...pipelineSpecProperties, // support & keep unknown values as well as whatever they may have changed that we use
+    ...pipelineSpecProperties,
     name: yamlPipeline.metadata?.name,
     finallyTasks,
     listTasks: sanitizedListTasks,
     finallyListTasks,
     loadingTasks,
+    workspaces,
   } as PipelineBuilderFormValues;
 };
 

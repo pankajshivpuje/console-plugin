@@ -579,7 +579,7 @@ export const convertBuilderFormToPipeline = (
       ),
       workspaces:
         workspaces.length > 0
-          ? workspaces
+          ? workspaces.map(({ type, data, ...ws }) => ws)
           : existingPipeline?.spec?.workspaces ?? [],
       tasks:
         filteredTasks.length > 0
@@ -616,7 +616,9 @@ export const convertPipelineToBuilderForm = (
     params,
     workspaces: workspaces.map((workspace) => ({
       ...workspace,
-      optional: !!workspace.optional, // Formik fails to understand "undefined boolean" checkbox values
+      optional: !!workspace.optional,
+      type: '' as any,
+      data: {},
     })),
     tasks,
     listTasks: [],
