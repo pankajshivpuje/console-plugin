@@ -31,11 +31,13 @@ import {
 import PipelineRunParametersForm from './PipelineRunParametersForm';
 import { PipelineRunLogsWithActiveTask } from './PipelineRunLogs';
 import PipelineRunEvents from './PipelineRunEvents';
+import PipelineRunFailureAnalysis from './PipelineRunFailureAnalysis';
 import { usePipelineRuns } from '../hooks/useTaskRuns';
 import { getReferenceForModel } from '../pipelines-overview/utils';
 import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/internal-types';
 import { MOCK_PIPELINE_RUNS } from '../__demo__/mock-data';
+import { ComputedStatus } from '../../types';
 
 type PipelineRunDetailsPageProps = {
   name: string;
@@ -57,6 +59,8 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
     MOCK_PIPELINE_RUNS.find((mock) => mock.metadata.name === name);
   /* this needs decoupling */
   const pipelineRunLoaded = k8sLoaded || trLoaded;
+  const isFailed =
+    pipelineRunFilterReducer(pipelineRun) === ComputedStatus.Failed;
 
   const customActionMenu = useCallback((_kindObj, obj) => {
     const reference = getReferenceForModel(PipelineRunModel);
@@ -149,6 +153,15 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
           component: PipelineRunLogsWithActiveTask,
         },
         navFactory.events(PipelineRunEvents),
+        ...(isFailed
+          ? [
+              {
+                href: 'failure-analysis',
+                name: t('Failure analysis'),
+                component: (props) => <PipelineRunFailureAnalysis {...props} />,
+              },
+            ]
+          : []),
       ]}
       customActionMenu={customActionMenu}
     />

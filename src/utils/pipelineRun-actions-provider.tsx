@@ -9,7 +9,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { PipelineRunModel } from '../models';
-import { PipelineRunKind } from '../types';
+import { ComputedStatus, PipelineRunKind } from '../types';
 import { returnValidPipelineRunModel } from '../components/utils/pipeline-utils';
 import {
   getPipelineRunData,
@@ -22,6 +22,8 @@ import {
 } from '../components/utils/common-utils';
 import { useErrorModal } from '../components/modals/error-modal';
 import { useGetActiveUser } from '../components/hooks/hooks';
+import { pipelineRunFilterReducer } from '../components/utils/pipeline-filter-reducer';
+import { MOCK_FAILURE_ANALYSIS } from '../components/__demo__/mock-failure-analysis-data';
 
 export const usePipelineRunActionsProvider = (resource: PipelineRunKind) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
@@ -34,6 +36,9 @@ export const usePipelineRunActionsProvider = (resource: PipelineRunKind) => {
 
   const hidePLRStopOrCancel = shouldHidePipelineRunStopOrCancel(resource);
   const isDeleteDisabled = isResourceLoadedFromTR(resource);
+  const isFailed =
+    pipelineRunFilterReducer(resource) === ComputedStatus.Failed;
+  const hasExistingAnalysis = isFailed && !!MOCK_FAILURE_ANALYSIS[name];
 
   const hasPipelineRef = !!(
     resource.spec.pipelineRef?.name ||
@@ -182,6 +187,21 @@ export const usePipelineRunActionsProvider = (resource: PipelineRunKind) => {
           });
         },
       },
+      ...(isFailed
+        ? [
+            {
+              id: hasExistingAnalysis
+                ? 'view-failure-analysis'
+                : 'analyze-failed-pipelinerun',
+              label: hasExistingAnalysis
+                ? t('View failure analysis report')
+                : t('Analyze failed pipelinerun'),
+              cta: {
+                href: `${resourcePathFromModel(PipelineRunModel, name, namespace)}/failure-analysis${hasExistingAnalysis ? '' : '?analyze=true'}`,
+              },
+            },
+          ]
+        : []),
       {
         id: 'delete-pipelinerun',
         label: t('Delete PipelineRun'),
@@ -210,5 +230,7 @@ export const usePipelineRunActionsProvider = (resource: PipelineRunKind) => {
     canCreatePipelineRun,
     canUpdatePipelineRun,
     canDeletePipelineRun,
+    isFailed,
+    hasExistingAnalysis,
   ]);
 };
