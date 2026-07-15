@@ -28,3 +28,4 @@ export * from './resultsSummary';
 export * from './task';
 export * from './taskRun';
 export * from './triggers';
+export * from './failureAnalysis';
