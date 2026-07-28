@@ -487,6 +487,23 @@ export const TektonConfigModel: K8sKind = {
   crd: true,
 };
 
+export const ManagedClusterModel: K8sKind = {
+  apiGroup: 'cluster.open-cluster-management.io',
+  apiVersion: 'v1',
+  label: 'ManagedCluster',
+  // t('plugin__pipelines-console-plugin~ManagedCluster')
+  labelKey: 'plugin__pipelines-console-plugin~ManagedCluster',
+  // t('plugin__pipelines-console-plugin~ManagedClusters')
+  labelPluralKey: 'plugin__pipelines-console-plugin~ManagedClusters',
+  plural: 'managedclusters',
+  abbr: 'MC',
+  namespaced: false,
+  kind: 'ManagedCluster',
+  id: 'managedcluster',
+  labelPlural: 'ManagedClusters',
+  crd: true,
+};
+
 export const GroupModel: K8sKind = {
   apiGroup: 'user.openshift.io',
   apiVersion: 'v1',

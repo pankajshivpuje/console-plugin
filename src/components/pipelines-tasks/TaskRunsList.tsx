@@ -32,10 +32,12 @@ import {
 } from '../../models';
 import {
   ALL_NAMESPACES_KEY,
+  chainsSignedAnnotation,
   DELETED_RESOURCE_IN_K8S_ANNOTATION,
   RESOURCE_LOADED_FROM_RESULTS_ANNOTATION,
   TektonResourceLabel,
 } from '../../consts';
+import SignedBadgeIcon from '../../images/SignedBadge';
 import { getReferenceForModel } from '../pipelines-overview/utils';
 import { sortPipelineAndTaskRunsByDuration } from '../pipelines-details/pipeline-step-utils';
 import { TaskRunKind } from '../../types';
@@ -79,6 +81,14 @@ const getTaskRunDataViewRows =
                     <Tooltip content="Archived in Tekton results">
                       <div className="task-run-list__results-indicator">
                         <ArchiveIcon />
+                      </div>
+                    </Tooltip>
+                  ) : null}
+                  {obj?.metadata?.annotations?.[chainsSignedAnnotation] ===
+                  'true' ? (
+                    <Tooltip content="Signed">
+                      <div className="task-run-list__signed-indicator">
+                        <SignedBadgeIcon />
                       </div>
                     </Tooltip>
                   ) : null}

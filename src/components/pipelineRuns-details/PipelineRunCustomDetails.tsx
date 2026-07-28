@@ -5,9 +5,11 @@ import {
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
+  Label,
 } from '@patternfly/react-core';
+import { MulticlusterIcon } from '@patternfly/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { getPLRLogSnippet } from '../logs/pipelineRunLogSnippet';
 import RunDetailsErrorLog from '../logs/RunDetailsErrorLog';
 import { getReferenceForModel } from '../pipelines-overview/utils';
@@ -35,6 +37,8 @@ import { useMultiClusterProxyService } from '../hooks/useMultiClusterProxyServic
 import TriggeredBySection from './TriggeredBySection';
 import PipelineResourceRef from '../triggers-details/PipelineResourceRef';
 import WorkspaceResourceLinkList from '../workspaces/WorkspaceResourceLinkList';
+import ChainsSigningDetails from '../chains/ChainsSigningDetails';
+import { useChainsSigningStatus } from '../hooks/useChainsSigningStatus';
 
 export type PipelineRunCustomDetailsProps = {
   pipelineRun: PipelineRunKind;
@@ -44,6 +48,8 @@ const PipelineRunCustomDetails: FC<PipelineRunCustomDetailsProps> = ({
   pipelineRun,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
+  const [searchParams] = useSearchParams();
+  const clusterName = searchParams.get('cluster');
   const { isResourceManagedByKueue } = useMultiClusterProxyService({
     managedBy: pipelineRun?.spec?.managedBy,
   });
@@ -65,6 +71,11 @@ const PipelineRunCustomDetails: FC<PipelineRunCustomDetailsProps> = ({
   /* this needs decoupling */
   const taskRunsLoaded = k8sLoaded && trLoaded;
 
+  const chainsSummary = useChainsSigningStatus(
+    pipelineRun,
+    taskRuns,
+    taskRunsLoaded,
+  );
   const sbomTaskRun = taskRunsLoaded ? getSbomTaskRun(taskRuns) : null;
   const buildImage = getImageUrl(pipelineRun);
   const linkToSbom = getSbomLink(sbomTaskRun);
@@ -81,6 +92,16 @@ const PipelineRunCustomDetails: FC<PipelineRunCustomDetailsProps> = ({
             />
           </DescriptionListDescription>
         </DescriptionListGroup>
+        {clusterName && (
+          <DescriptionListGroup>
+            <DescriptionListTerm>{t('Execution cluster')}</DescriptionListTerm>
+            <DescriptionListDescription>
+              <Label color="blue" isCompact icon={<MulticlusterIcon />}>
+                {clusterName}
+              </Label>
+            </DescriptionListDescription>
+          </DescriptionListGroup>
+        )}
         {taskRunsLoaded && (
           <RunDetailsErrorLog
             logDetails={getPLRLogSnippet(pipelineRun, taskRuns)}
@@ -96,6 +117,7 @@ const PipelineRunCustomDetails: FC<PipelineRunCustomDetailsProps> = ({
           </DescriptionListDescription>
         </DescriptionListGroup>
 
+        <ChainsSigningDetails summary={chainsSummary} loaded={taskRunsLoaded} />
         <DescriptionListGroup>
           <DescriptionListTerm>{t('Pipeline')}</DescriptionListTerm>
           <DescriptionListDescription>

@@ -114,7 +114,7 @@ const CodeEditorField: FC<CodeEditorFieldProps> = ({
             onSave={onSave}
             showShortcuts={showShortcuts}
             showMiniMap={showMiniMap}
-            language={language}
+            language={language as any}
             toolbarLinks={
               !sidebarOpen &&
               hasSidebarContent && [

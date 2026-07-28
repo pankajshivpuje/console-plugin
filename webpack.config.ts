@@ -6,6 +6,7 @@ import { Configuration as WebpackConfiguration } from 'webpack';
 import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 // const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 interface Configuration extends WebpackConfiguration {
@@ -146,6 +147,9 @@ const config: Configuration = {
     watchFiles: ['src/**/*'],
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.FORCE_ACM': JSON.stringify(process.env.FORCE_ACM || ''),
+    }),
     new ConsoleRemotePlugin(),
     new CopyWebpackPlugin({
       patterns: [{ from: path.resolve(__dirname, 'locales'), to: 'locales' }],

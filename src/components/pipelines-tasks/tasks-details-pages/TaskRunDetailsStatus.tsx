@@ -11,7 +11,11 @@ import {
   taskRunFilterTitleReducer,
 } from '../../utils/pipeline-filter-reducer';
 import { TaskRunKind } from '../../../types';
-import { TektonResourceLabel } from '../../../consts';
+import {
+  chainsSignedAnnotation,
+  chainsTransparencyAnnotation,
+  TektonResourceLabel,
+} from '../../../consts';
 import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { getReferenceForModel } from '../../pipelines-overview/utils';
 import { PipelineRunModel, PodModel } from '../../../models';
@@ -69,6 +73,30 @@ const TaskRunDetailsStatus: FC<TaskRunDetailsStatusProps> = ({
           {pipelineRunDuration(taskRun)}
         </DescriptionListDescription>
       </DescriptionListGroup>
+      {taskRun.metadata?.annotations?.[chainsSignedAnnotation] && (
+        <DescriptionListGroup data-test="signing">
+          <DescriptionListTerm>{t('Signing')}</DescriptionListTerm>
+          <DescriptionListDescription>
+            {taskRun.metadata.annotations[chainsSignedAnnotation] === 'true'
+              ? t('Signed')
+              : t('Unsigned')}
+            {taskRun.metadata.annotations[chainsTransparencyAnnotation] && (
+              <>
+                {' — '}
+                <a
+                  href={
+                    taskRun.metadata.annotations[chainsTransparencyAnnotation]
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('Transparency log')}
+                </a>
+              </>
+            )}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+      )}
       <RunDetailsErrorLog
         logDetails={getTRLogSnippet(taskRun)}
         namespace={taskRun.metadata?.namespace}

@@ -21,4 +21,18 @@
       color: var(--pf-t--global--text--color--subtle);
     }
   }
+
+  &__signed-indicator {
+    display: inline-block;
+    margin-left: var(--pf-t--global--spacer--xs);
+    vertical-align: middle;
+  }
+}
+
+.opp-taskrun-details-page {
+  &__signed-indicator {
+    display: inline-block;
+    margin-left: var(--pf-t--global--spacer--xs);
+    vertical-align: middle;
+  }
 }

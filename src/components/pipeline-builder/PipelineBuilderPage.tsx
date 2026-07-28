@@ -20,6 +20,11 @@ import { DocumentTitle, k8sCreate, k8sUpdate } from '@openshift-console/dynamic-
 import { returnValidPipelineModel } from '../utils/pipeline-utils';
 import { getReferenceForModel } from '../pipelines-overview/utils';
 import { useNavigate, useParams } from 'react-router';
+import {
+  AiAssistantProvider,
+  AiAssistantSidebar,
+  AiAssistantToggle,
+} from '../ai-assistant';
 
 import './PipelineBuilderPage.scss';
 
@@ -97,25 +102,29 @@ const PipelineBuilderPage: FC<PipelineBuilderPageProps> = (props) => {
   };
 
   return (
-    <div className="odc-pipeline-builder-page">
-      <DocumentTitle>
-        {t('Pipeline builder')}
-      </DocumentTitle>
-      <Formik
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        onReset={() => navigate(-1)}
-        validationSchema={validationSchema(t)}
-      >
-        {(formikProps) => (
-          <PipelineBuilderForm
-            {...formikProps}
-            namespace={ns}
-            existingPipeline={existingPipeline}
-          />
-        )}
-      </Formik>
-    </div>
+    <AiAssistantProvider>
+      <div className="odc-pipeline-builder-page">
+        <DocumentTitle>
+          {t('Pipeline builder')}
+        </DocumentTitle>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          onReset={() => navigate(-1)}
+          validationSchema={validationSchema(t)}
+        >
+          {(formikProps) => (
+            <PipelineBuilderForm
+              {...formikProps}
+              namespace={ns}
+              existingPipeline={existingPipeline}
+            />
+          )}
+        </Formik>
+      </div>
+      <AiAssistantSidebar />
+      <AiAssistantToggle />
+    </AiAssistantProvider>
   );
 };
 

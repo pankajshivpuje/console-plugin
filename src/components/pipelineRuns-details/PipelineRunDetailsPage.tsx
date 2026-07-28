@@ -8,21 +8,24 @@ import {
   BreadcrumbItem,
   Content,
   ContentVariants,
+  Label,
   Tooltip,
 } from '@patternfly/react-core';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { navFactory } from '../utils/horizontal-nav';
 import PipelineRunDetails from './PipelineRunDetails';
 import ResourceYAMLEditorViewOnly from '../yaml-editor/ResourceYAMLEditorViewOnly';
 import {
-  chainsSignedAnnotation,
   DELETED_RESOURCE_IN_K8S_ANNOTATION,
   RESOURCE_LOADED_FROM_RESULTS_ANNOTATION,
   PIPELINE_RUN_MANAGED_BY_KUEUE_LABEL,
 } from '../../consts';
+import { ComputedStatus } from '../../types';
 import { ArchiveIcon, MulticlusterIcon } from '@patternfly/react-icons';
-import SignedBadgeIcon from '../../images/SignedBadge';
+import ChainsSigningBadge from '../chains/ChainsSigningBadge';
+import { useChainsSigningStatus } from '../hooks/useChainsSigningStatus';
+import { useTaskRuns } from '../hooks/useTaskRuns';
 import Status from '../status/Status';
 import {
   pipelineRunFilterReducer,
@@ -46,6 +49,8 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
   namespace,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
+  const [searchParams] = useSearchParams();
+  const clusterName = searchParams.get('cluster');
   const [pipelineRuns, k8sLoaded, trLoaded] = usePipelineRuns(namespace, {
     name,
     limit: 1,
@@ -53,6 +58,28 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
   const pipelineRun = pipelineRuns?.[0];
   /* this needs decoupling */
   const pipelineRunLoaded = k8sLoaded || trLoaded;
+
+  const plrStatus = pipelineRunFilterReducer(pipelineRun);
+  const pipelineRunFinished =
+    plrStatus !== ComputedStatus.Running &&
+    plrStatus !== ComputedStatus.Pending &&
+    plrStatus !== ComputedStatus.Cancelling;
+  const [taskRuns, trK8sLoaded, trResultsLoaded] = useTaskRuns(
+    namespace,
+    name,
+    undefined,
+    undefined,
+    {
+      pipelineRunFinished,
+      pipelineRunManagedBy: pipelineRun?.spec?.managedBy,
+    },
+  );
+  const taskRunsLoaded = trK8sLoaded && trResultsLoaded;
+  const chainsSummary = useChainsSigningStatus(
+    pipelineRun,
+    taskRuns,
+    taskRunsLoaded,
+  );
 
   const customActionMenu = useCallback((_kindObj, obj) => {
     const reference = getReferenceForModel(PipelineRunModel);
@@ -70,14 +97,7 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
     return (
       <div className="pipelinerun-details-page pf-v6-l-flex pf-v6-l-gap-md pf-v6-u-align-items-center">
         {pipelineRun?.metadata?.name}{' '}
-        {pipelineRun?.metadata?.annotations?.[chainsSignedAnnotation] ===
-          'true' && (
-          <Tooltip content={t('Signed')}>
-            <div className="opp-pipeline-run-details__signed-indicator">
-              <SignedBadgeIcon width="18" height="18" />
-            </div>
-          </Tooltip>
-        )}
+        <ChainsSigningBadge summary={chainsSummary} iconSize={18} />
         {(pipelineRun?.metadata?.annotations?.[
           DELETED_RESOURCE_IN_K8S_ANNOTATION
         ] === 'true' ||
@@ -88,10 +108,13 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
             <ArchiveIcon className="pipelinerun-details-page__results-indicator" />
           </Tooltip>
         )}
-        {pipelineRun?.spec?.managedBy ===
-          PIPELINE_RUN_MANAGED_BY_KUEUE_LABEL && (
+        {(pipelineRun?.spec?.managedBy ===
+          PIPELINE_RUN_MANAGED_BY_KUEUE_LABEL ||
+          clusterName) && (
           <Tooltip content={t('Multicluster Pipeline Run')}>
-            <MulticlusterIcon className="pipelinerun-details-page__results-indicator" />
+            <Label color="blue" isCompact icon={<MulticlusterIcon />}>
+              {clusterName || t('Multi-cluster')}
+            </Label>
           </Tooltip>
         )}
         <ResourceStatus>
@@ -102,7 +125,7 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
         </ResourceStatus>
       </div>
     );
-  }, [pipelineRun]);
+  }, [pipelineRun, clusterName]);
   if (!pipelineRunLoaded) {
     return <LoadingBox />;
   }
@@ -114,21 +137,47 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
         <Content component={ContentVariants.h1}>{resourceTitleFunc}</Content>
       }
       model={PipelineRunModel}
-      breadcrumbs={[
-        <BreadcrumbItem key="app-link" component="div">
-          <Link
-            data-test="breadcrumb-link"
-            className="pf-v6-c-breadcrumb__link"
-            to={`/pipelines/ns/${namespace}/pipeline-runs`}
-          >
-            {t('PipelineRuns')}
-          </Link>
-        </BreadcrumbItem>,
-        {
-          path: `/pipelines/ns/${namespace}/`,
-          name: t('PipelineRun details'),
-        },
-      ]}
+      breadcrumbs={
+        clusterName
+          ? [
+              <BreadcrumbItem key="mc-link" component="div">
+                <Link
+                  data-test="breadcrumb-link"
+                  className="pf-v6-c-breadcrumb__link"
+                  to={`/pipelines/ns/${namespace}`}
+                >
+                  {t('PipelineRuns')}
+                </Link>
+              </BreadcrumbItem>,
+              <BreadcrumbItem key="cluster-link" component="div">
+                <Link
+                  className="pf-v6-c-breadcrumb__link"
+                  to={`/pipelines/ns/${namespace}?cluster=${clusterName}`}
+                >
+                  {clusterName}
+                </Link>
+              </BreadcrumbItem>,
+              {
+                path: `/pipelines/ns/${namespace}/`,
+                name: t('PipelineRun details'),
+              },
+            ]
+          : [
+              <BreadcrumbItem key="app-link" component="div">
+                <Link
+                  data-test="breadcrumb-link"
+                  className="pf-v6-c-breadcrumb__link"
+                  to={`/pipelines/ns/${namespace}/pipeline-runs`}
+                >
+                  {t('PipelineRuns')}
+                </Link>
+              </BreadcrumbItem>,
+              {
+                path: `/pipelines/ns/${namespace}/`,
+                name: t('PipelineRun details'),
+              },
+            ]
+      }
       pages={[
         navFactory.details(PipelineRunDetails),
         navFactory.editYaml(ResourceYAMLEditorViewOnly),
