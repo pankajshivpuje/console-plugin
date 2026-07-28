@@ -1,10 +1,13 @@
 import {
   K8sResourceCommon,
   SetFeatureFlag,
+  getGroupVersionKindForModel,
   k8sGet,
+  useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useState, useEffect } from 'react';
 import {
+  FLAG_ACM_MULTI_CLUSTER_PIPELINES,
   FLAG_HIDE_STATIC_PIPELINE_PLUGIN_APPROVALS_LIST,
   FLAG_HIDE_STATIC_PIPELINE_PLUGIN_CLUSTERTASKS_LIST,
   FLAG_HIDE_STATIC_PIPELINE_PLUGIN_CLUSTERTASK_DETAILS,
@@ -45,7 +48,13 @@ import {
   FLAG_HIDE_STATIC_PIPELINE_PLUGIN_TRIGGERTEMPLATE_DETAILS,
   FLAG_PIPELINE_TEKTON_RESULT_INSTALLED,
 } from '../../consts';
-import { TektonResultModel } from '../../models';
+import {
+  ManagedClusterModel,
+  TektonConfigModel,
+  TektonResultModel,
+} from '../../models';
+import { ManagedClusterKind, TektonConfig } from '../../types';
+import { useK8sGet } from './use-k8sGet-hook';
 
 export const useFlagHookProvider = (setFeatureFlag: SetFeatureFlag) => {
   setFeatureFlag(
@@ -152,4 +161,38 @@ export const useTektonResultInstallProvider = (
     fetch();
   }, []);
   setFeatureFlag(FLAG_PIPELINE_TEKTON_RESULT_INSTALLED, data ? true : false);
+};
+
+const MANAGED_CLUSTER_GVK = getGroupVersionKindForModel(ManagedClusterModel);
+
+export const useACMMultiClusterFlagProvider = (
+  setFeatureFlag: SetFeatureFlag,
+) => {
+  const [managedClusters, mcLoaded, mcError] = useK8sWatchResource<
+    ManagedClusterKind[]
+  >({
+    groupVersionKind: MANAGED_CLUSTER_GVK,
+    isList: true,
+    namespaced: false,
+    optional: true,
+  });
+
+  const [tektonConfig, tcLoaded] = useK8sGet<TektonConfig>(
+    TektonConfigModel,
+    'config',
+  );
+
+  const isACMAvailable = mcLoaded && !mcError && Array.isArray(managedClusters);
+  const isHubCluster =
+    tcLoaded &&
+    !tektonConfig?.spec?.scheduler?.['multi-cluster-disabled'] &&
+    tektonConfig?.spec?.scheduler?.['multi-cluster-role']?.toLowerCase() ===
+      'hub';
+
+  // TODO: remove FORCE_ACM override before merging
+  const forceACM = process.env.FORCE_ACM === 'true';
+  setFeatureFlag(
+    FLAG_ACM_MULTI_CLUSTER_PIPELINES,
+    forceACM || (isACMAvailable && !!isHubCluster),
+  );
 };

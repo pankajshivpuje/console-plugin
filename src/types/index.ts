@@ -27,4 +27,6 @@ export * from './repository';
 export * from './resultsSummary';
 export * from './task';
 export * from './taskRun';
+export * from './chains';
 export * from './triggers';
+export * from './multiCluster';

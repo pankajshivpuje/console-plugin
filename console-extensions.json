@@ -522,6 +522,12 @@
     }
   },
   {
+    "type": "console.flag/hookProvider",
+    "properties": {
+      "handler": { "$codeRef": "hookProvider.useACMMultiClusterFlagProvider" }
+    }
+  },
+  {
     "type": "console.page/resource/list",
     "properties": {
       "model": {
@@ -1707,6 +1713,58 @@
       "provider": {
         "$codeRef": "defaultActionsProvider.useDefaultActionsProvider"
       }
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "exact": true,
+      "path": [
+        "/pipelines/multi-cluster/ns/:ns",
+        "/pipelines/multi-cluster/all-namespaces"
+      ],
+      "component": {
+        "$codeRef": "multiClusterComponent.MultiClusterPipelineRunsPage"
+      }
+    },
+    "flags": {
+      "required": ["ACM_MULTI_CLUSTER_PIPELINES"]
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "exact": true,
+      "path": [
+        "/pipelines/multi-cluster-overview/ns/:ns",
+        "/pipelines/multi-cluster-overview/all-namespaces"
+      ],
+      "component": {
+        "$codeRef": "multiClusterComponent.MultiClusterOverviewPage"
+      }
+    },
+    "flags": {
+      "required": ["ACM_MULTI_CLUSTER_PIPELINES"]
+    }
+  },
+  {
+    "type": "console.tab/horizontalNav",
+    "properties": {
+      "model": {
+        "group": "cluster.open-cluster-management.io",
+        "version": "v1",
+        "kind": "ManagedCluster"
+      },
+      "page": {
+        "name": "%plugin__pipelines-console-plugin~Pipelines%",
+        "href": "pipelines"
+      },
+      "component": {
+        "$codeRef": "multiClusterComponent.ClusterPipelinesTab"
+      }
+    },
+    "flags": {
+      "required": ["ACM_MULTI_CLUSTER_PIPELINES"]
     }
   }
 ]

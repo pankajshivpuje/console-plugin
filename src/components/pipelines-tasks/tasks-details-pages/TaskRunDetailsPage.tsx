@@ -22,9 +22,11 @@ import { useTaskRuns } from '../../hooks/useTaskRuns';
 import { navFactory } from '../../utils/horizontal-nav';
 import ResourceYAMLEditorViewOnly from '../../yaml-editor/ResourceYAMLEditorViewOnly';
 import {
+  chainsSignedAnnotation,
   DELETED_RESOURCE_IN_K8S_ANNOTATION,
   RESOURCE_LOADED_FROM_RESULTS_ANNOTATION,
 } from '../../../consts';
+import SignedBadgeIcon from '../../../images/SignedBadge';
 import { LoadingBox } from '../../status/status-box';
 import { taskRunStatus } from '../../utils/pipeline-utils';
 import Status from '../../status/Status';
@@ -70,6 +72,13 @@ const TaskRunDetailsPage = () => {
           ] === 'true') && (
           <Tooltip content={t('Archived in Tekton results')}>
             <ArchiveIcon className="pipelinerun-details-page__results-indicator" />
+          </Tooltip>
+        )}
+        {data?.metadata?.annotations?.[chainsSignedAnnotation] === 'true' && (
+          <Tooltip content={t('Signed')}>
+            <div className="opp-taskrun-details-page__signed-indicator">
+              <SignedBadgeIcon width="18" height="18" />
+            </div>
           </Tooltip>
         )}
         <ResourceStatus>

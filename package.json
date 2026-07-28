@@ -161,7 +161,8 @@
       "pipelineActionsProvider": "./utils/pipeline-actions-provider.ts",
       "pipelineRunActionsProvider": "./utils/pipelineRun-actions-provider.tsx",
       "taskRunActionsProvider": "./utils/taskRun-actions-provider.tsx",
-      "approvalTaskActionsProvider": "./utils/approvalTask-actions-provider.tsx"
+      "approvalTaskActionsProvider": "./utils/approvalTask-actions-provider.tsx",
+      "multiClusterComponent": "./components/multi-cluster"
     },
     "dependencies": {
       "@console/pluginAPI": ">=4.15"
@@ -169,6 +170,8 @@
   },
   "dependencies": {
     "@babel/runtime": "latest",
+    "@monaco-editor/react": "^4.7.0",
+    "@patternfly/chatbot": "^6.7.1",
     "@patternfly/react-drag-drop": "^6.0.0",
     "@types/express": "^4.17.18",
     "@types/js-yaml": "^3.10.0",

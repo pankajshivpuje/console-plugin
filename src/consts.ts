@@ -167,6 +167,7 @@ export const KEBAB_BUTTON_ID = 'kebab-button';
 export const DELETED_RESOURCE_IN_K8S_ANNOTATION = 'resource.deleted.in.k8s';
 export const DEFAULT_WORKSPACE_ANNOTATION = 'tekton.dev/default-workspace';
 export const chainsSignedAnnotation = 'chains.tekton.dev/signed';
+export const chainsTransparencyAnnotation = 'chains.tekton.dev/transparency';
 export const preferredNameAnnotation = 'pipeline.openshift.io/preferredName';
 export const FLAG_OPENSHIFT_PIPELINE_AS_CODE = 'OPENSHIFT_PIPELINE_AS_CODE';
 export const FLAG_OPENSHIFT_PIPELINE_APPROVAL_TASK =
@@ -204,3 +205,8 @@ export const DASH = '-';
 export const ADMIN_PERSPECTIVE_BASE_PATH = '/pipelines';
 export const DEV_PERSPECTIVE_BASE_PATH = '/dev-pipelines';
 export const HUB_INTEGRATION_KEY = 'enable-devconsole-integration';
+
+export const FLAG_ACM_MULTI_CLUSTER_PIPELINES =
+  'ACM_MULTI_CLUSTER_PIPELINES';
+export const CLUSTER_NAME_ANNOTATION = 'pipelines.openshift.io/cluster-name';
+export const LOCAL_CLUSTER_NAME = 'local-cluster';

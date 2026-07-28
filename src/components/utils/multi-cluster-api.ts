@@ -1,5 +1,10 @@
 import { consoleFetchJSON } from '@openshift-console/dynamic-plugin-sdk';
-import { PodKind, TaskRunKind } from '../../types';
+import {
+  ClustersResponse,
+  MultiClusterPipelineRunsResponse,
+  PodKind,
+  TaskRunKind,
+} from '../../types';
 
 const PROXY_BASE = '/api/proxy/plugin/pipelines-console-plugin/multicluster-proxy';
 
@@ -67,6 +72,16 @@ export const getMultiClusterLogsStreamPath = (
   container: string,
 ): string =>
   `${PROXY_BASE}/api/v1/namespaces/${ns}/logs/stream?pipelineRun=${plrName}&pod=${podName}&container=${container}`;
+
+export const getMultiClusterPipelineRuns = (
+  ns: string,
+): Promise<MultiClusterPipelineRunsResponse> =>
+  consoleFetchJSON(
+    `${PROXY_BASE}/api/v1/namespaces/${ns}/pipelineruns`,
+  );
+
+export const getMultiClusterClusters = (): Promise<ClustersResponse> =>
+  consoleFetchJSON(`${PROXY_BASE}/api/v1/clusters`);
 
 export const checkReady = async (): Promise<boolean> => {
   try {

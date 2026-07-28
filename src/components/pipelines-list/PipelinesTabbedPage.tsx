@@ -16,6 +16,7 @@ import { RepositoriesList } from '../repositories-list';
 import { PipelinesList } from '../pipelines-list';
 import { PipelineRunsList } from '../pipelineRuns-list';
 import {
+  FLAG_ACM_MULTI_CLUSTER_PIPELINES,
   FLAG_OPENSHIFT_PIPELINE_APPROVAL_TASK,
   FLAG_OPENSHIFT_PIPELINE_AS_CODE,
   PIPELINE_NAMESPACE,
@@ -29,6 +30,7 @@ import { MultiTabListPage } from '../multi-tab-list';
 import AllProjectsPage from '../projects-list/AllProjectsPage';
 import { useLocation, useParams } from 'react-router';
 import { ApprovalTasksList } from '../approval-tasks';
+import { MultiClusterPipelineRunsList } from '../multi-cluster';
 import { useK8sGet } from '../hooks/use-k8sGet-hook';
 import { SecretKind } from '../../types';
 import { PAC_SECRET_NAME } from '../pac/const';
@@ -45,6 +47,7 @@ export const PageContents: FC<PageContentsProps> = ({
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const isRepositoryEnabled = useFlag(FLAG_OPENSHIFT_PIPELINE_AS_CODE);
   const isApprovalTaskEnabled = useFlag(FLAG_OPENSHIFT_PIPELINE_APPROVAL_TASK);
+  const isMultiClusterEnabled = useFlag(FLAG_ACM_MULTI_CLUSTER_PIPELINES);
 
   const [pacSecretData, pacSecretDataLoaded, pacSecretDataError] =
     useK8sGet<SecretKind>(SecretModel, PAC_SECRET_NAME, PIPELINE_NAMESPACE);
@@ -92,6 +95,15 @@ export const PageContents: FC<PageContentsProps> = ({
             // t(ApprovalTaskModel.labelPluralKey)
             name: ApprovalTaskModel.labelPluralKey,
             component: ApprovalTasksList,
+          },
+        ]
+      : []),
+    ...(isMultiClusterEnabled
+      ? [
+          {
+            href: 'multi-cluster-pipeline-runs',
+            name: t('Multi-Cluster'),
+            component: MultiClusterPipelineRunsList,
           },
         ]
       : []),
