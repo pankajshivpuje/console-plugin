@@ -4,6 +4,7 @@ import { SearchIcon } from '@patternfly/react-icons/dist/esm/icons/search-icon';
 import {
   Button,
   ButtonVariant,
+  Radio,
 } from '@patternfly/react-core';
 import {
   CatalogItem,
@@ -43,6 +44,8 @@ import {
   updateArtifactHubTask,
 } from '../catalog/apis/artifactHub';
 import { FLAGS } from '../../types';
+
+import './PipelineQuickSearch.scss';
 
 const MOCK_PIPELINE_CATALOG_ITEMS: CatalogItem[] = [
   {
@@ -266,8 +269,33 @@ const Contents: FC<
   const isDevConsoleProxyAvailable = useFlag(FLAGS.DEVCONSOLE_PROXY);
   savedCallback.current = callback;
   const [failedTasks, setFailedTasks] = useState<string[]>([]);
+  const [resourceFilter, setResourceFilter] = useState<'task' | 'pipeline'>('task');
   useLoadingTaskCleanup(onUpdateTasks, taskGroup);
   useCleanupOnFailure(failedTasks, onUpdateTasks, taskGroup);
+
+  const itemFilter = useCallback(
+    (item: CatalogItem) => item.attributes?.resourceKind === resourceFilter,
+    [resourceFilter],
+  );
+
+  const headerContent = (
+    <div className="pipelineQuickSearch__radio-group">
+      <Radio
+        isChecked={resourceFilter === 'task'}
+        name="resource-filter"
+        onChange={() => setResourceFilter('task')}
+        label={t('Task')}
+        id="resource-filter-task"
+      />
+      <Radio
+        isChecked={resourceFilter === 'pipeline'}
+        name="resource-filter"
+        onChange={() => setResourceFilter('pipeline')}
+        label={t('Pipeline')}
+        id="resource-filter-pipeline"
+      />
+    </div>
+  );
 
   const getExistingTaskNames = (): string[] => {
     const taskNames = new Set<string>();
@@ -511,7 +539,9 @@ const Contents: FC<
       setIsOpen={setIsOpen}
       disableKeyboardOpen
       icon={<SearchIcon />}
-      title={t('Select task')}
+      headerContent={headerContent}
+      itemFilter={itemFilter}
+      title={t('Select')}
       callback={savedCallback.current}
       setFailedTasks={setFailedTasks}
       detailsRenderer={detailsRenderer}
