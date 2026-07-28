@@ -24,6 +24,7 @@ import { useErrorModal } from '../components/modals/error-modal';
 import { useGetActiveUser } from '../components/hooks/hooks';
 import { pipelineRunFilterReducer } from '../components/utils/pipeline-filter-reducer';
 import { MOCK_FAILURE_ANALYSIS } from '../components/__demo__/mock-failure-analysis-data';
+import { RhUiAiExperienceIcon } from '@patternfly/react-icons';
 
 export const usePipelineRunActionsProvider = (resource: PipelineRunKind) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
@@ -196,6 +197,7 @@ export const usePipelineRunActionsProvider = (resource: PipelineRunKind) => {
               label: hasExistingAnalysis
                 ? t('View failure analysis report')
                 : t('Analyze failed pipelinerun'),
+              icon: <RhUiAiExperienceIcon />,
               cta: {
                 href: `${resourcePathFromModel(PipelineRunModel, name, namespace)}/failure-analysis${hasExistingAnalysis ? '' : '?analyze=true'}`,
               },

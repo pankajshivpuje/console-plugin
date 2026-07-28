@@ -3106,6 +3106,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@patternfly/react-icons@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@patternfly/react-icons@npm:6.6.0"
+  dependencies:
+    tslib: "npm:^2.8.1"
+  peerDependencies:
+    react: ^17 || ^18 || ^19
+    react-dom: ^17 || ^18 || ^19
+  checksum: 10c0/55ce255ce1acedc0405c3ceb22c4ac1843b2e19d9c2953bfe3cdd76561b402490bf233ad51b8aa3904616173131da78ab7792c46c9a5d0d859bded3c8dccbc73
+  languageName: node
+  linkType: hard
+
 "@patternfly/react-log-viewer@npm:^6.0.0":
   version: 6.3.0
   resolution: "@patternfly/react-log-viewer@npm:6.3.0"
@@ -11884,7 +11896,7 @@ __metadata:
     "@patternfly/react-component-groups": "npm:^6.0.0"
     "@patternfly/react-core": "npm:^6.4.0"
     "@patternfly/react-drag-drop": "npm:^6.0.0"
-    "@patternfly/react-icons": "npm:^6.4.0"
+    "@patternfly/react-icons": "npm:^6.6.0"
     "@patternfly/react-log-viewer": "npm:^6.0.0"
     "@patternfly/react-styles": "npm:~6.4.0"
     "@patternfly/react-table": "npm:^6.4.0"
