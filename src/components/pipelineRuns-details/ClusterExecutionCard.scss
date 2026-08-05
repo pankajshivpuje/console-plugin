@@ -1,0 +1,40 @@
+.opp-cluster-execution {
+  margin-bottom: var(--pf-t--global--spacer--lg);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--md);
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+  &__card {
+    border: 1px solid var(--pf-t--global--border--color--default);
+    border-radius: var(--pf-t--global--border--radius--medium);
+  }
+  &__panel-title {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+  &__sub-title {
+    margin-bottom: var(--pf-t--global--spacer--sm);
+  }
+  &__divider {
+    margin: var(--pf-t--global--spacer--md) 0;
+  }
+  &__node-info {
+    margin-top: var(--pf-t--global--spacer--md);
+    font-size: var(--pf-t--global--font--size--xs);
+    color: var(--pf-t--global--text--color--subtle);
+  }
+  &__external-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--xs);
+    margin-top: var(--pf-t--global--spacer--md);
+    font-size: var(--pf-t--global--font--size--sm);
+    color: var(--pf-t--global--text--color--link--default);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

@@ -7,6 +7,8 @@ import PipelineRunVisualization from './PipelineRunVisualization';
 import PipelineRunCustomDetails from './PipelineRunCustomDetails';
 import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 import { Loading } from '../Loading';
+import ClusterExecutionCard from './ClusterExecutionCard';
+import { getClusterDataForPipelineRun } from '../__demo__/mock-cluster-data';
 
 type PipelineRunDetailsProps = {
   obj: PipelineRunKind;
@@ -20,6 +22,9 @@ const PipelineRunDetails: FC<PipelineRunDetailsProps> = ({
     return <Loading />;
   }
 
+  const clusterData = getClusterDataForPipelineRun(pipelineRun.metadata?.name);
+  const clusterName = pipelineRun.metadata?.annotations?.['tekton.dev/cluster'];
+
   return (
     <PageSection
       key={pipelineRun?.metadata?.uid + pipelineRun?.metadata?.name}
@@ -28,6 +33,12 @@ const PipelineRunDetails: FC<PipelineRunDetailsProps> = ({
     >
       <Title headingLevel="h2">{t('PipelineRun details')}</Title>
       <PipelineRunVisualization pipelineRun={pipelineRun} />
+      {clusterData && clusterName && (
+        <ClusterExecutionCard
+          clusterData={clusterData}
+          clusterName={clusterName}
+        />
+      )}
       <Grid hasGutter>
         <GridItem sm={6}>
           <ResourceSummary resource={pipelineRun} model={PipelineRunModel} />

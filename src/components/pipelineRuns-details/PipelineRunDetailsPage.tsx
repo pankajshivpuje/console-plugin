@@ -38,6 +38,8 @@ import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/internal-types';
 import { MOCK_PIPELINE_RUNS } from '../__demo__/mock-data';
 import { ComputedStatus } from '../../types';
+import ClusterBadge from '../cluster/ClusterBadge';
+import { getClusterDataForPipelineRun } from '../__demo__/mock-cluster-data';
 
 type PipelineRunDetailsPageProps = {
   name: string;
@@ -108,6 +110,18 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
             title={pipelineRunTitleFilterReducer(pipelineRun)}
           />
         </ResourceStatus>
+        {(() => {
+          const clusterData = getClusterDataForPipelineRun(pipelineRun?.metadata?.name);
+          if (!clusterData) return null;
+          const clusterName = pipelineRun?.metadata?.annotations?.['tekton.dev/cluster'];
+          return clusterName ? (
+            <ClusterBadge
+              clusterName={clusterName}
+              clusterType={clusterData.clusterInfo.type}
+              region={clusterData.clusterInfo.region}
+            />
+          ) : null;
+        })()}
       </div>
     );
   }, [pipelineRun]);
