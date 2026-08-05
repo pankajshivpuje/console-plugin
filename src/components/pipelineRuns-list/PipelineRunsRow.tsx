@@ -5,11 +5,11 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { FC } from 'react';
 import { memo } from 'react';
-import { ArchiveIcon, MulticlusterIcon } from '@patternfly/react-icons';
+import { ArchiveIcon, MulticlusterIcon, AngleRightIcon, AngleDownIcon } from '@patternfly/react-icons';
 import { PipelineRunKind } from '../../types';
 import { ResourceLinkWithIcon } from '../utils/resource-link';
 import { NamespaceModel, PipelineRunModel } from '../../models';
-import { Tooltip } from '@patternfly/react-core';
+import { Tooltip, Button } from '@patternfly/react-core';
 import {
   DELETED_RESOURCE_IN_K8S_ANNOTATION,
   RESOURCE_LOADED_FROM_RESULTS_ANNOTATION,
@@ -65,69 +65,81 @@ const PLRStatus: FC<PLRStatusProps> = memo(({ obj }) => {
 
 export const getPipelineRunsListDataViewRows: GetDataViewRows<
   PipelineRunKind,
-  { repositoryPLRs?: boolean }
+  { repositoryPLRs?: boolean; expandedPLR?: string | null; toggleExpand?: (name: string) => void }
 > = (data, columns) => {
-  return data.map(({ obj, rowData: { repositoryPLRs } }) => {
+  return data.map(({ obj, rowData: { repositoryPLRs, expandedPLR, toggleExpand } }) => {
     const plrLabels = obj.metadata.labels;
     const plrAnnotations = obj.metadata.annotations;
     const branchName =
       plrLabels?.[RepositoryAnnotations[RepoAnnotationFields.BRANCH]] ||
       plrAnnotations?.[RepositoryAnnotations[RepoAnnotationFields.BRANCH]];
 
+    const clusterData = getClusterDataForPipelineRun(obj.metadata.name);
+    const isExpanded = expandedPLR === obj.metadata.name;
+    const hasClusterData = !!clusterData;
+
     const rowCells = {
       [tableColumnInfo[0].id]: {
         cell: (
-          <ResourceLinkWithIcon
-            groupVersionKind={getGroupVersionKindForModel(PipelineRunModel)}
-            name={obj.metadata.name}
-            namespace={obj.metadata.namespace}
-            data-test-id={obj.metadata.name}
-            model={PipelineRunModel}
-            nameSuffix={
-              <>
-                {obj?.metadata?.annotations?.[chainsSignedAnnotation] ===
-                'true' ? (
-                  <Tooltip content={t('Signed')}>
-                    <div className="opp-pipeline-run-list__signed-indicator">
-                      <SignedBadgeIcon />
-                    </div>
-                  </Tooltip>
-                ) : null}
-                {obj?.metadata?.annotations?.[
-                  DELETED_RESOURCE_IN_K8S_ANNOTATION
-                ] === 'true' ||
-                obj?.metadata?.annotations?.[
-                  RESOURCE_LOADED_FROM_RESULTS_ANNOTATION
-                ] === 'true' ? (
-                  <Tooltip content={t('Archived in Tekton results')}>
-                    <div className="opp-pipeline-run-list__results-indicator">
-                      <ArchiveIcon />
-                    </div>
-                  </Tooltip>
-                ) : null}
-                {obj.spec?.managedBy === PIPELINE_RUN_MANAGED_BY_KUEUE_LABEL ? (
-                  <Tooltip content={t('Multicluster Pipeline Run')}>
-                    <MulticlusterIcon className="opp-pipeline-run-list__results-indicator" />
-                  </Tooltip>
-                ) : null}
-              </>
-            }
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {hasClusterData && toggleExpand && (
+              <Button
+                variant="plain"
+                onClick={() => toggleExpand(obj.metadata.name)}
+                aria-label={isExpanded ? t('Collapse row') : t('Expand row')}
+                style={{ padding: '0', minWidth: '24px' }}
+              >
+                {isExpanded ? <AngleDownIcon /> : <AngleRightIcon />}
+              </Button>
+            )}
+            <ResourceLinkWithIcon
+              groupVersionKind={getGroupVersionKindForModel(PipelineRunModel)}
+              name={obj.metadata.name}
+              namespace={obj.metadata.namespace}
+              data-test-id={obj.metadata.name}
+              model={PipelineRunModel}
+              nameSuffix={
+                <>
+                  {obj?.metadata?.annotations?.[chainsSignedAnnotation] ===
+                  'true' ? (
+                    <Tooltip content={t('Signed')}>
+                      <div className="opp-pipeline-run-list__signed-indicator">
+                        <SignedBadgeIcon />
+                      </div>
+                    </Tooltip>
+                  ) : null}
+                  {obj?.metadata?.annotations?.[
+                    DELETED_RESOURCE_IN_K8S_ANNOTATION
+                  ] === 'true' ||
+                  obj?.metadata?.annotations?.[
+                    RESOURCE_LOADED_FROM_RESULTS_ANNOTATION
+                  ] === 'true' ? (
+                    <Tooltip content={t('Archived in Tekton results')}>
+                      <div className="opp-pipeline-run-list__results-indicator">
+                        <ArchiveIcon />
+                      </div>
+                    </Tooltip>
+                  ) : null}
+                  {obj.spec?.managedBy === PIPELINE_RUN_MANAGED_BY_KUEUE_LABEL ? (
+                    <Tooltip content={t('Multicluster Pipeline Run')}>
+                      <MulticlusterIcon className="opp-pipeline-run-list__results-indicator" />
+                    </Tooltip>
+                  ) : null}
+                </>
+              }
+            />
+          </div>
         ),
         props: { ...getNameCellProps('pipelineruns-list'), modifier: 'nowrap' },
       },
       [tableColumnInfo[1].id]: {
-        cell: (() => {
-          const clusterData = getClusterDataForPipelineRun(obj.metadata.name);
-          if (!clusterData) return DASH;
-          return (
-            <ClusterBadge
-              clusterName={obj.metadata.annotations?.['tekton.dev/cluster'] || ''}
-              clusterType={clusterData.clusterInfo.type}
-              region={clusterData.clusterInfo.region}
-            />
-          );
-        })(),
+        cell: !clusterData ? DASH : (
+          <ClusterBadge
+            clusterName={obj.metadata.annotations?.['tekton.dev/cluster'] || ''}
+            clusterType={clusterData.clusterInfo.type}
+            region={clusterData.clusterInfo.region}
+          />
+        ),
         props: { modifier: 'nowrap' },
       },
       [tableColumnInfo[2].id]: {

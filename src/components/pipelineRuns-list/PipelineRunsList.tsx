@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import usePipelineRunsColumns from './usePipelineRunsColumns';
@@ -12,6 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { useDataViewFilter } from '../hooks/useDataViewFilter';
 import { DataViewFilterToolbar } from '../common/DataViewFilterToolbar';
 import { MOCK_PIPELINE_RUNS } from '../__demo__/mock-data';
+import PipelineRunExpandedContent from './PipelineRunExpandedContent';
+import { getClusterDataForPipelineRun } from '../__demo__/mock-cluster-data';
 
 import './PipelineRunsList.scss';
 
@@ -36,6 +38,7 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
   const currentUser = useGetActiveUser();
   namespace = namespace || ns;
   const columns = usePipelineRunsColumns(namespace, repositoryPLRs);
+  const [expandedPLR, setExpandedPLR] = useState<string | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
@@ -84,6 +87,10 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
     return trLoaded;
   }, [k8sLoaded, trLoaded, filterValues?.dataSource]);
 
+  const toggleExpand = (plrName: string) => {
+    setExpandedPLR((prev) => (prev === plrName ? null : plrName));
+  };
+
   return (
     <ListPageBody>
       {!hideTextFilter && (
@@ -104,10 +111,23 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
         customRowData={{
           repositoryPLRs,
           currentUser,
+          expandedPLR,
+          toggleExpand,
         }}
         hideColumnManagement
         hideNameLabelFilters
       />
+      {expandedPLR && (() => {
+        const clusterData = getClusterDataForPipelineRun(expandedPLR);
+        const plr = filteredData.find((r) => r.metadata?.name === expandedPLR);
+        const clusterName = plr?.metadata?.annotations?.['tekton.dev/cluster'];
+        return clusterData && clusterName ? (
+          <PipelineRunExpandedContent
+            clusterData={clusterData}
+            clusterName={clusterName}
+          />
+        ) : null;
+      })()}
       <div ref={loadMoreRef}></div>
     </ListPageBody>
   );
