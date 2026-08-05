@@ -54,7 +54,7 @@ const usePipelineRunsColumns = (
     {
       id: tableColumnInfo[1].id,
       title: t('Cluster'),
-      sort: `metadata.annotations.tekton.dev/cluster`,
+      sort: 'metadata.annotations["tekton.dev/cluster"]',
       props: { className: tableColumnInfo[1].classNames, modifier: 'nowrap' },
     },
     {

@@ -120,9 +120,9 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
     return trLoaded;
   }, [k8sLoaded, trLoaded, filterValues?.dataSource]);
 
-  const toggleExpand = (plrName: string) => {
+  const toggleExpand = useCallback((plrName: string) => {
     setExpandedPLR((prev) => (prev === plrName ? null : plrName));
-  };
+  }, []);
 
   return (
     <ListPageBody>
