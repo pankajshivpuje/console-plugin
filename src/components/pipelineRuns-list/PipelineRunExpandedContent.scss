@@ -2,7 +2,17 @@
   padding: var(--pf-t--global--spacer--md) var(--pf-t--global--spacer--lg);
 
   &__title {
-    margin-bottom: var(--pf-t--global--spacer--sm);
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--sm);
+    margin-bottom: var(--pf-t--global--spacer--md);
+    font-size: var(--pf-t--global--font--size--xs);
+    font-weight: var(--pf-t--global--font--weight--bold);
+    letter-spacing: 0.05em;
+    color: var(--pf-t--global--text--color--subtle);
+  }
+  &__title-icon {
+    font-size: var(--pf-t--global--font--size--sm);
   }
   &__pill {
     margin-top: var(--pf-t--global--spacer--sm);

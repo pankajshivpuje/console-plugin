@@ -8,9 +8,13 @@ import {
   GridItem,
   CodeBlock,
   CodeBlockCode,
-  Title,
 } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+import {
+  CogIcon,
+  FileAltIcon,
+  ChartPieIcon,
+  ExternalLinkAltIcon,
+} from '@patternfly/react-icons';
 import { RoutingPill, ResourceMeter } from '../cluster';
 import type { PipelineRunClusterData } from '../__demo__/mock-cluster-data';
 import { useTranslation } from 'react-i18next';
@@ -44,9 +48,10 @@ const PipelineRunExpandedContent: FC<PipelineRunExpandedContentProps> = ({
   return (
     <Grid hasGutter className="opp-plr-expanded">
       <GridItem sm={12} md={4}>
-        <Title headingLevel="h4" size="md" className="opp-plr-expanded__title">
-          {t('Routing Decision')}
-        </Title>
+        <div className="opp-plr-expanded__title">
+          <CogIcon className="opp-plr-expanded__title-icon" />
+          {t('ROUTING DECISION')}
+        </div>
         <DescriptionList isCompact isHorizontal>
           <DescriptionListGroup>
             <DescriptionListTerm>{t('Dispatched by')}</DescriptionListTerm>
@@ -94,9 +99,10 @@ const PipelineRunExpandedContent: FC<PipelineRunExpandedContentProps> = ({
       </GridItem>
 
       <GridItem sm={12} md={4}>
-        <Title headingLevel="h4" size="md" className="opp-plr-expanded__title">
-          {t('Aggregated Logs')} ({clusterName})
-        </Title>
+        <div className="opp-plr-expanded__title">
+          <FileAltIcon className="opp-plr-expanded__title-icon" />
+          {t('AGGREGATED LOGS')} ({clusterName.toUpperCase()})
+        </div>
         <CodeBlock>
           <CodeBlockCode>{logText}</CodeBlockCode>
         </CodeBlock>
@@ -106,9 +112,10 @@ const PipelineRunExpandedContent: FC<PipelineRunExpandedContentProps> = ({
       </GridItem>
 
       <GridItem sm={12} md={4}>
-        <Title headingLevel="h4" size="md" className="opp-plr-expanded__title">
-          {t('Cluster Resources')}
-        </Title>
+        <div className="opp-plr-expanded__title">
+          <ChartPieIcon className="opp-plr-expanded__title-icon" />
+          {t('CLUSTER RESOURCES (AT EXECUTION)')}
+        </div>
         <ResourceMeter label={t('CPU')} value={resources.cpuPercent} />
         <ResourceMeter label={t('Memory')} value={resources.memoryPercent} />
         <ResourceMeter

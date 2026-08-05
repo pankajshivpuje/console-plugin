@@ -11,21 +11,15 @@ import {
   MenuToggle,
   MenuToggleElement,
 } from '@patternfly/react-core';
-import usePipelineRunsColumns from './usePipelineRunsColumns';
 import { PipelineRunKind } from '../../types';
 import { useGetPipelineRuns } from '../hooks/useTektonResult';
-import { getPipelineRunsListDataViewRows } from './PipelineRunsRow';
 import { useGetActiveUser } from '../hooks/hooks';
-import { ConsoleDataView } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { useTranslation } from 'react-i18next';
 import { useDataViewFilter } from '../hooks/useDataViewFilter';
 import { DataViewFilterToolbar } from '../common/DataViewFilterToolbar';
 import { MOCK_PIPELINE_RUNS } from '../__demo__/mock-data';
-import PipelineRunExpandedContent from './PipelineRunExpandedContent';
-import {
-  getClusterDataForPipelineRun,
-  getAllClusterNames,
-} from '../__demo__/mock-cluster-data';
+import { getAllClusterNames } from '../__demo__/mock-cluster-data';
+import MultiClusterPipelineRunsTable from './MultiClusterPipelineRunsTable';
 
 import './PipelineRunsList.scss';
 
@@ -47,10 +41,8 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const { ns } = useParams();
-  const currentUser = useGetActiveUser();
+  useGetActiveUser();
   namespace = namespace || ns;
-  const columns = usePipelineRunsColumns(namespace, repositoryPLRs);
-  const [expandedPLR, setExpandedPLR] = useState<string | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   useEffect(() => {
@@ -120,10 +112,6 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
     return trLoaded;
   }, [k8sLoaded, trLoaded, filterValues?.dataSource]);
 
-  const toggleExpand = useCallback((plrName: string) => {
-    setExpandedPLR((prev) => (prev === plrName ? null : plrName));
-  }, []);
-
   return (
     <ListPageBody>
       {!bannerDismissed && (
@@ -175,33 +163,11 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
           </Select>
         </DataViewFilterToolbar>
       )}
-      <ConsoleDataView<PipelineRunKind>
-        label={t('PipelineRuns')}
-        columns={columns}
+      <MultiClusterPipelineRunsTable
         data={clusterFilteredData}
         loaded={loaded}
         loadError={pipelineRunsLoadError}
-        getDataViewRows={getPipelineRunsListDataViewRows}
-        customRowData={{
-          repositoryPLRs,
-          currentUser,
-          expandedPLR,
-          toggleExpand,
-        }}
-        hideColumnManagement
-        hideNameLabelFilters
       />
-      {expandedPLR && (() => {
-        const clusterData = getClusterDataForPipelineRun(expandedPLR);
-        const plr = clusterFilteredData.find((r) => r.metadata?.name === expandedPLR);
-        const clusterName = plr?.metadata?.annotations?.['tekton.dev/cluster'];
-        return clusterData && clusterName ? (
-          <PipelineRunExpandedContent
-            clusterData={clusterData}
-            clusterName={clusterName}
-          />
-        ) : null;
-      })()}
       <div ref={loadMoreRef}></div>
     </ListPageBody>
   );
