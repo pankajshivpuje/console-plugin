@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { TooltipPosition } from '@patternfly/react-core';
 import {
   Node,
   NodeModel,
@@ -72,7 +71,7 @@ const BuilderNode: FC<BuilderNodeProps> = ({ element }) => {
           x={width / 2}
           y={height + BUILDER_NODE_ADD_RADIUS + BUILDER_NODE_ADD_PADDING}
           tooltip={t('Add a parallel task')}
-          tooltipPosition={TooltipPosition.bottom}
+          tooltipPosition="bottom"
           onClick={() => onAddNode(AddNodeDirection.PARALLEL)}
         />
       </g>

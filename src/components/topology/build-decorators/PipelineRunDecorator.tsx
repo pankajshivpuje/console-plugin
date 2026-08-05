@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useRef } from 'react';
-import { Tooltip, TooltipPosition } from '@patternfly/react-core';
+import { Tooltip } from '@patternfly/react-core';
 import { Link } from 'react-router';
 import {
   AccessReviewResourceAttributes,
@@ -118,7 +118,7 @@ export const ConnectedPipelineRunDecorator: FC<
     <Tooltip
       triggerRef={ref}
       content={tooltipContent}
-      position={TooltipPosition.left}
+      position="left"
     >
       <g ref={ref} data-test="PipelineRunDecorator">
         {decoratorContent}

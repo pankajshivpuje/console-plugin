@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
-import { Button, Popover, PopoverPosition } from '@patternfly/react-core';
+import { Button, Popover } from '@patternfly/react-core';
 import PipelineResourceStatus from './PipelineResourceStatus';
 import PipelineRunStatusPopoverContent from './PipelineRunStatusPopoverContent';
 import { ComputedStatus, PipelineRunKind } from '../../types';
@@ -37,7 +37,7 @@ const PipelineRunStatusContent: FC<PipelineRunStatusProps> = ({
             isVisible={isPopoverOpen}
             shouldClose={() => setIsPopoverOpen(false)}
             shouldOpen={() => setIsPopoverOpen(true)}
-            position={PopoverPosition.auto}
+            position="auto"
           >
             <Button
               icon={<PipelineResourceStatus status={status} title={title} />}

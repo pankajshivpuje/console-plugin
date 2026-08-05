@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useRef } from 'react';
-import { Tooltip, TooltipPosition } from '@patternfly/react-core';
+import { Tooltip } from '@patternfly/react-core';
 import { PlusIcon } from '@patternfly/react-icons/dist/esm/icons/plus-icon';
 import { BUILDER_NODE_ADD_RADIUS } from './const';
 
@@ -10,7 +10,7 @@ type PlusNodeProps = {
   x: number;
   y: number;
   tooltip: string;
-  tooltipPosition?: TooltipPosition;
+  tooltipPosition?: 'auto' | 'top' | 'bottom' | 'left' | 'right';
   onClick?: () => void;
 };
 
