@@ -163,6 +163,11 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       uid: 'mock-plr-buildah-1',
       creationTimestamp: '2025-11-10T14:30:00Z',
       labels: { [TektonResourceLabel.pipeline]: 'buildah-deploy' },
+      annotations: {
+        'tekton.dev/cluster': 'spoke-prod-east',
+        'multikueue.x-k8s.io/dispatch-reason': 'Lowest queue depth (2)',
+        'multikueue.x-k8s.io/queue-wait': '4s',
+      },
     },
     spec: { pipelineRef: { name: 'buildah-deploy' } },
     status: {
@@ -203,6 +208,11 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       uid: 'mock-plr-buildah-2',
       creationTimestamp: '2025-11-09T09:15:00Z',
       labels: { [TektonResourceLabel.pipeline]: 'buildah-deploy' },
+      annotations: {
+        'tekton.dev/cluster': 'spoke-edge',
+        'multikueue.x-k8s.io/dispatch-reason': 'Only cluster with matching node selector (arch: arm64)',
+        'multikueue.x-k8s.io/queue-wait': '2m 14s',
+      },
     },
     spec: { pipelineRef: { name: 'buildah-deploy' } },
     status: {
@@ -244,6 +254,11 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       uid: 'mock-plr-s2i-java-1',
       creationTimestamp: '2025-10-20T11:00:00Z',
       labels: { [TektonResourceLabel.pipeline]: 's2i-java' },
+      annotations: {
+        'tekton.dev/cluster': 'hub-central',
+        'multikueue.x-k8s.io/dispatch-reason': 'Pipeline annotation: tekton.dev/prefer-local: "true"',
+        'multikueue.x-k8s.io/queue-wait': '0s',
+      },
     },
     spec: { pipelineRef: { name: 's2i-java' } },
     status: {
@@ -290,6 +305,11 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       uid: 'mock-plr-docker-1',
       creationTimestamp: '2025-09-25T16:45:00Z',
       labels: { [TektonResourceLabel.pipeline]: 'docker-build-push' },
+      annotations: {
+        'tekton.dev/cluster': 'spoke-staging',
+        'multikueue.x-k8s.io/dispatch-reason': 'Lowest utilization (45% CPU, 38% mem)',
+        'multikueue.x-k8s.io/queue-wait': '0s',
+      },
     },
     spec: { pipelineRef: { name: 'docker-build-push' } },
     status: {
@@ -325,6 +345,11 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       uid: 'mock-plr-nodejs-1',
       creationTimestamp: '2025-08-15T08:00:00Z',
       labels: { [TektonResourceLabel.pipeline]: 'nodejs-deploy' },
+      annotations: {
+        'tekton.dev/cluster': 'spoke-prod-west',
+        'multikueue.x-k8s.io/dispatch-reason': 'Region affinity (us-west-2)',
+        'multikueue.x-k8s.io/queue-wait': '2s',
+      },
     },
     spec: { pipelineRef: { name: 'nodejs-deploy' } },
     status: {
@@ -376,6 +401,11 @@ export const MOCK_PIPELINE_RUNS: PipelineRunKind[] = [
       uid: 'mock-plr-scan-1',
       creationTimestamp: '2025-07-10T13:30:00Z',
       labels: { [TektonResourceLabel.pipeline]: 'scan-and-deploy' },
+      annotations: {
+        'tekton.dev/cluster': 'spoke-dev',
+        'multikueue.x-k8s.io/dispatch-reason': 'Namespace affinity (dev-team-*)',
+        'multikueue.x-k8s.io/queue-wait': '48s',
+      },
     },
     spec: { pipelineRef: { name: 'scan-and-deploy' } },
     status: {
