@@ -1,7 +1,16 @@
 import type { FC } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  Alert,
+  AlertActionCloseButton,
+  Select,
+  SelectOption,
+  SelectList,
+  MenuToggle,
+  MenuToggleElement,
+} from '@patternfly/react-core';
 import usePipelineRunsColumns from './usePipelineRunsColumns';
 import { PipelineRunKind } from '../../types';
 import { useGetPipelineRuns } from '../hooks/useTektonResult';
@@ -13,7 +22,10 @@ import { useDataViewFilter } from '../hooks/useDataViewFilter';
 import { DataViewFilterToolbar } from '../common/DataViewFilterToolbar';
 import { MOCK_PIPELINE_RUNS } from '../__demo__/mock-data';
 import PipelineRunExpandedContent from './PipelineRunExpandedContent';
-import { getClusterDataForPipelineRun } from '../__demo__/mock-cluster-data';
+import {
+  getClusterDataForPipelineRun,
+  getAllClusterNames,
+} from '../__demo__/mock-cluster-data';
 
 import './PipelineRunsList.scss';
 
@@ -76,6 +88,27 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
     },
   });
 
+  const [selectedCluster, setSelectedCluster] = useState<string>('all');
+  const [clusterSelectOpen, setClusterSelectOpen] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(() =>
+    localStorage.getItem('opp-multicluster-banner-dismissed') === 'true',
+  );
+
+  const clusterFilteredData = useMemo(() => {
+    if (selectedCluster === 'all') return filteredData;
+    return filteredData.filter(
+      (plr) =>
+        plr.metadata?.annotations?.['tekton.dev/cluster'] === selectedCluster,
+    );
+  }, [filteredData, selectedCluster]);
+
+  const handleBannerDismiss = useCallback(() => {
+    setBannerDismissed(true);
+    localStorage.setItem('opp-multicluster-banner-dismissed', 'true');
+  }, []);
+
+  const clusterNames = getAllClusterNames();
+
   const loaded = useMemo(() => {
     const selectedSources = filterValues?.dataSource as string[] | undefined;
     const bothOrNone =
@@ -93,18 +126,59 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
 
   return (
     <ListPageBody>
+      {!bannerDismissed && (
+        <Alert
+          variant="info"
+          isInline
+          title={t('Multi-cluster routing active')}
+          actionClose={<AlertActionCloseButton onClose={handleBannerDismiss} />}
+          className="opp-plr-multicluster-banner"
+        >
+          {t(
+            'PipelineRuns are dynamically dispatched via MultiKueue to the optimal spoke cluster based on current fleet capacity. The Cluster column shows where each run executed.',
+          )}
+        </Alert>
+      )}
       {!hideTextFilter && (
         <DataViewFilterToolbar
           filterValues={filterValues}
           onFilterChange={onFilterChange}
           onClearAll={onClearAll}
           checkboxFilters={updatedCheckboxFilters}
-        />
+        >
+          <Select
+            isOpen={clusterSelectOpen}
+            onOpenChange={setClusterSelectOpen}
+            onSelect={(_e, value) => {
+              setSelectedCluster(value as string);
+              setClusterSelectOpen(false);
+            }}
+            selected={selectedCluster}
+            toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+              <MenuToggle
+                ref={toggleRef}
+                onClick={() => setClusterSelectOpen(!clusterSelectOpen)}
+                isExpanded={clusterSelectOpen}
+              >
+                {selectedCluster === 'all' ? t('All Clusters') : selectedCluster}
+              </MenuToggle>
+            )}
+          >
+            <SelectList>
+              <SelectOption value="all">{t('All Clusters')}</SelectOption>
+              {clusterNames.map((name) => (
+                <SelectOption key={name} value={name}>
+                  {name}
+                </SelectOption>
+              ))}
+            </SelectList>
+          </Select>
+        </DataViewFilterToolbar>
       )}
       <ConsoleDataView<PipelineRunKind>
         label={t('PipelineRuns')}
         columns={columns}
-        data={filteredData}
+        data={clusterFilteredData}
         loaded={loaded}
         loadError={pipelineRunsLoadError}
         getDataViewRows={getPipelineRunsListDataViewRows}
@@ -119,7 +193,7 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
       />
       {expandedPLR && (() => {
         const clusterData = getClusterDataForPipelineRun(expandedPLR);
-        const plr = filteredData.find((r) => r.metadata?.name === expandedPLR);
+        const plr = clusterFilteredData.find((r) => r.metadata?.name === expandedPLR);
         const clusterName = plr?.metadata?.annotations?.['tekton.dev/cluster'];
         return clusterData && clusterName ? (
           <PipelineRunExpandedContent
