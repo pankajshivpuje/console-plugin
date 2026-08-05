@@ -7,7 +7,7 @@ export interface RoutingPillProps {
 }
 
 const RoutingPill: FC<RoutingPillProps> = ({ quality, text }) => {
-  const color = quality === 'optimal' ? 'green' : 'gold';
+  const color = quality === 'optimal' ? 'green' : 'yellow';
   return (
     <Label isCompact color={color}>
       {text}
