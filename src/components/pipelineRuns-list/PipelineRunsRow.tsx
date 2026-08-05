@@ -81,13 +81,13 @@ export const getPipelineRunsListDataViewRows: GetDataViewRows<
     const rowCells = {
       [tableColumnInfo[0].id]: {
         cell: (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="opp-plr-row__name-cell">
             {hasClusterData && toggleExpand && (
               <Button
                 variant="plain"
                 onClick={() => toggleExpand(obj.metadata.name)}
                 aria-label={isExpanded ? t('Collapse row') : t('Expand row')}
-                style={{ padding: '0', minWidth: '24px' }}
+                className="opp-plr-row__expand-btn"
               >
                 {isExpanded ? <AngleDownIcon /> : <AngleRightIcon />}
               </Button>
