@@ -1,0 +1,18 @@
+.opp-cluster-badge {
+  &--hub {
+    --pf-v6-c-label--BackgroundColor: rgba(138, 109, 215, 0.15);
+    --pf-v6-c-label--Color: #b094e8;
+    --pf-v6-c-label--BorderColor: rgba(138, 109, 215, 0.3);
+  }
+  &--spoke {
+    --pf-v6-c-label--BackgroundColor: rgba(57, 135, 229, 0.1);
+    --pf-v6-c-label--Color: #6da7ec;
+    --pf-v6-c-label--BorderColor: rgba(57, 135, 229, 0.25);
+  }
+  &__region {
+    font-weight: 400;
+    color: var(--pf-t--global--text--color--subtle);
+    font-size: var(--pf-t--global--font--size--xs);
+    margin-left: var(--pf-t--global--spacer--xs);
+  }
+}
