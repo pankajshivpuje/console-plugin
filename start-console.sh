@@ -40,7 +40,8 @@ if [ -x "$(command -v podman)" ]; then
         podman run --pull always --rm --network=host --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
     else
         BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://host.containers.internal:9001"
-        podman run --pull always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        K8S_HOST=$(echo "$BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT" | sed -E 's|https?://([^:]+):.*|\1|')
+        podman run --pull always --rm --platform linux/amd64 --add-host="$K8S_HOST":host-gateway -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
     fi
 else
     BRIDGE_PLUGINS="${npm_package_consolePlugin_name}=http://host.docker.internal:9001"

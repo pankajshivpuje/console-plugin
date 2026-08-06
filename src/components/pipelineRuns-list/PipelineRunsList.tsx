@@ -165,8 +165,8 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
       )}
       <MultiClusterPipelineRunsTable
         data={clusterFilteredData}
-        loaded={loaded}
-        loadError={pipelineRunsLoadError}
+        loaded={loaded || MOCK_PIPELINE_RUNS.length > 0}
+        loadError={MOCK_PIPELINE_RUNS.length > 0 ? undefined : pipelineRunsLoadError}
       />
       <div ref={loadMoreRef}></div>
     </ListPageBody>

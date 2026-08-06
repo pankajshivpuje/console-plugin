@@ -657,6 +657,8 @@
   "You made changes to this page.": "You made changes to this page.",
   "Your approval has been requested on {{plrs}} pipeline": "Your approval has been requested on {{plrs}} pipeline",
   "Your Git repository is now configured to run <2>push.yaml</2> on every Git push event.": "Your Git repository is now configured to run <2>push.yaml</2> on every Git push event.",
+  "Fleet Management": "Fleet Management",
+  "Virtualization": "Virtualization",
   "Zoom in": "Zoom in",
   "Zoom out": "Zoom out"
 }

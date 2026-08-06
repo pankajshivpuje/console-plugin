@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   NamespaceBar,
   NavPage,
+  useActivePerspective,
   useFlag,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -131,9 +132,10 @@ export const PageContents: FC<PageContentsProps> = ({
 const PipelinesTabbedPage: FC = () => {
   const { ns } = useParams();
   const location = useLocation();
+  const [activePerspective] = useActivePerspective();
   const perspective = location?.pathname.includes('dev-pipelines')
     ? 'dev'
-    : 'admin';
+    : activePerspective;
   return (
     <>
       <NamespaceBar />

@@ -113,8 +113,8 @@ const CodeEditorField: FC<CodeEditorFieldProps> = ({
             onChange={handleOnChange}
             onSave={onSave}
             showShortcuts={showShortcuts}
-            showMiniMap={showMiniMap}
             language={language}
+            options={{ minimap: { enabled: showMiniMap } }}
             toolbarLinks={
               !sidebarOpen &&
               hasSidebarContent && [
