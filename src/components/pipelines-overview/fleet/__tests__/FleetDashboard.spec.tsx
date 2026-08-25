@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react';
-import PipelinesOverviewPage from '../PipelinesOverviewPage';
+import { render, screen, fireEvent } from '@testing-library/react';
+import FleetDashboard from '../FleetDashboard';
 
 jest.mock('react-i18next', () => ({ useTranslation: () => ({ t: (k: string) => k }) }));
-jest.mock('../../cluster', () => ({
+jest.mock('../../../cluster', () => ({
   ClusterBadge: ({ clusterName }: { clusterName: string }) => <span>{clusterName}</span>,
   ResourceMeter: ({ value }: { value: number }) => <span>{value}%</span>,
   RoutingPill: () => <span />,
@@ -16,10 +16,16 @@ jest.mock('@patternfly/react-charts/victory', () => ({
   ChartLegend: () => <div />, ChartThemeColor: { multiOrdered: 'm', blue: 'blue' },
 }));
 
-describe('Pipeline Overview page', () => {
-  it('renders the Fleet Dashboard', () => {
-    render(<PipelinesOverviewPage />);
+describe('FleetDashboard', () => {
+  it('renders the Fleet Dashboard title and Overview tab by default', () => {
+    render(<FleetDashboard />);
     expect(screen.getByText('Fleet Dashboard')).toBeTruthy();
     expect(screen.getByText('Spoke fleet health')).toBeTruthy();
+  });
+
+  it('switches to the Alerts tab', () => {
+    render(<FleetDashboard />);
+    fireEvent.click(screen.getByRole('tab', { name: /Alerts/i }));
+    expect(screen.getByText('Active alerts')).toBeTruthy();
   });
 });
