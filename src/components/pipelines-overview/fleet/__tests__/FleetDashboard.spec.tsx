@@ -17,9 +17,9 @@ jest.mock('@patternfly/react-charts/victory', () => ({
 }));
 
 describe('FleetDashboard', () => {
-  it('renders the Fleet Dashboard title and Overview tab by default', () => {
+  it('renders the Overview title and Overview tab by default', () => {
     render(<FleetDashboard />);
-    expect(screen.getByText('Fleet Dashboard')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Overview' })).toBeTruthy();
     expect(screen.getByText('Spoke fleet health')).toBeTruthy();
   });
 

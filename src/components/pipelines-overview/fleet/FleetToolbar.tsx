@@ -12,6 +12,7 @@ import {
   SearchInput,
   Toolbar,
   ToolbarContent,
+  ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
 import { FilterIcon, SyncAltIcon, DownloadIcon } from '@patternfly/react-icons';
@@ -48,78 +49,80 @@ const FleetToolbar: FC<FleetToolbarProps> = ({ filter, onChange }) => {
     });
 
   return (
-    <Toolbar className="pf-v6-u-pb-0">
+    <Toolbar className="pf-v6-u-px-0 pf-v6-u-pb-0" inset={{ default: 'insetNone' }}>
       <ToolbarContent>
-        <ToolbarItem>
-          <Button variant="secondary" icon={<FilterIcon />}>
-            {t('Filter')}
-          </Button>
-        </ToolbarItem>
-        <ToolbarItem>
-          <Dropdown
-            isOpen={spokeOpen}
-            onOpenChange={setSpokeOpen}
-            toggle={(ref) => (
-              <MenuToggle
-                ref={ref}
-                onClick={() => setSpokeOpen((o) => !o)}
-                isExpanded={spokeOpen}
-              >
-                {t('All Spoke Clusters')} ({filter.selectedSpokes.length})
-              </MenuToggle>
-            )}
-          >
-            <DropdownList>
-              {ALL_SPOKES.map((s) => (
-                <DropdownItem
-                  key={s}
-                  onClick={() => toggleSpoke(s)}
-                  isSelected={filter.selectedSpokes.includes(s)}
+        <ToolbarGroup variant="filter-group">
+          <ToolbarItem>
+            <Button variant="secondary" icon={<FilterIcon />}>
+              {t('Filter')}
+            </Button>
+          </ToolbarItem>
+          <ToolbarItem>
+            <Dropdown
+              isOpen={spokeOpen}
+              onOpenChange={setSpokeOpen}
+              toggle={(ref) => (
+                <MenuToggle
+                  ref={ref}
+                  onClick={() => setSpokeOpen((o) => !o)}
+                  isExpanded={spokeOpen}
                 >
-                  {s}
-                </DropdownItem>
-              ))}
-            </DropdownList>
-          </Dropdown>
-        </ToolbarItem>
-        <ToolbarItem>
-          <Dropdown
-            isOpen={timeOpen}
-            onOpenChange={setTimeOpen}
-            toggle={(ref) => (
-              <MenuToggle
-                ref={ref}
-                onClick={() => setTimeOpen((o) => !o)}
-                isExpanded={timeOpen}
-              >
-                {filter.timeRange}
-              </MenuToggle>
-            )}
-          >
-            <DropdownList>
-              {TIME_RANGE_OPTIONS.map((tr) => (
-                <DropdownItem
-                  key={tr}
-                  onClick={() => {
-                    onChange({ ...filter, timeRange: tr });
-                    setTimeOpen(false);
-                  }}
+                  {t('All Spoke Clusters')} ({filter.selectedSpokes.length})
+                </MenuToggle>
+              )}
+            >
+              <DropdownList>
+                {ALL_SPOKES.map((s) => (
+                  <DropdownItem
+                    key={s}
+                    onClick={() => toggleSpoke(s)}
+                    isSelected={filter.selectedSpokes.includes(s)}
+                  >
+                    {s}
+                  </DropdownItem>
+                ))}
+              </DropdownList>
+            </Dropdown>
+          </ToolbarItem>
+          <ToolbarItem>
+            <Dropdown
+              isOpen={timeOpen}
+              onOpenChange={setTimeOpen}
+              toggle={(ref) => (
+                <MenuToggle
+                  ref={ref}
+                  onClick={() => setTimeOpen((o) => !o)}
+                  isExpanded={timeOpen}
                 >
-                  {tr}
-                </DropdownItem>
-              ))}
-            </DropdownList>
-          </Dropdown>
-        </ToolbarItem>
-        <ToolbarItem>
-          <SearchInput
-            placeholder={t('Search by pipeline name...')}
-            value={filter.search}
-            onChange={(_e, v) => onChange({ ...filter, search: v })}
-            onClear={() => onChange({ ...filter, search: '' })}
-          />
-        </ToolbarItem>
-        <ToolbarItem>
+                  {filter.timeRange}
+                </MenuToggle>
+              )}
+            >
+              <DropdownList>
+                {TIME_RANGE_OPTIONS.map((tr) => (
+                  <DropdownItem
+                    key={tr}
+                    onClick={() => {
+                      onChange({ ...filter, timeRange: tr });
+                      setTimeOpen(false);
+                    }}
+                  >
+                    {tr}
+                  </DropdownItem>
+                ))}
+              </DropdownList>
+            </Dropdown>
+          </ToolbarItem>
+          <ToolbarItem>
+            <SearchInput
+              placeholder={t('Search by pipeline name...')}
+              value={filter.search}
+              onChange={(_e, v) => onChange({ ...filter, search: v })}
+              onClear={() => onChange({ ...filter, search: '' })}
+            />
+          </ToolbarItem>
+        </ToolbarGroup>
+        <ToolbarItem variant="label-group">
           <LabelGroup numLabels={ALL_SPOKES.length}>
             {filter.selectedSpokes.map((s) => (
               <Label
@@ -133,13 +136,31 @@ const FleetToolbar: FC<FleetToolbarProps> = ({ filter, onChange }) => {
             ))}
           </LabelGroup>
         </ToolbarItem>
-        <ToolbarItem align={{ default: 'alignEnd' }}>
-          <span className="pf-v6-u-color-200 pf-v6-u-mr-sm">
-            {t('Updated')} {LAST_UPDATED_LABEL}
-          </span>
-          <Button variant="plain" aria-label={t('Refresh')} icon={<SyncAltIcon />} />
-          <Button variant="plain" aria-label={t('Download')} icon={<DownloadIcon />} />
-        </ToolbarItem>
+        <ToolbarGroup
+          variant="action-group-plain"
+          align={{ default: 'alignEnd' }}
+          gap={{ default: 'gapSm' }}
+        >
+          <ToolbarItem alignSelf="center">
+            <span className="pf-v6-u-color-200">
+              {t('Updated')} {LAST_UPDATED_LABEL}
+            </span>
+          </ToolbarItem>
+          <ToolbarItem>
+            <Button
+              variant="plain"
+              aria-label={t('Refresh')}
+              icon={<SyncAltIcon />}
+            />
+          </ToolbarItem>
+          <ToolbarItem>
+            <Button
+              variant="plain"
+              aria-label={t('Download')}
+              icon={<DownloadIcon />}
+            />
+          </ToolbarItem>
+        </ToolbarGroup>
       </ToolbarContent>
     </Toolbar>
   );

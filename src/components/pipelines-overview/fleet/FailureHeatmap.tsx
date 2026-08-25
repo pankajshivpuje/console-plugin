@@ -14,8 +14,9 @@ const cellColor = (value: number, max: number): string => {
   if (max === 0 || value === 0)
     return 'var(--pf-t--global--background--color--secondary--default)';
   const intensity = Math.min(1, value / max);
-  // blend toward danger red by opacity
-  return `rgba(201, 25, 11, ${0.15 + intensity * 0.85})`;
+  // blend the danger status token toward transparent by intensity
+  const pct = Math.round((0.15 + intensity * 0.85) * 100);
+  return `color-mix(in srgb, var(--pf-t--global--color--status--danger--default) ${pct}%, transparent)`;
 };
 
 const FailureHeatmap: FC<FailureHeatmapProps> = ({ metrics }) => {

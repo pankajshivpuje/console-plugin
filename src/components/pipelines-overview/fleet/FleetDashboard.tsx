@@ -45,14 +45,19 @@ const FleetDashboard: FC = () => {
 
   return (
     <>
-      <PageSection hasBodyWrapper={false} className="pf-v6-u-pl-md pf-v6-u-pb-0">
-        <Title headingLevel="h1">{t('Fleet Dashboard')}</Title>
+      <PageSection hasBodyWrapper={false} className="pf-v6-u-pb-0">
+        <Title headingLevel="h1">{t('Overview')}</Title>
       </PageSection>
-      <PageSection hasBodyWrapper={false} className="pf-v6-u-p-0 pf-v6-u-pl-md">
+      <PageSection
+        hasBodyWrapper={false}
+        type="tabs"
+        padding={{ default: 'noPadding' }}
+      >
         <Tabs
+          usePageInsets
           activeKey={activeTab}
           onSelect={(_e, key) => setActiveTab(Number(key))}
-          aria-label={t('Fleet Dashboard tabs')}
+          aria-label={t('Overview tabs')}
         >
           <Tab eventKey={0} title={<TabTitleText>{t('Overview')}</TabTitleText>} />
           <Tab eventKey={1} title={<TabTitleText>{t('Build Times')}</TabTitleText>} />
@@ -67,10 +72,10 @@ const FleetDashboard: FC = () => {
           <Tab eventKey={4} title={<TabTitleText>{t('Alerts')}</TabTitleText>} />
         </Tabs>
       </PageSection>
-      <div className="pf-v6-u-pl-md pf-v6-u-pr-md">
+      <PageSection hasBodyWrapper={false}>
         <FleetToolbar filter={filter} onChange={setFilter} />
         <div className="pf-v6-u-mt-md">{renderTab()}</div>
-      </div>
+      </PageSection>
     </>
   );
 };
