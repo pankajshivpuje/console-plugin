@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -38,7 +38,7 @@ interface FleetOverviewTabProps {
   filter: FleetFilterState;
 }
 
-const ChartCard: FC<{ title: string; children: React.ReactNode }> = ({
+const ChartCard: FC<{ title: string; children: ReactNode }> = ({
   title,
   children,
 }) => (

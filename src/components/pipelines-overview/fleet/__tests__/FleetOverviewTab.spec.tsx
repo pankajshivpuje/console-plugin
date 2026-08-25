@@ -19,7 +19,6 @@ jest.mock('@patternfly/react-charts/victory', () => ({
   ChartStack: ({ children }: any) => <div>{children}</div>,
   ChartLine: () => <div />,
   ChartVoronoiContainer: () => <div />,
-  ChartLegend: () => <div />,
   ChartThemeColor: { multiOrdered: 'multiOrdered', blue: 'blue' },
 }));
 
@@ -28,13 +27,13 @@ describe('FleetOverviewTab', () => {
 
   it('renders the fleet KPIs and health table', () => {
     render(<FleetOverviewTab filter={filter} />);
-    expect(screen.getByText('Fleet success rate')).toBeTruthy();
-    expect(screen.getByText('12,847')).toBeTruthy();
-    expect(screen.getByText('Spoke fleet health')).toBeTruthy();
+    screen.getByText('Fleet success rate');
+    screen.getByText((content) => content.replace(/[^0-9]/g, '') === '12847');
+    screen.getByText('Spoke fleet health');
   });
 
   it('shows an empty state when no spokes selected', () => {
     render(<FleetOverviewTab filter={{ ...filter, selectedSpokes: [] }} />);
-    expect(screen.getByText('No spoke clusters selected')).toBeTruthy();
+    screen.getByText('No spoke clusters selected');
   });
 });
