@@ -1,10 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import FleetStatCard from '../FleetStatCard';
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string) => k }),
-}));
-
 describe('FleetStatCard', () => {
   it('renders label, value and delta', () => {
     render(
@@ -16,8 +12,8 @@ describe('FleetStatCard', () => {
         spark={[1, 2, 3, 2, 4]}
       />,
     );
-    expect(screen.getByText('FLEET SUCCESS RATE')).toBeTruthy();
-    expect(screen.getByText('94.2%')).toBeTruthy();
-    expect(screen.getByText('+1.3%')).toBeTruthy();
+    screen.getByText('FLEET SUCCESS RATE');
+    screen.getByText('94.2%');
+    screen.getByText('+1.3%');
   });
 });

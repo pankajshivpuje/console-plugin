@@ -15,7 +15,6 @@ const Sparkline: FC<SparklineProps> = ({ values, color }) => {
       height={40}
       width={120}
       padding={{ top: 4, bottom: 4, left: 4, right: 4 }}
-      themeColor="blue"
     >
       <ChartArea
         data={data}
