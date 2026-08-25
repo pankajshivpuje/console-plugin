@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Icon } from '@patternfly/react-core';
+import { Icon, Flex, FlexItem } from '@patternfly/react-core';
 import {
   CheckCircleIcon,
   InProgressIcon,
@@ -21,9 +21,12 @@ const LocalQueueStatusIcon: FC<{ status: LocalQueueStatus }> = ({ status }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const { icon, status: iconStatus } = CONFIG[status];
   return (
-    <span className="pf-v6-l-flex pf-v6-u-align-items-center pf-v6-l-gap-sm">
-      <Icon status={iconStatus}>{icon}</Icon> {t(status)}
-    </span>
+    <Flex gap={{ default: 'gapSm' }} alignItems={{ default: 'alignItemsCenter' }}>
+      <FlexItem>
+        <Icon status={iconStatus}>{icon}</Icon>
+      </FlexItem>
+      <FlexItem>{t(status)}</FlexItem>
+    </Flex>
   );
 };
 
