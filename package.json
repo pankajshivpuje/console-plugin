@@ -158,8 +158,6 @@
       "pipelineActionsProvider": "./utils/pipeline-actions-provider.ts",
       "pipelineRunActionsProvider": "./utils/pipelineRun-actions-provider.tsx",
       "taskRunActionsProvider": "./utils/taskRun-actions-provider.tsx",
-      "pipelinePerspective": "./components/perspective/perspective.ts",
-      "fleetManagementPerspective": "./components/perspective/fleet-management.ts",
       "virtualizationPerspective": "./components/perspective/virtualization.ts"
     },
     "dependencies": {
