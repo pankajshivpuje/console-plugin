@@ -31,8 +31,6 @@ import {
 import PipelineRunParametersForm from './PipelineRunParametersForm';
 import { PipelineRunLogsWithActiveTask } from './PipelineRunLogs';
 import PipelineRunEvents from './PipelineRunEvents';
-import PipelineRunTaskRuns from './PipelineRunTaskRuns';
-import PipelineRunOutput from './PipelineRunOutput';
 import PipelineRunFailureAnalysis from './PipelineRunFailureAnalysis';
 import { usePipelineRuns } from '../hooks/useTaskRuns';
 import { getReferenceForModel } from '../pipelines-overview/utils';
@@ -169,16 +167,6 @@ const PipelineRunDetailsPage: FC<PipelineRunDetailsPageProps> = ({
           component: PipelineRunLogsWithActiveTask,
         },
         navFactory.events(PipelineRunEvents),
-        {
-          href: 'output',
-          name: t('Output'),
-          component: (props) => <PipelineRunOutput obj={pipelineRun} {...props} />,
-        },
-        {
-          href: 'task-runs',
-          name: t('TaskRuns'),
-          component: (props) => <PipelineRunTaskRuns obj={pipelineRun} {...props} />,
-        },
         ...(isFailed
           ? [
               {
