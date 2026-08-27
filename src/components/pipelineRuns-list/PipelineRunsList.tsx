@@ -20,6 +20,7 @@ import { DataViewFilterToolbar } from '../common/DataViewFilterToolbar';
 import { MOCK_PIPELINE_RUNS } from '../__demo__/mock-data';
 import { getAllClusterNames } from '../__demo__/mock-cluster-data';
 import MultiClusterPipelineRunsTable from './MultiClusterPipelineRunsTable';
+import ConnectivityLegend from './ConnectivityLegend';
 
 import './PipelineRunsList.scss';
 
@@ -161,6 +162,7 @@ const PipelineRunsList: FC<PipelineRunsListProps> = ({
               ))}
             </SelectList>
           </Select>
+          <ConnectivityLegend />
         </DataViewFilterToolbar>
       )}
       <MultiClusterPipelineRunsTable

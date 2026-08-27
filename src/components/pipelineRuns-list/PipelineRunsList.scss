@@ -31,3 +31,35 @@
 .opp-plr-multicluster-banner {
   margin: var(--pf-t--global--spacer--md) var(--pf-t--global--spacer--lg) 0;
 }
+
+.opp-connectivity-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pf-t--global--spacer--md);
+  margin-inline-start: var(--pf-t--global--spacer--md);
+  color: var(--pf-t--global--text--color--subtle);
+  font-size: var(--pf-t--global--font--size--sm);
+
+  &__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--xs);
+  }
+}
+
+.opp-connectivity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+
+  &--connected {
+    background: var(--pf-t--global--color--status--success--default);
+  }
+  &--idle {
+    background: var(--pf-t--global--color--status--warning--default);
+  }
+  &--disconnected {
+    background: var(--pf-t--global--color--status--danger--default);
+  }
+}
