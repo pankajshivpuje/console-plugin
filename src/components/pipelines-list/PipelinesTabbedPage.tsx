@@ -16,6 +16,7 @@ import {
 import { RepositoriesList } from '../repositories-list';
 import { PipelinesList } from '../pipelines-list';
 import { PipelineRunsList } from '../pipelineRuns-list';
+import { LocalQueuesList } from '../localqueues-list';
 import {
   FLAG_OPENSHIFT_PIPELINE_APPROVAL_TASK,
   FLAG_OPENSHIFT_PIPELINE_AS_CODE,
@@ -62,6 +63,11 @@ export const PageContents: FC<PageContentsProps> = ({
       onSelection: (_key: string, _action: MenuAction, url: string) =>
         `${url}/form`,
     },
+    localQueue: {
+      label: t('LocalQueue'),
+      onSelection: (_key: string, _action: MenuAction, _url: string) =>
+        `/pipelines/ns/${namespace ?? 'default'}/local-queues?create=1`,
+    },
   };
   const pages: NavPage[] = [
     {
@@ -96,6 +102,11 @@ export const PageContents: FC<PageContentsProps> = ({
           },
         ]
       : []),
+    {
+      href: 'local-queues',
+      name: t('LocalQueues'),
+      component: LocalQueuesList,
+    },
   ];
 
   const secondaryButtonAction: SecondaryButtonAction = {
