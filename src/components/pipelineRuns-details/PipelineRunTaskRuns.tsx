@@ -7,6 +7,7 @@ import { useTaskRuns } from '../hooks/useTaskRuns';
 import { LoadingBox } from '../status/status-box';
 import Status from '../status/Status';
 import { pipelineRunFilterReducer } from '../utils/pipeline-filter-reducer';
+import { pipelineRunDuration } from '../utils/pipeline-utils';
 
 const taskName = (tr: TaskRunKind): string =>
   tr.spec?.taskRef?.name ||
@@ -41,6 +42,7 @@ const PipelineRunTaskRuns: FC<{ obj: PipelineRunKind }> = ({ obj }) => {
           <Th>{t('Task')}</Th>
           <Th>{t('Status')}</Th>
           <Th>{t('Started')}</Th>
+          <Th>{t('Duration')}</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -52,6 +54,7 @@ const PipelineRunTaskRuns: FC<{ obj: PipelineRunKind }> = ({ obj }) => {
               <Status status={pipelineRunFilterReducer(tr)} />
             </Td>
             <Td dataLabel={t('Started')}>{started(tr)}</Td>
+            <Td dataLabel={t('Duration')}>{pipelineRunDuration(tr)}</Td>
           </Tr>
         ))}
       </Tbody>

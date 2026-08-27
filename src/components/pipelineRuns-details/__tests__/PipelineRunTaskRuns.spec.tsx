@@ -1,10 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import PipelineRunTaskRuns from '../PipelineRunTaskRuns';
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string) => k }),
-}));
-
 const mockUseTaskRuns = jest.fn();
 jest.mock('../../hooks/useTaskRuns', () => ({
   useTaskRuns: (...args: unknown[]) => mockUseTaskRuns(...args),
@@ -36,7 +32,11 @@ describe('PipelineRunTaskRuns', () => {
         {
           metadata: { name: 'build-and-gitops-fetch', namespace: 'demo' },
           spec: { taskRef: { name: 'git-clone' } },
-          status: { conditions: [{ type: 'Succeeded', status: 'True' }] },
+          status: {
+            conditions: [{ type: 'Succeeded', status: 'True' }],
+            startTime: '2026-08-25T10:00:00Z',
+            completionTime: '2026-08-25T10:00:45Z',
+          },
         },
       ],
       true,
@@ -46,6 +46,9 @@ describe('PipelineRunTaskRuns', () => {
     render(<PipelineRunTaskRuns obj={pipelineRun} />);
     expect(screen.getByText('build-and-gitops-fetch')).toBeTruthy();
     expect(screen.getByText('git-clone')).toBeTruthy();
+    // Duration column: pipelineRunDuration with 45 s elapsed renders '{{value}} second'
+    // via the test-env getI18n() mock which passes only the key (no interpolation options)
+    expect(screen.getByText('{{value}} second')).toBeTruthy();
   });
 
   it('renders an empty state when there are no TaskRuns', () => {

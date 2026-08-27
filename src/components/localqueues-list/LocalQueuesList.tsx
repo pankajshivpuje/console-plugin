@@ -19,8 +19,6 @@ import LocalQueuesTable from './LocalQueuesTable';
 import LocalQueueModal, { LocalQueueFormValues } from './LocalQueueModal';
 import LocalQueueDeleteModal from './LocalQueueDeleteModal';
 
-import './LocalQueues.scss';
-
 interface ToastAlert {
   key: number;
   variant: AlertVariant;

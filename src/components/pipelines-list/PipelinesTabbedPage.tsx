@@ -65,8 +65,8 @@ export const PageContents: FC<PageContentsProps> = ({
     },
     localQueue: {
       label: t('LocalQueue'),
-      onSelection: (_key: string, _action: MenuAction, _url: string) =>
-        `/pipelines/ns/${namespace ?? 'default'}/local-queues?create=1`,
+      onSelection: (_key: string, _action: MenuAction, url: string) =>
+        `${url}/local-queues?create=1`,
     },
   };
   const pages: NavPage[] = [
