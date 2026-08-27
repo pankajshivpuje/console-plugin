@@ -11,3 +11,6 @@ yarn-error.log
 *.pem
 integration-tests/cypress-a11y-report.json
 .yarn/*
+
+# Playwright MCP browser-session scratch
+.playwright-mcp/
