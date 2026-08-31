@@ -925,6 +925,32 @@
   {
     "type": "console.page/route",
     "properties": {
+      "path": ["/dev-pipelines/ns/:ns/local-queues/:name"],
+      "exact": true,
+      "component": {
+        "$codeRef": "localQueuesDetails.LocalQueueDetailsPage"
+      }
+    },
+    "flags": {
+      "required": ["HIDE_STATIC_PIPELINE_PLUGIN_PIPELINE_NAV_OPTION"]
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
+      "path": ["/pipelines/ns/:ns/local-queues/:name"],
+      "exact": true,
+      "component": {
+        "$codeRef": "localQueuesDetails.LocalQueueDetailsPage"
+      }
+    },
+    "flags": {
+      "required": ["HIDE_STATIC_PIPELINE_PLUGIN_PIPELINE_NAV_OPTION"]
+    }
+  },
+  {
+    "type": "console.page/route",
+    "properties": {
       "path": ["/dev-pipelines/ns/:ns", "/dev-pipelines/all-namespaces"],
       "exact": false,
       "component": {

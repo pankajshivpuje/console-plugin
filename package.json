@@ -158,7 +158,8 @@
       "pipelineActionsProvider": "./utils/pipeline-actions-provider.ts",
       "pipelineRunActionsProvider": "./utils/pipelineRun-actions-provider.tsx",
       "taskRunActionsProvider": "./utils/taskRun-actions-provider.tsx",
-      "virtualizationPerspective": "./components/perspective/virtualization.ts"
+      "virtualizationPerspective": "./components/perspective/virtualization.ts",
+      "localQueuesDetails": "./components/localqueues-list"
     },
     "dependencies": {
       "@console/pluginAPI": ">=4.15"

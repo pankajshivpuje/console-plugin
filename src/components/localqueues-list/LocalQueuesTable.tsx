@@ -1,15 +1,13 @@
 import type { FC, Ref } from 'react';
 import { useState } from 'react';
+import { Link, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Table, Thead, Tbody, Tr, Th, Td } from '@patternfly/react-table';
 import {
   Bullseye,
-  Button,
   Dropdown,
   DropdownItem,
   DropdownList,
-  Label,
-  LabelGroup,
   MenuToggle,
   MenuToggleElement,
 } from '@patternfly/react-core';
@@ -17,6 +15,7 @@ import EllipsisVIcon from '@patternfly/react-icons/dist/esm/icons/ellipsis-v-ico
 import type { LocalQueue } from '../__demo__/mock-localqueue-data';
 import SchedulingPolicyBadge from './SchedulingPolicyBadge';
 import LocalQueueStatusIcon from './LocalQueueStatusIcon';
+import { TargetClusters } from './presenters';
 
 export interface LocalQueuesTableProps {
   rows: LocalQueue[];
@@ -64,33 +63,14 @@ const RowKebab: FC<{
   );
 };
 
-// ---- Target Clusters presenter ----
-
-const TargetClusters: FC<{ lq: LocalQueue }> = ({ lq }) => {
-  const { t } = useTranslation('plugin__pipelines-console-plugin');
-
-  if (lq.schedulingPolicy === 'hub-only') {
-    return <span className="pf-v6-u-color-200">{t('Hub cluster')}</span>;
-  }
-  if (lq.schedulingPolicy === 'any-spoke') {
-    return <span className="pf-v6-u-color-200">{t('All available spokes')}</span>;
-  }
-  // selected-spokes
-  return (
-    <LabelGroup numLabels={5}>
-      {lq.spokeClusterNames.map((s) => (
-        <Label key={s} isCompact>
-          {s}
-        </Label>
-      ))}
-    </LabelGroup>
-  );
-};
-
 // ---- Table ----
 
 const LocalQueuesTable: FC<LocalQueuesTableProps> = ({ rows, onEdit, onDelete }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
+  const location = useLocation();
+  const base = location.pathname.includes('dev-pipelines')
+    ? 'dev-pipelines'
+    : 'pipelines';
 
   if (rows.length === 0) {
     return (
@@ -117,9 +97,9 @@ const LocalQueuesTable: FC<LocalQueuesTableProps> = ({ rows, onEdit, onDelete })
         {rows.map((lq) => (
           <Tr key={`${lq.namespace}/${lq.name}`}>
             <Td dataLabel={t('Name')}>
-              <Button variant="link" isInline>
+              <Link to={`/${base}/ns/${lq.namespace}/local-queues/${lq.name}`}>
                 {lq.name}
-              </Button>
+              </Link>
             </Td>
             <Td dataLabel={t('Namespace')}>{lq.namespace}</Td>
             <Td dataLabel={t('Scheduling Policy')}>

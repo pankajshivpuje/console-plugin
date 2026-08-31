@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import LocalQueuesList from '../LocalQueuesList';
+import { resetQueues } from '../localqueue-store';
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string) => k }),
@@ -15,6 +16,11 @@ let mockSearchParams = new URLSearchParams();
 
 jest.mock('react-router', () => ({
   useSearchParams: () => [mockSearchParams, mockSetSearchParams],
+  // LocalQueuesTable uses these; stub them for the list's render tree.
+  useLocation: () => ({ pathname: '/pipelines/all-namespaces' }),
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  ),
 }));
 
 // Helper: fill the Create modal's name and namespace fields, then submit
@@ -34,6 +40,8 @@ describe('LocalQueuesList', () => {
   beforeEach(() => {
     mockSetSearchParams.mockClear();
     mockSearchParams = new URLSearchParams();
+    // The store is a module singleton; reset it so tests don't leak state.
+    resetQueues();
   });
 
   it('renders the 6 seed queues', () => {

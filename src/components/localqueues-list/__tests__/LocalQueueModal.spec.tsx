@@ -50,6 +50,8 @@ describe('LocalQueueModal', () => {
           spokeClusterNames: ['spoke-arm-central-01'],
           status: 'Ready',
           lastUpdated: '1 day ago',
+          clusterQueue: 'arm-cq',
+          quota: { cpu: { used: 12, total: 16 }, memoryGi: { used: 20, total: 64 } },
         }}
         onClose={jest.fn()}
         onSubmit={jest.fn()}

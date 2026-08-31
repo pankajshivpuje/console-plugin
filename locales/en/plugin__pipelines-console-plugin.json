@@ -697,5 +697,19 @@
   "{{value}} minute": "{{value}} minute",
   "{{value}} second": "{{value}} second",
   "{{value}}+ event exist, but none match the current filter": "{{value}}+ event exist, but none match the current filter",
-  "{{version}} (latest)": "{{version}} (latest)"
+  "{{version}} (latest)": "{{version}} (latest)",
+  "Admitted": "Admitted",
+  "Back to LocalQueues": "Back to LocalQueues",
+  "CPU": "CPU",
+  "ClusterQueue": "ClusterQueue",
+  "GiB": "GiB",
+  "LocalQueue detail tabs": "LocalQueue detail tabs",
+  "LocalQueue not found": "LocalQueue not found",
+  "Memory": "Memory",
+  "No workloads found": "No workloads found",
+  "Resource usage": "Resource usage",
+  "The requested LocalQueue does not exist or has been deleted.": "The requested LocalQueue does not exist or has been deleted.",
+  "This is a read-only preview of the generated LocalQueue manifest.": "This is a read-only preview of the generated LocalQueue manifest.",
+  "Workloads": "Workloads",
+  "cores": "cores"
 }

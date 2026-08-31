@@ -14,10 +14,16 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { MOCK_LOCAL_QUEUES, LocalQueue } from '../__demo__/mock-localqueue-data';
+import { LocalQueue } from '../__demo__/mock-localqueue-data';
 import LocalQueuesTable from './LocalQueuesTable';
 import LocalQueueModal, { LocalQueueFormValues } from './LocalQueueModal';
 import LocalQueueDeleteModal from './LocalQueueDeleteModal';
+import {
+  useLocalQueues,
+  createQueue,
+  updateQueue,
+  deleteQueue,
+} from './localqueue-store';
 
 interface ToastAlert {
   key: number;
@@ -29,7 +35,7 @@ const LocalQueuesList: FC = () => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [queues, setQueues] = useState<LocalQueue[]>(() => [...MOCK_LOCAL_QUEUES]);
+  const queues = useLocalQueues();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<LocalQueue | null>(null);
@@ -90,13 +96,7 @@ const LocalQueuesList: FC = () => {
 
     if (editTarget) {
       // Edit: merge changes, update lastUpdated
-      setQueues((prev) =>
-        prev.map((lq) =>
-          lq.name === editTarget.name && lq.namespace === editTarget.namespace
-            ? { ...lq, ...values, lastUpdated: 'Just now' }
-            : lq,
-        ),
-      );
+      updateQueue(editTarget.namespace, editTarget.name, values);
       addToast(
         AlertVariant.success,
         `${t('LocalQueue')} "${values.name}" ${t('updated successfully.')}`,
@@ -107,10 +107,7 @@ const LocalQueuesList: FC = () => {
         addToast(AlertVariant.danger, t('A LocalQueue with this name already exists.'));
         return;
       }
-      setQueues((prev) => [
-        { ...values, status: 'Pending', lastUpdated: 'Just now' },
-        ...prev,
-      ]);
+      createQueue(values);
       addToast(
         AlertVariant.success,
         `${t('LocalQueue')} "${values.name}" ${t('created successfully.')}`,
@@ -122,9 +119,7 @@ const LocalQueuesList: FC = () => {
   const handleConfirmDelete = () => {
     if (!deleteTarget) return;
     const { name, namespace } = deleteTarget;
-    setQueues((prev) =>
-      prev.filter((lq) => !(lq.name === name && lq.namespace === namespace)),
-    );
+    deleteQueue(namespace, name);
     setDeleteTarget(null);
     addToast(AlertVariant.success, `${t('LocalQueue')} "${name}" ${t('deleted.')}`);
   };
