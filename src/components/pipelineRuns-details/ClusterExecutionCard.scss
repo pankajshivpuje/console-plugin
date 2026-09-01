@@ -1,40 +1,28 @@
 .opp-cluster-execution {
   margin-bottom: var(--pf-t--global--spacer--lg);
 
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: var(--pf-t--global--spacer--md);
-    margin-bottom: var(--pf-t--global--spacer--md);
+  // Equal-width columns separated by vertical dividers; each column stretches
+  // to full height so the dividers span the tallest panel.
+  &__columns {
+    align-items: stretch;
   }
-  &__card {
-    border: 1px solid var(--pf-t--global--border--color--default);
-    border-radius: var(--pf-t--global--border--radius--medium);
+  &__panel {
+    height: 100%;
   }
-  &__panel-title {
-    margin-bottom: var(--pf-t--global--spacer--md);
-  }
-  &__sub-title {
-    margin-bottom: var(--pf-t--global--spacer--sm);
-  }
-  &__divider {
-    margin: var(--pf-t--global--spacer--md) 0;
+  // Lock a consistent horizontal term width across every panel so all
+  // term/value pairs line up identically column-to-column.
+  &__dl {
+    --pf-v6-c-description-list--m-horizontal__term--width: 12ch;
   }
   &__node-info {
-    margin-top: var(--pf-t--global--spacer--md);
+    margin-top: var(--pf-t--global--spacer--sm);
     font-size: var(--pf-t--global--font--size--xs);
     color: var(--pf-t--global--text--color--subtle);
   }
-  &__external-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--pf-t--global--spacer--xs);
-    margin-top: var(--pf-t--global--spacer--md);
-    font-size: var(--pf-t--global--font--size--sm);
-    color: var(--pf-t--global--text--color--link--default);
-    text-decoration: none;
-    &:hover {
-      text-decoration: underline;
-    }
+  &__logs-divider {
+    margin: var(--pf-t--global--spacer--lg) 0;
+  }
+  &__logs .opp-cluster-execution__panel-title {
+    margin-bottom: var(--pf-t--global--spacer--sm);
   }
 }

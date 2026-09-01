@@ -1,14 +1,17 @@
 import type { FC } from 'react';
 import {
+  Button,
   Card,
   CardBody,
+  CardHeader,
+  CardTitle,
   DescriptionList,
   DescriptionListGroup,
   DescriptionListTerm,
   DescriptionListDescription,
   Divider,
-  Grid,
-  GridItem,
+  Flex,
+  FlexItem,
   Title,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
@@ -20,6 +23,7 @@ import {
 } from '../cluster';
 import { useTranslation } from 'react-i18next';
 import type { PipelineRunClusterData } from '../__demo__/mock-cluster-data';
+import AggregatedLogsSection from './AggregatedLogsSection';
 
 import './ClusterExecutionCard.scss';
 
@@ -40,6 +44,7 @@ const ClusterExecutionCard: FC<ClusterExecutionCardProps> = ({
     timeline,
     clusterQueue,
     secretSync,
+    logs,
   } = clusterData;
 
   const queueDisplay = `${resources.queueUsed} / ${resources.queueCapacity}`;
@@ -48,27 +53,48 @@ const ClusterExecutionCard: FC<ClusterExecutionCardProps> = ({
   );
 
   return (
-    <div className="opp-cluster-execution">
-      <div className="opp-cluster-execution__header">
-        <Title headingLevel="h2" size="lg">
-          {t('Cluster Execution')}
-        </Title>
-        <ClusterBadge
-          clusterName={clusterName}
-          clusterType={clusterInfo.type}
-          region={clusterInfo.region}
-        />
-      </div>
+    <Card className="opp-cluster-execution">
+      <CardHeader
+        actions={{
+          actions: (
+            <ClusterBadge
+              clusterName={clusterName}
+              clusterType={clusterInfo.type}
+              region={clusterInfo.region}
+            />
+          ),
+          hasNoOffset: true,
+        }}
+      >
+        <CardTitle component="h2">{t('Cluster Execution')}</CardTitle>
+      </CardHeader>
 
-      <Card isPlain className="opp-cluster-execution__card">
-        <CardBody>
-          <Grid hasGutter>
-            {/* Panel 1: Dispatch & Routing */}
-            <GridItem sm={12} md={4}>
-              <Title headingLevel="h4" size="md" className="opp-cluster-execution__panel-title">
+      <CardBody>
+        <Flex
+          direction={{ default: 'column', md: 'row' }}
+          alignItems={{ default: 'alignItemsStretch' }}
+          gap={{ default: 'gapLg' }}
+          className="opp-cluster-execution__columns"
+        >
+          {/* Panel 1: Dispatch & Routing */}
+          <FlexItem flex={{ default: 'flex_1' }}>
+            <Flex
+              direction={{ default: 'column' }}
+              gap={{ default: 'gapMd' }}
+              className="opp-cluster-execution__panel"
+            >
+              <Title
+                headingLevel="h3"
+                size="md"
+                className="opp-cluster-execution__panel-title"
+              >
                 {t('Dispatch & Routing')}
               </Title>
-              <DescriptionList isCompact isHorizontal>
+              <DescriptionList
+                isCompact
+                isHorizontal
+                className="opp-cluster-execution__dl"
+              >
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Dispatched by')}</DescriptionListTerm>
                   <DescriptionListDescription>{routing.dispatchedBy}</DescriptionListDescription>
@@ -92,43 +118,71 @@ const ClusterExecutionCard: FC<ClusterExecutionCardProps> = ({
                   </DescriptionListGroup>
                 )}
               </DescriptionList>
-              <RoutingPill
-                quality={routing.routeQuality}
-                text={
-                  routing.routeQuality === 'optimal'
-                    ? t('Optimal route')
-                    : t('Constrained route')
-                }
-              />
-              <Divider className="opp-cluster-execution__divider" />
-              <Title headingLevel="h5" size="md" className="opp-cluster-execution__sub-title">
+              <div>
+                <RoutingPill
+                  quality={routing.routeQuality}
+                  text={
+                    routing.routeQuality === 'optimal'
+                      ? t('Optimal route')
+                      : t('Constrained route')
+                  }
+                />
+              </div>
+              <Divider />
+              <Title
+                headingLevel="h4"
+                size="md"
+                className="opp-cluster-execution__sub-title"
+              >
                 {t('Dispatch timeline')}
               </Title>
               <DispatchTimeline timeline={timeline} />
-            </GridItem>
+            </Flex>
+          </FlexItem>
 
-            {/* Panel 2: Cluster Resources */}
-            <GridItem sm={12} md={4}>
-              <Title headingLevel="h4" size="md" className="opp-cluster-execution__panel-title">
+          <Divider orientation={{ default: 'horizontal', md: 'vertical' }} />
+
+          {/* Panel 2: Cluster Resources */}
+          <FlexItem flex={{ default: 'flex_1' }}>
+            <Flex
+              direction={{ default: 'column' }}
+              gap={{ default: 'gapMd' }}
+              className="opp-cluster-execution__panel"
+            >
+              <Title
+                headingLevel="h3"
+                size="md"
+                className="opp-cluster-execution__panel-title"
+              >
                 {t('Cluster Resources (at execution)')}
               </Title>
-              <ResourceMeter label={t('CPU')} value={resources.cpuPercent} />
-              <ResourceMeter label={t('Memory')} value={resources.memoryPercent} />
-              <ResourceMeter
-                label={t('Queue')}
-                value={queuePercent}
-                displayValue={queueDisplay}
-              />
-              <div className="opp-cluster-execution__node-info">
-                {t('Node:')} <strong>{resources.node}</strong>
-                <br />
-                {resources.vCPU} vCPU &middot; {resources.ramGi} Gi RAM
+              <div>
+                <ResourceMeter label={t('CPU')} value={resources.cpuPercent} />
+                <ResourceMeter label={t('Memory')} value={resources.memoryPercent} />
+                <ResourceMeter
+                  label={t('Queue')}
+                  value={queuePercent}
+                  displayValue={queueDisplay}
+                />
+                <div className="opp-cluster-execution__node-info">
+                  {t('Node:')} <strong>{resources.node}</strong>
+                  <br />
+                  {resources.vCPU} vCPU &middot; {resources.ramGi} Gi RAM
+                </div>
               </div>
-              <Divider className="opp-cluster-execution__divider" />
-              <Title headingLevel="h5" size="md" className="opp-cluster-execution__sub-title">
+              <Divider />
+              <Title
+                headingLevel="h4"
+                size="md"
+                className="opp-cluster-execution__sub-title"
+              >
                 {t('ClusterQueue')}
               </Title>
-              <DescriptionList isCompact isHorizontal>
+              <DescriptionList
+                isCompact
+                isHorizontal
+                className="opp-cluster-execution__dl"
+              >
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
                   <DescriptionListDescription>{clusterQueue.name}</DescriptionListDescription>
@@ -146,14 +200,30 @@ const ClusterExecutionCard: FC<ClusterExecutionCardProps> = ({
                   <DescriptionListDescription>{clusterQueue.active}</DescriptionListDescription>
                 </DescriptionListGroup>
               </DescriptionList>
-            </GridItem>
+            </Flex>
+          </FlexItem>
 
-            {/* Panel 3: Cluster Info */}
-            <GridItem sm={12} md={4}>
-              <Title headingLevel="h4" size="md" className="opp-cluster-execution__panel-title">
+          <Divider orientation={{ default: 'horizontal', md: 'vertical' }} />
+
+          {/* Panel 3: Cluster Info */}
+          <FlexItem flex={{ default: 'flex_1' }}>
+            <Flex
+              direction={{ default: 'column' }}
+              gap={{ default: 'gapMd' }}
+              className="opp-cluster-execution__panel"
+            >
+              <Title
+                headingLevel="h3"
+                size="md"
+                className="opp-cluster-execution__panel-title"
+              >
                 {t('Cluster Info')}
               </Title>
-              <DescriptionList isCompact isHorizontal>
+              <DescriptionList
+                isCompact
+                isHorizontal
+                className="opp-cluster-execution__dl"
+              >
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Cluster')}</DescriptionListTerm>
                   <DescriptionListDescription>
@@ -188,11 +258,19 @@ const ClusterExecutionCard: FC<ClusterExecutionCardProps> = ({
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               </DescriptionList>
-              <Divider className="opp-cluster-execution__divider" />
-              <Title headingLevel="h5" size="md" className="opp-cluster-execution__sub-title">
+              <Divider />
+              <Title
+                headingLevel="h4"
+                size="md"
+                className="opp-cluster-execution__sub-title"
+              >
                 {t('Secret sync')}
               </Title>
-              <DescriptionList isCompact isHorizontal>
+              <DescriptionList
+                isCompact
+                isHorizontal
+                className="opp-cluster-execution__dl"
+              >
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Last sync')}</DescriptionListTerm>
                   <DescriptionListDescription>{secretSync.lastSync}</DescriptionListDescription>
@@ -204,14 +282,27 @@ const ClusterExecutionCard: FC<ClusterExecutionCardProps> = ({
                   </DescriptionListDescription>
                 </DescriptionListGroup>
               </DescriptionList>
-              <a className="opp-cluster-execution__external-link" href="#">
-                <ExternalLinkAltIcon /> {t('Open')} {clusterName} {t('console')}
-              </a>
-            </GridItem>
-          </Grid>
-        </CardBody>
-      </Card>
-    </div>
+              <Button
+                variant="link"
+                isInline
+                component="a"
+                href="#"
+                icon={<ExternalLinkAltIcon />}
+              >
+                {t('Open')} {clusterName} {t('console')}
+              </Button>
+            </Flex>
+          </FlexItem>
+        </Flex>
+
+        {logs?.length > 0 && (
+          <>
+            <Divider className="opp-cluster-execution__logs-divider" />
+            <AggregatedLogsSection logs={logs} clusterName={clusterName} />
+          </>
+        )}
+      </CardBody>
+    </Card>
   );
 };
 
