@@ -1,14 +1,65 @@
 .opp-cluster-execution {
   margin-bottom: var(--pf-t--global--spacer--lg);
 
-  // Equal-width columns separated by vertical dividers; each column stretches
-  // to full height so the dividers span the tallest panel.
-  &__columns {
-    align-items: stretch;
+  // The console flattens cards (card background == page background, no border
+  // or shadow), so the section blends into the page. Restore a proper raised
+  // card surface with a border, radius and elevation that read in both themes.
+  --pf-v6-c-card--BackgroundColor: var(
+    --pf-t--global--background--color--floating--default
+  );
+  border: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
+  border-radius: var(--pf-t--global--border--radius--medium);
+  box-shadow: var(--pf-t--global--box-shadow--sm);
+
+  // Three columns that share row tracks so the horizontal divider between each
+  // column's upper and lower section lands on one shared line, and the vertical
+  // dividers span the full height. Stacks to a single column on small screens.
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--pf-t--global--spacer--lg);
+    grid-template-areas:
+      'c1t'
+      'c1b'
+      'c2t'
+      'c2b'
+      'c3t'
+      'c3b';
+
+    .opp-cluster-execution__vdivider,
+    .opp-cluster-execution__hr {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: var(--pf-t--global--spacer--lg);
+      row-gap: 0;
+      align-items: start;
+      grid-template-areas:
+        'c1t v1 c2t v2 c3t'
+        'h1  v1 h2  v2 h3'
+        'c1b v1 c2b v2 c3b';
+
+      .opp-cluster-execution__vdivider {
+        display: block;
+        align-self: stretch;
+      }
+      .opp-cluster-execution__hr {
+        display: block;
+        margin: var(--pf-t--global--spacer--md) 0;
+      }
+    }
   }
-  &__panel {
-    height: 100%;
+
+  // Each cell stacks its heading and content with one consistent rhythm.
+  &__block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pf-t--global--spacer--sm);
   }
+
   // Lock a consistent horizontal term width across every panel so all
   // term/value pairs line up identically column-to-column.
   &__dl {
@@ -22,7 +73,7 @@
   &__logs-divider {
     margin: var(--pf-t--global--spacer--lg) 0;
   }
-  &__logs .opp-cluster-execution__panel-title {
+  &__logs .pf-v6-c-title {
     margin-bottom: var(--pf-t--global--spacer--sm);
   }
 }

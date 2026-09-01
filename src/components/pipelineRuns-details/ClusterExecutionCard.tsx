@@ -11,16 +11,10 @@ import {
   DescriptionListDescription,
   Divider,
   Flex,
-  FlexItem,
   Title,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
-import {
-  ClusterBadge,
-  RoutingPill,
-  ResourceMeter,
-  DispatchTimeline,
-} from '../cluster';
+import { ClusterBadge, ResourceMeter, DispatchTimeline } from '../cluster';
 import { useTranslation } from 'react-i18next';
 import type { PipelineRunClusterData } from '../__demo__/mock-cluster-data';
 import AggregatedLogsSection from './AggregatedLogsSection';
@@ -54,246 +48,225 @@ const ClusterExecutionCard: FC<ClusterExecutionCardProps> = ({
 
   return (
     <Card className="opp-cluster-execution">
-      <CardHeader
-        actions={{
-          actions: (
-            <ClusterBadge
-              clusterName={clusterName}
-              clusterType={clusterInfo.type}
-              region={clusterInfo.region}
-            />
-          ),
-          hasNoOffset: true,
-        }}
-      >
-        <CardTitle component="h2">{t('Cluster Execution')}</CardTitle>
+      <CardHeader>
+        <Flex
+          alignItems={{ default: 'alignItemsCenter' }}
+          gap={{ default: 'gapMd' }}
+        >
+          <CardTitle component="h2">{t('Cluster Execution')}</CardTitle>
+          <ClusterBadge
+            clusterName={clusterName}
+            clusterType={clusterInfo.type}
+            region={clusterInfo.region}
+          />
+        </Flex>
       </CardHeader>
 
       <CardBody>
-        <Flex
-          direction={{ default: 'column', md: 'row' }}
-          alignItems={{ default: 'alignItemsStretch' }}
-          gap={{ default: 'gapLg' }}
-          className="opp-cluster-execution__columns"
-        >
-          {/* Panel 1: Dispatch & Routing */}
-          <FlexItem flex={{ default: 'flex_1' }}>
-            <Flex
-              direction={{ default: 'column' }}
-              gap={{ default: 'gapMd' }}
-              className="opp-cluster-execution__panel"
+        {/* A 3-column grid whose columns share row tracks, so the horizontal
+            divider between each column's upper/lower section lands on one
+            shared line and the vertical dividers span the full height. */}
+        <div className="opp-cluster-execution__grid">
+          {/* Row 1 — upper sections */}
+          <div
+            className="opp-cluster-execution__block"
+            style={{ gridArea: 'c1t' }}
+          >
+            <Title headingLevel="h3" size="md">
+              {t('Dispatch & Routing')}
+            </Title>
+            <DescriptionList
+              isCompact
+              isHorizontal
+              className="opp-cluster-execution__dl"
             >
-              <Title
-                headingLevel="h3"
-                size="md"
-                className="opp-cluster-execution__panel-title"
-              >
-                {t('Dispatch & Routing')}
-              </Title>
-              <DescriptionList
-                isCompact
-                isHorizontal
-                className="opp-cluster-execution__dl"
-              >
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Dispatched by')}</DescriptionListTerm>
+                <DescriptionListDescription>{routing.dispatchedBy}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Target cluster')}</DescriptionListTerm>
+                <DescriptionListDescription>{routing.targetCluster}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Routing reason')}</DescriptionListTerm>
+                <DescriptionListDescription>{routing.reason}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Queue wait')}</DescriptionListTerm>
+                <DescriptionListDescription>{routing.queueWait}</DescriptionListDescription>
+              </DescriptionListGroup>
+              {routing.alternatives && (
                 <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Dispatched by')}</DescriptionListTerm>
-                  <DescriptionListDescription>{routing.dispatchedBy}</DescriptionListDescription>
+                  <DescriptionListTerm>{t('Alternatives')}</DescriptionListTerm>
+                  <DescriptionListDescription>{routing.alternatives}</DescriptionListDescription>
                 </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Target cluster')}</DescriptionListTerm>
-                  <DescriptionListDescription>{routing.targetCluster}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Routing reason')}</DescriptionListTerm>
-                  <DescriptionListDescription>{routing.reason}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Queue wait')}</DescriptionListTerm>
-                  <DescriptionListDescription>{routing.queueWait}</DescriptionListDescription>
-                </DescriptionListGroup>
-                {routing.alternatives && (
-                  <DescriptionListGroup>
-                    <DescriptionListTerm>{t('Alternatives')}</DescriptionListTerm>
-                    <DescriptionListDescription>{routing.alternatives}</DescriptionListDescription>
-                  </DescriptionListGroup>
-                )}
-              </DescriptionList>
-              <div>
-                <RoutingPill
-                  quality={routing.routeQuality}
-                  text={
-                    routing.routeQuality === 'optimal'
-                      ? t('Optimal route')
-                      : t('Constrained route')
-                  }
-                />
+              )}
+            </DescriptionList>
+          </div>
+
+          <div
+            className="opp-cluster-execution__block"
+            style={{ gridArea: 'c2t' }}
+          >
+            <Title headingLevel="h3" size="md">
+              {t('Cluster Resources (at execution)')}
+            </Title>
+            <div>
+              <ResourceMeter label={t('CPU')} value={resources.cpuPercent} />
+              <ResourceMeter label={t('Memory')} value={resources.memoryPercent} />
+              <ResourceMeter
+                label={t('Queue')}
+                value={queuePercent}
+                displayValue={queueDisplay}
+              />
+              <div className="opp-cluster-execution__node-info">
+                {t('Node:')} <strong>{resources.node}</strong>
+                <br />
+                {resources.vCPU} vCPU &middot; {resources.ramGi} Gi RAM
               </div>
-              <Divider />
-              <Title
-                headingLevel="h4"
-                size="md"
-                className="opp-cluster-execution__sub-title"
-              >
-                {t('Dispatch timeline')}
-              </Title>
-              <DispatchTimeline timeline={timeline} />
-            </Flex>
-          </FlexItem>
+            </div>
+          </div>
 
-          <Divider orientation={{ default: 'horizontal', md: 'vertical' }} />
-
-          {/* Panel 2: Cluster Resources */}
-          <FlexItem flex={{ default: 'flex_1' }}>
-            <Flex
-              direction={{ default: 'column' }}
-              gap={{ default: 'gapMd' }}
-              className="opp-cluster-execution__panel"
+          <div
+            className="opp-cluster-execution__block"
+            style={{ gridArea: 'c3t' }}
+          >
+            <Title headingLevel="h3" size="md">
+              {t('Cluster Info')}
+            </Title>
+            <DescriptionList
+              isCompact
+              isHorizontal
+              className="opp-cluster-execution__dl"
             >
-              <Title
-                headingLevel="h3"
-                size="md"
-                className="opp-cluster-execution__panel-title"
-              >
-                {t('Cluster Resources (at execution)')}
-              </Title>
-              <div>
-                <ResourceMeter label={t('CPU')} value={resources.cpuPercent} />
-                <ResourceMeter label={t('Memory')} value={resources.memoryPercent} />
-                <ResourceMeter
-                  label={t('Queue')}
-                  value={queuePercent}
-                  displayValue={queueDisplay}
-                />
-                <div className="opp-cluster-execution__node-info">
-                  {t('Node:')} <strong>{resources.node}</strong>
-                  <br />
-                  {resources.vCPU} vCPU &middot; {resources.ramGi} Gi RAM
-                </div>
-              </div>
-              <Divider />
-              <Title
-                headingLevel="h4"
-                size="md"
-                className="opp-cluster-execution__sub-title"
-              >
-                {t('ClusterQueue')}
-              </Title>
-              <DescriptionList
-                isCompact
-                isHorizontal
-                className="opp-cluster-execution__dl"
-              >
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
-                  <DescriptionListDescription>{clusterQueue.name}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Flavor')}</DescriptionListTerm>
-                  <DescriptionListDescription>{clusterQueue.flavor}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Pending')}</DescriptionListTerm>
-                  <DescriptionListDescription>{clusterQueue.pending}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Active')}</DescriptionListTerm>
-                  <DescriptionListDescription>{clusterQueue.active}</DescriptionListDescription>
-                </DescriptionListGroup>
-              </DescriptionList>
-            </Flex>
-          </FlexItem>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Cluster')}</DescriptionListTerm>
+                <DescriptionListDescription>
+                  <ClusterBadge
+                    clusterName={clusterName}
+                    clusterType={clusterInfo.type}
+                  />
+                </DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Region')}</DescriptionListTerm>
+                <DescriptionListDescription>
+                  {clusterInfo.region} ({clusterInfo.regionName})
+                </DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Provider')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterInfo.provider}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('OCP version')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterInfo.ocpVersion}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Pipelines ver.')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterInfo.pipelinesVersion}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterInfo.status}</DescriptionListDescription>
+              </DescriptionListGroup>
+            </DescriptionList>
+          </div>
 
-          <Divider orientation={{ default: 'horizontal', md: 'vertical' }} />
+          {/* Vertical dividers spanning all rows */}
+          <Divider
+            orientation={{ default: 'vertical' }}
+            className="opp-cluster-execution__vdivider"
+            style={{ gridArea: 'v1' }}
+          />
+          <Divider
+            orientation={{ default: 'vertical' }}
+            className="opp-cluster-execution__vdivider"
+            style={{ gridArea: 'v2' }}
+          />
 
-          {/* Panel 3: Cluster Info */}
-          <FlexItem flex={{ default: 'flex_1' }}>
-            <Flex
-              direction={{ default: 'column' }}
-              gap={{ default: 'gapMd' }}
-              className="opp-cluster-execution__panel"
+          {/* Row 2 — horizontal dividers, one per column, on a shared line */}
+          <Divider className="opp-cluster-execution__hr" style={{ gridArea: 'h1' }} />
+          <Divider className="opp-cluster-execution__hr" style={{ gridArea: 'h2' }} />
+          <Divider className="opp-cluster-execution__hr" style={{ gridArea: 'h3' }} />
+
+          {/* Row 3 — lower sections */}
+          <div
+            className="opp-cluster-execution__block"
+            style={{ gridArea: 'c1b' }}
+          >
+            <Title headingLevel="h4" size="md">
+              {t('Dispatch timeline')}
+            </Title>
+            <DispatchTimeline timeline={timeline} />
+          </div>
+
+          <div
+            className="opp-cluster-execution__block"
+            style={{ gridArea: 'c2b' }}
+          >
+            <Title headingLevel="h4" size="md">
+              {t('ClusterQueue')}
+            </Title>
+            <DescriptionList
+              isCompact
+              isHorizontal
+              className="opp-cluster-execution__dl"
             >
-              <Title
-                headingLevel="h3"
-                size="md"
-                className="opp-cluster-execution__panel-title"
-              >
-                {t('Cluster Info')}
-              </Title>
-              <DescriptionList
-                isCompact
-                isHorizontal
-                className="opp-cluster-execution__dl"
-              >
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Cluster')}</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    <ClusterBadge
-                      clusterName={clusterName}
-                      clusterType={clusterInfo.type}
-                    />
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Region')}</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    {clusterInfo.region} ({clusterInfo.regionName})
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Provider')}</DescriptionListTerm>
-                  <DescriptionListDescription>{clusterInfo.provider}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('OCP version')}</DescriptionListTerm>
-                  <DescriptionListDescription>{clusterInfo.ocpVersion}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Pipelines ver.')}</DescriptionListTerm>
-                  <DescriptionListDescription>{clusterInfo.pipelinesVersion}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    {clusterInfo.status}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-              </DescriptionList>
-              <Divider />
-              <Title
-                headingLevel="h4"
-                size="md"
-                className="opp-cluster-execution__sub-title"
-              >
-                {t('Secret sync')}
-              </Title>
-              <DescriptionList
-                isCompact
-                isHorizontal
-                className="opp-cluster-execution__dl"
-              >
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Last sync')}</DescriptionListTerm>
-                  <DescriptionListDescription>{secretSync.lastSync}</DescriptionListDescription>
-                </DescriptionListGroup>
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('Secrets synced')}</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    {secretSync.synced} / {secretSync.total}
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-              </DescriptionList>
-              <Button
-                variant="link"
-                isInline
-                component="a"
-                href="#"
-                icon={<ExternalLinkAltIcon />}
-              >
-                {t('Open')} {clusterName} {t('console')}
-              </Button>
-            </Flex>
-          </FlexItem>
-        </Flex>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Name')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterQueue.name}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Flavor')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterQueue.flavor}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Pending')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterQueue.pending}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Active')}</DescriptionListTerm>
+                <DescriptionListDescription>{clusterQueue.active}</DescriptionListDescription>
+              </DescriptionListGroup>
+            </DescriptionList>
+          </div>
+
+          <div
+            className="opp-cluster-execution__block"
+            style={{ gridArea: 'c3b' }}
+          >
+            <Title headingLevel="h4" size="md">
+              {t('Secret sync')}
+            </Title>
+            <DescriptionList
+              isCompact
+              isHorizontal
+              className="opp-cluster-execution__dl"
+            >
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Last sync')}</DescriptionListTerm>
+                <DescriptionListDescription>{secretSync.lastSync}</DescriptionListDescription>
+              </DescriptionListGroup>
+              <DescriptionListGroup>
+                <DescriptionListTerm>{t('Secrets synced')}</DescriptionListTerm>
+                <DescriptionListDescription>
+                  {secretSync.synced} / {secretSync.total}
+                </DescriptionListDescription>
+              </DescriptionListGroup>
+            </DescriptionList>
+            <Button
+              variant="link"
+              isInline
+              component="a"
+              href="#"
+              icon={<ExternalLinkAltIcon />}
+            >
+              {t('Open')} {clusterName} {t('console')}
+            </Button>
+          </div>
+        </div>
 
         {logs?.length > 0 && (
           <>

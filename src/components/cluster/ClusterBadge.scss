@@ -1,4 +1,13 @@
 .opp-cluster-badge {
+  // Vertically center the icon against the label text. The icon wrapper is
+  // stretched to the content height and centers the SVG within it, so its
+  // optical center matches the text line box instead of sitting slightly high.
+  .pf-v6-c-label__icon {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+  }
+
   &--hub {
     --pf-v6-c-label--BackgroundColor: rgba(138, 109, 215, 0.15);
     --pf-v6-c-label--Color: #b094e8;
