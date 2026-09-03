@@ -59,7 +59,7 @@ const FleetDashboard: FC = () => {
           onSelect={(_e, key) => setActiveTab(Number(key))}
           aria-label={t('Overview tabs')}
         >
-          <Tab eventKey={0} title={<TabTitleText>{t('Overview')}</TabTitleText>} />
+          <Tab eventKey={0} title={<TabTitleText>{t('Dashboard')}</TabTitleText>} />
           <Tab eventKey={1} title={<TabTitleText>{t('Build Times')}</TabTitleText>} />
           <Tab
             eventKey={2}

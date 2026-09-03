@@ -23,7 +23,7 @@ import {
 } from '@patternfly/react-charts/victory';
 import FleetStatCard from './FleetStatCard';
 import SpokeHealthTable from './SpokeHealthTable';
-import FailureHeatmap from './FailureHeatmap';
+import FailureBySpokeChart from './FailureBySpokeChart';
 import type { FleetFilterState } from './types';
 import {
   getDispatchThroughput,
@@ -167,7 +167,7 @@ const FleetOverviewTab: FC<FleetOverviewTabProps> = ({ filter }) => {
           </ChartCard>
         </GridItem>
         <GridItem md={6}>
-          <FailureHeatmap metrics={metrics} />
+          <FailureBySpokeChart metrics={metrics} />
         </GridItem>
       </Grid>
 

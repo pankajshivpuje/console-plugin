@@ -21,21 +21,6 @@
 .opp-fleet-value--danger { color: var(--pf-t--global--color--status--danger--default); }
 .opp-fleet-value--success { color: var(--pf-t--global--color--status--success--default); }
 
-.opp-fleet-heatmap {
-  display: grid;
-  gap: 2px;
-  &__cell {
-    aspect-ratio: 1;
-    border-radius: 2px;
-    min-height: 18px;
-  }
-  &__rowlabel,
-  &__collabel {
-    font-size: var(--pf-t--global--font--size--xs);
-    color: var(--pf-t--global--text--color--subtle);
-  }
-}
-
 .opp-fleet-alert {
   border-inline-start: 3px solid transparent;
   margin-block-end: var(--pf-t--global--spacer--md);
