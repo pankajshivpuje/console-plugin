@@ -42,13 +42,23 @@
         'h1  v1 h2  v2 h3'
         'c1b v1 c2b v2 c3b';
 
+      // The console environment leaves PatternFly's
+      // `--pf-v6-c-divider--BackgroundColor` unset, so the <hr> dividers draw
+      // no line (transparent background, zero border). Paint the line
+      // ourselves from the theme border token. `align-self: stretch` makes the
+      // vertical dividers span the full grid height (all three row tracks), so
+      // the line runs from the top section clear through the bottom section.
       .opp-cluster-execution__vdivider {
         display: block;
         align-self: stretch;
+        width: var(--pf-t--global--border--width--regular);
+        background-color: var(--pf-t--global--border--color--default);
       }
       .opp-cluster-execution__hr {
         display: block;
         margin: var(--pf-t--global--spacer--md) 0;
+        height: var(--pf-t--global--border--width--regular);
+        background-color: var(--pf-t--global--border--color--default);
       }
     }
   }

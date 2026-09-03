@@ -7,7 +7,6 @@ import {
   Tr,
   Td,
   Th,
-  ExpandableRowContent,
   ThProps,
 } from '@patternfly/react-table';
 import {
@@ -32,11 +31,7 @@ import {
   LazyActionMenu,
 } from '@openshift-console/dynamic-plugin-sdk-internal';
 import ClusterBadge from '../cluster/ClusterBadge';
-import {
-  getClusterDataForPipelineRun,
-  PipelineRunClusterData,
-} from '../__demo__/mock-cluster-data';
-import PipelineRunExpandedContent from './PipelineRunExpandedContent';
+import { getClusterDataForPipelineRun } from '../__demo__/mock-cluster-data';
 import PipelineRunVulnerabilities from '../pipelines-list/status/PipelineRunVulnerabilities';
 import LinkedPipelineRunTaskStatus from '../pipelines-list/status/LinkedPipelineRunTaskStatus';
 import PipelineRunStatusContent from '../status/PipelineRunStatusContent';
@@ -70,26 +65,14 @@ const PLRStatus: FC<{ obj: PipelineRunKind }> = memo(({ obj }) => (
   />
 ));
 
-const NUM_COLUMNS = 9;
-
 const MultiClusterPipelineRunsTable: FC<MultiClusterPipelineRunsTableProps> = ({
   data,
   loaded,
   loadError,
 }) => {
   const { t } = useTranslation('plugin__pipelines-console-plugin');
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [activeSortIndex, setActiveSortIndex] = useState<number | null>(null);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc'>('desc');
-
-  const toggleExpand = useCallback((name: string) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
-      else next.add(name);
-      return next;
-    });
-  }, []);
 
   const getSortValue = useCallback(
     (plr: PipelineRunKind, index: number): string => {
@@ -165,7 +148,6 @@ const MultiClusterPipelineRunsTable: FC<MultiClusterPipelineRunsTableProps> = ({
     <Table aria-label={t('PipelineRuns')} variant="compact">
       <Thead>
         <Tr>
-          <Th screenReaderText="Row expansion" />
           <Th sort={getSortParams(0)}>{t('Name')}</Th>
           <Th sort={getSortParams(1)}>{t('Cluster')}</Th>
           <Th>{t('Vulnerabilities')}</Th>
@@ -176,28 +158,16 @@ const MultiClusterPipelineRunsTable: FC<MultiClusterPipelineRunsTableProps> = ({
           <Th screenReaderText="Actions" />
         </Tr>
       </Thead>
-      {sortedData.map((plr, rowIndex) => {
+      {sortedData.map((plr) => {
         const name = plr.metadata?.name || '';
         const clusterData = getClusterDataForPipelineRun(name);
-        const isExpanded = expandedRows.has(name);
         const hasClusterData = !!clusterData;
         const clusterName =
           plr.metadata?.annotations?.['tekton.dev/cluster'] || '';
 
         return (
-          <Tbody key={plr.metadata?.uid || name} isExpanded={isExpanded}>
+          <Tbody key={plr.metadata?.uid || name}>
             <Tr>
-              <Td
-                expand={
-                  hasClusterData
-                    ? {
-                        rowIndex,
-                        isExpanded,
-                        onToggle: () => toggleExpand(name),
-                      }
-                    : undefined
-                }
-              />
               <Td dataLabel={t('Name')}>
                 <ResourceLinkWithIcon
                   groupVersionKind={getGroupVersionKindForModel(
@@ -278,18 +248,6 @@ const MultiClusterPipelineRunsTable: FC<MultiClusterPipelineRunsTableProps> = ({
                 />
               </Td>
             </Tr>
-            {hasClusterData && (
-              <Tr isExpanded={isExpanded}>
-                <Td colSpan={NUM_COLUMNS} noPadding>
-                  <ExpandableRowContent>
-                    <PipelineRunExpandedContent
-                      clusterData={clusterData as PipelineRunClusterData}
-                      clusterName={clusterName}
-                    />
-                  </ExpandableRowContent>
-                </Td>
-              </Tr>
-            )}
           </Tbody>
         );
       })}
